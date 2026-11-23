@@ -608,7 +608,7 @@ Im lokalen Demo-Modus entfallen die Verbindungen zu Supabase; ohne Netz zusätzl
 ## Ordnerstruktur
 ```
 src/
-  app/                      Routen (App Router): (entdecken)/page.tsx = Entdecken, (entdecken)/treffen/[id]/ = Detail,
+  app/                      Routen (App Router): page.tsx = Landing (F-31, `components/landing`), (entdecken)/entdecken/page.tsx = Entdecken, (entdecken)/treffen/[id]/ = Detail,
                             meine-treffen/, erstellen/, profil/, anmelden/
   components/
     app/                    App-Rahmen, Seitenrahmen, Toasts, app-services (DataServices für die Oberfläche)
@@ -621,7 +621,7 @@ src/
     navigation/             Tab-Leiste (mobil), Seitenleiste (Desktop)
     profile/                Profil mit Zählern „dabei“ / „organisiert“
     sheet/                  Bottom Sheet mit Rastpunkten
-  hooks/                    use-event-list, use-event-detail, use-participation, use-dialog-focus, use-media-query, use-stored-flag
+  hooks/                    use-event-list, use-event-detail, use-participation, use-dialog-focus, use-media-query
   lib/
     events/                 Kernlogik Treffen (rein): event-model, stored-event, event-validation, event-search,
                             participation, event-creation, event-presentation, list-order, viewer-events,

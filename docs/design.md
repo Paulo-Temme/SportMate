@@ -60,7 +60,7 @@ ausgewählte Marker nutzt den Akzent.
 
 ## Typografie
 - Schrift: **Schibsted Grotesk** (über `next/font/google`, selbst gehostet), Fallback system-ui.
-- Größen: 28/22/17/15/13 px. Überschriften 600, Fließtext 400, Zahlen tabellarisch (`font-variant-numeric: tabular-nums`).
+- Größen: 28/22/17/15/13 px. Ausnahme Landing Page (`/`): Hero-Überschrift `clamp(34px, 9.4vw, 60px)`, Zeile 2 in `--ink-2` (Entscheidung 23.11.2026, F-31). Überschriften 600, Fließtext 400, Zahlen tabellarisch (`font-variant-numeric: tabular-nums`).
 - Keine Großbuchstaben-Überschriften mit Sperrung, außer kleinen Labels (12 px, 500).
 
 ## Karte

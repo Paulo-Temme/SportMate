@@ -51,14 +51,14 @@ Gemeinsame Begriffe für alle Akzeptanzkriterien:
 | E-6 | F-28 | Hinweis, wenn Mindestzahl 2 Stunden vor Beginn fehlt | DR-3.2.3 | M | Could | nein | offen | | |
 | E-6 | F-29 | E-Mail bei kurzfristiger Absage | FB-36, FB-20 | M | Could | nein | offen | | |
 | E-6 | F-30 | Nachricht an alle Teilnehmenden | FB-56 (Widerspruch FB-40, FB-21) | M | Won't | nein | offen | | |
-| E-7 Einstieg und Betrieb | F-31 | Startseite mit Erklärung und zwei Einstiegen | FB-58, H-2 | S | Should | nein | teilweise | | |
+| E-7 Einstieg und Betrieb | F-31 | Startseite mit Erklärung und zwei Einstiegen | FB-58, H-2 | S | Should | nein | umgesetzt | | |
 | E-7 | F-32 | Lokaler Demo-Modus ohne Server | C-2, Z5, SM-R30 | M | Must | ja | umgesetzt | | |
 | E-8 Sportstätten-Buchungspilot | F-33 | Hallenanfrage mit Status „Angefragt“ | DR-5.1.1–2, DR-5.2.1, SM-R16, FB-24, FB-26, FB-39 | L | Could | nein | offen | | |
 | E-8 | F-34 | Preis und Stornobedingungen vor dem Absenden | DR-5.4.1–2, SM-R15, FB-27, FB-39 | S | Could | nein | offen | | |
 | E-8 | F-35 | Betreiber bestätigt oder lehnt ab, keine Doppelbestätigung | DR-5.2.2, DR-5.3.1, SM-R17–20, SM-R29, NFR-6, NFR-7, FB-28 | L | Won't | nein | offen | | |
 
 Release 1: 14 Stories (13 Must, 1 Should). Stand Endlauf: 11 umgesetzt, 3 teilweise (F-12, F-13, F-22). Außerhalb
-von Release 1 vorgezogen: F-09, F-25 umgesetzt; F-14, F-15, F-20, F-31 teilweise. Vorgeschlagene Reihenfolge der Umsetzung:
+von Release 1 vorgezogen: F-09, F-25 umgesetzt; F-31 umgesetzt (Landing); F-14, F-15, F-20 teilweise. Vorgeschlagene Reihenfolge der Umsetzung:
 F-32 → F-05 → F-12 → F-13 → F-06 → F-07 → F-08 → F-01 → F-02 → F-17 → F-22 → F-23 → F-24 → F-18.
 Hinweis: Bis 25.11.2026 bleiben zwei Tage. Was davon tatsächlich fertig wird, entscheidet das Team; Reihenfolge so,
 dass jeder Zwischenstand vorführbar ist (Demo-Modus zuerst, Supabase-Konto danach).
@@ -370,11 +370,16 @@ Ziel: Z2.2. Kanal ist Annahme (FB-20, FB-36: In-App reicht nicht immer).
 ### F-31 Startseite mit Erklärung und zwei Einstiegen
 - **User Story:** Als neuer Besucher möchte ich auf einer Startseite kurz erfahren, was SportMate ist, damit ich nicht mitten in die Anwendung geworfen werde.
 - **Quelle:** FB-58, H-2.
-- **Priorität / Größe / Release 1:** Should / S / nein · **Status:** teilweise (als Erstbesuch-Hinweis auf Entdecken umgesetzt (E2E AK1/AK2 grün), keine eigene Startseite unter `/`)
+- **Priorität / Größe / Release 1:** Should / S / nein · **Status:** umgesetzt (23.11.2026, Landing unter `/`, Entdecken unter `/entdecken`; AK1–AK8 E2E grün in `e2e/f-31-landing.spec.ts`, Komponententests `landing-view.test.tsx`). AKs am 23.11.2026 vom Orchestrator an die Umsetzung angepasst (Schritte „Finden → Mitmachen → Spielen“ statt Erstbesuch-Hinweis).
 - **Akzeptanzkriterien:**
-  - AK1: Gegeben die Adresse `/`. Wenn sie geöffnet wird, dann zeigt sie eine Überschrift mit Erklärung, die drei Schritte „Sportart auswählen → Treffen finden → Gemeinsam Sport machen“ und die Buttons „Treffen entdecken“ und „Treffen erstellen“.
-  - AK2: Gegeben die Startseite. Wenn „Treffen entdecken“ gewählt wird, dann öffnet sich die Treffenübersicht.
-  - AK3: Gegeben eine nicht angemeldete Person. Wenn sie „Treffen erstellen“ wählt, dann erscheint die Anmeldung (F-02 AK4).
+  - AK1: Gegeben die Adresse `/`. Wenn sie geöffnet wird, dann zeigt sie eine Überschrift mit „Sport in Flensburg“, „So funktioniert's“ mit den Schritten „Finden → Mitmachen → Spielen“ und die Einstiege „Treffen entdecken“ und „Treffen erstellen“, ohne Tab-Leiste; Seitentitel „SportMate – Sporttreffen in Flensburg“.
+  - AK2: Gegeben die Startseite. Wenn „Treffen entdecken“ gewählt wird, dann öffnet sich `/entdecken` mit Karte und Trefferliste, „Entdecken“ ist in der Navigation aktiv.
+  - AK3: Gegeben die Startseite. Wenn „Treffen erstellen“ gewählt wird, dann erscheint für Gäste die Anmeldung (F-02 AK4), für Angemeldete das Formular unter `/erstellen`.
+  - AK4: Gegeben kommende Treffen mit freien Plätzen. Wenn die Startseite geladen ist, dann zeigt die Kartenvorschau 1–4 dieser Treffen als nicht überlappende Marker; ein Marker führt zu `/treffen/[id]`, das hervorgehobene Treffen wird mit Titel und freien Plätzen genannt.
+  - AK5: Gegeben keine kommenden Treffen oder ein Ladefehler. Wenn die Startseite geladen ist, dann zeigt die Vorschau keine Marker, sondern einen erklärenden Text; beide Einstiege bleiben sichtbar.
+  - AK6: Gegeben 360 px Breite bzw. „Bewegung reduzieren“. Wenn die Startseite geöffnet wird, dann gibt es keinen horizontalen Überlauf bzw. sie lädt ohne Konsolen- oder Seitenfehler.
+  - AK7: Gegeben Startseite bzw. Entdecken auf dem Desktop. Der Kopf zeigt Gästen „Anmelden“ (→ `/anmelden`), Angemeldeten „Profil“; das Logo führt von überall zu `/`.
+  - AK8: Gegeben die Startseite. Sie nennt unter „Was SportMate nicht ist“: kein Verein, kein Gruppenchat, keine Hallenbuchung; die Fußzeile nennt „Hochschulprojekt WS 2026/27“, © OpenStreetMap-Mitwirkende, OpenFreeMap und dass Beispieltreffen fiktiv sind.
 
 ### F-32 Lokaler Demo-Modus ohne Server
 - **User Story:** Als Team möchte ich die App ohne Server mit gekennzeichneten Demodaten starten, damit Präsentationen und Tests unabhängig von Netz und Supabase funktionieren.
