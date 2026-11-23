@@ -32,7 +32,7 @@ export type EventRow = {
 export const eventRowColumns =
   'id, organizer_id, organizer_name, is_demo, sport, title, description, meeting_point, location_name, latitude, longitude, ' +
   'starts_at, ends_at, capacity, min_participants, level, age_group, cost_cents, bring_along, participant_count, ' +
-  'external_participants, status, organizer:profiles(display_name)';
+  'external_participants, status, organizer:profiles!events_organizer_id_fkey(display_name)';
 
 /** Wer liest: angemeldete Person (oder `null`) und die Treffen, an denen sie teilnimmt. */
 export type EventViewer = { userId: string | null; participatingIds: ReadonlySet<string> };
