@@ -38,5 +38,6 @@ Positiv, negativ, was jetzt beachtet werden muss. Wann die Entscheidung neu gepr
 | [0007](0007-datenzugriff-aus-dem-browser.md) | Datenzugriff direkt aus dem Browser (supabase-js + RLS) | vorgeschlagen |
 | [0008](0008-seed-treffen-ohne-konto.md) | Seed-Treffen ohne Konto | vorgeschlagen |
 | [0009](0009-filtern-in-der-kernlogik.md) | Suche und Filter in der Kernlogik statt in der Datenbank | vorgeschlagen |
+| [0010](0010-demo-modus-im-arbeitsspeicher.md) | Demo-Modus hält Treffen nur im Arbeitsspeicher, Produktion nutzt Supabase | vorgeschlagen |
 
 Alle Notizen vom 23.11.2026 (architect), Freigabe durch das Team offen.

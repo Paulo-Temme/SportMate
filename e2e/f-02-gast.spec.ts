@@ -48,7 +48,7 @@ test('F-31 AK1/AK2: Erstbesuch-Hinweis erklärt SportMate in drei Schritten und 
 
 test('F-32 AK1: im lokalen Modus steht dauerhaft der Demo-Hinweis', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByText('Demo-Modus – Beispieldaten, nichts wird gespeichert')).toBeVisible();
+  await expect(page.getByText('Demo-Modus – Beispieldaten, Änderungen gehen beim Neuladen verloren')).toBeVisible();
   await page.goto('/profil');
-  await expect(page.getByText('Demo-Modus – Beispieldaten, nichts wird gespeichert')).toBeVisible();
+  await expect(page.getByText('Demo-Modus – Beispieldaten, Änderungen gehen beim Neuladen verloren')).toBeVisible();
 });

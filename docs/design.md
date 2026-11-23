@@ -34,9 +34,19 @@ zurückhaltenden Animationen. Kein "KI-Look". Die Karte ist kein eingebettetes F
 | `--accent-soft` | `#FCE9E2` | Hintergrund aktiver Chips |
 | `--ok` | `#1F8A5B` | "Plätze frei", bestätigt |
 | `--warn` | `#B7791F` | "Fast voll", Mindestteilnehmer noch nicht erreicht |
+| `--accent-strong` | `#D2441B` | Flächen mit weißer Schrift: "Jetzt teilnehmen", ausgewählter Marker (Kontrast Weiß darauf 4,6:1) |
+| `--ok-ink` | `#1B7A50` | Text in Ok-Farbe auf Weiß, z. B. "5 von 10 Plätzen frei", "Dabei" (5,3:1) |
+| `--warn-ink` | `#8F5C12` | Text in Warnfarbe auf Weiß, z. B. "Sucht noch Mitspielende" (5,7:1) |
 | Radius | 12 px (Elemente), 24 px (Sheets), 999 px (Chips, Suchleiste) | |
 | Schatten | nur `0 1px 2px rgba(21,23,26,.06), 0 8px 24px rgba(21,23,26,.08)` für schwebende Elemente | |
 | Abstand | 4er-Raster (4, 8, 12, 16, 24, 32) | |
+
+**Warum drei zusätzliche Farbtöne (eingeführt vom UI-Agenten, 23.11.2026):** Der Akzent `#E8552B` erreicht mit
+weißer Schrift nur 3,6:1 und verfehlt damit WCAG AA (4,5:1 für normalen Text). `--accent-strong` ist derselbe
+Farbton, dunkler, und erreicht 4,6:1; `--accent` bleibt für Flächen ohne Text (Auswahlbalken, Fokus-Akzente).
+Ebenso sind `--ok` (4,3:1) und `--warn` (3,6:1) als Textfarbe auf Weiß zu hell für AA; `--ok-ink` und `--warn-ink` sind die
+dunkleren Textvarianten desselben Tons. Es bleibt bei einem Akzent: Die neuen Werte sind Abstufungen, keine neuen
+Farben. Kontrastwerte nach der WCAG-2.1-Formel für relative Leuchtdichte, nachgerechnet am 23.11.2026 (coder).
 
 Sportarten bekommen **keine** eigenen Knallfarben, sondern ein Lucide-Icon im neutralen Kreis. Ausnahme: der
 ausgewählte Marker nutzt den Akzent.

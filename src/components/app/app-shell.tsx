@@ -13,7 +13,7 @@ function ShellFrame({ children }: { children: ReactNode }) {
     <div className={styles.shell} data-demo={demo}>
       {demo && (
         <p className={styles.demoBanner} data-testid="demo-banner">
-          Demo-Modus – Beispieldaten, nichts wird gespeichert
+          Demo-Modus – Beispieldaten, Änderungen gehen beim Neuladen verloren
         </p>
       )}
       {children}
