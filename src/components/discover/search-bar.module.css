@@ -1,0 +1,79 @@
+/* Suchleiste als Pille (F-09). */
+.bar {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  padding-left: var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+  pointer-events: auto;
+}
+
+.searchIcon {
+  flex: none;
+  color: var(--ink-2);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 var(--space-2) 0 var(--space-3);
+  border: 0;
+  background: transparent;
+  font-size: 16px;
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--ink-2);
+}
+
+.input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.bar:focus-within {
+  box-shadow: 0 0 0 2px var(--ink), var(--shadow-float);
+}
+
+.clear {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 44px;
+  color: var(--ink-2);
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background: var(--line);
+}
+
+.filterButton {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 48px;
+  border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
+  color: var(--ink);
+}
+
+.badge {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-strong);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 600;
+}
