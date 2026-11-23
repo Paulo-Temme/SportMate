@@ -1,0 +1,134 @@
+/* Tab-Leiste (mobil) und linke Leiste (Desktop) (F-05). */
+.navigation {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  height: calc(var(--tabbar-height) + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+}
+
+.brand {
+  display: none;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  height: 100%;
+}
+
+.item,
+.primaryItem {
+  display: flex;
+  justify-content: center;
+}
+
+.link,
+.primaryLink {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 64px;
+  min-height: 44px;
+  padding: 6px 4px;
+  text-decoration: none;
+  color: var(--ink-2);
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: var(--radius-element);
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.link[data-active='true'] {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.iconWrap {
+  display: grid;
+  place-items: center;
+  height: 26px;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.link:active .iconWrap,
+.primaryLink:active .iconWrap {
+  transform: scale(0.94);
+}
+
+.primaryLink {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.primaryLink .iconWrap {
+  width: 44px;
+  height: 30px;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: #ffffff;
+}
+
+.primaryLink[data-active='true'] .iconWrap {
+  background: var(--accent-strong);
+}
+
+.label {
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+@media (min-width: 1024px) {
+  .navigation {
+    top: 0;
+    right: auto;
+    width: var(--rail-width);
+    height: 100dvh;
+    padding: var(--space-6) 0;
+    border-top: 0;
+    border-right: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-8);
+  }
+
+  .brand {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-element);
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    height: auto;
+  }
+
+  .primaryItem {
+    order: -1;
+    margin-bottom: var(--space-4);
+  }
+
+  .link,
+  .primaryLink {
+    width: 64px;
+    min-height: 56px;
+    font-size: 11px;
+  }
+
+  .link:hover {
+    color: var(--ink);
+    background: var(--bg);
+  }
+
+}

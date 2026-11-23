@@ -1,0 +1,28 @@
+/* Belegungslinie (F-05). */
+.track {
+  position: relative;
+  display: block;
+  width: 40px;
+  height: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--line);
+  overflow: hidden;
+  flex: none;
+}
+
+.track[data-wide='true'] {
+  width: 100%;
+  height: 4px;
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+  background: var(--ok);
+  transform-origin: left center;
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+
+.track[data-full='true'] .fill {
+  background: var(--ink-3);
+}

@@ -1,14 +1,25 @@
-/* Globale Design-Tokens und Grundstile laut docs/design.md (F-00). Komponenten nutzen CSS Modules mit diesen Variablen. */
+/* Globale Design-Tokens und Grundstile laut docs/design.md (F-00, F-05). Komponenten nutzen CSS Modules mit diesen Variablen. */
 :root {
   --bg: #f7f6f2;
   --surface: #ffffff;
   --ink: #15171a;
   --ink-2: #5b6068;
+  --ink-3: #8a8f96;
   --line: #e7e5df;
+  --line-strong: #d6d3cb;
   --accent: #e8552b;
+  /* Gleicher Farbton, dunkler: weiße Schrift auf Akzentflächen erreicht so WCAG AA (4,6:1). */
+  --accent-strong: #d2441b;
+  --accent-ink: #c2421c;
   --accent-soft: #fce9e2;
   --ok: #1f8a5b;
   --warn: #b7791f;
+  /* Textvarianten von Ok/Warnung für AA-Kontrast auf Weiß. */
+  --ok-ink: #1b7a50;
+  --warn-ink: #8f5c12;
+  --danger: #b4321f;
+  --map-water: #dde4e8;
+  --map-park: #e9eee4;
 
   --radius-element: 12px;
   --radius-sheet: 24px;
@@ -31,6 +42,13 @@
 
   --duration-fast: 150ms;
   --duration-slow: 350ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --tabbar-height: 64px;
+  --rail-width: 76px;
+  --panel-width: 400px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 
   --font-family: var(--font-sans), system-ui, sans-serif;
   color-scheme: light;
@@ -49,6 +67,11 @@ body {
   height: 100%;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   min-height: 100dvh;
   background: var(--bg);
@@ -56,8 +79,10 @@ body {
   font-family: var(--font-family);
   font-size: var(--text-s);
   line-height: 1.45;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
 }
 
 h1,
@@ -65,6 +90,7 @@ h2,
 h3 {
   font-weight: 600;
   line-height: 1.2;
+  letter-spacing: -0.01em;
 }
 
 a {
@@ -79,9 +105,54 @@ textarea {
   color: inherit;
 }
 
+button {
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
 :focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* MapLibre: Attribution dezent statt der Standardbox. */
+.maplibregl-ctrl-attrib.maplibregl-compact {
+  background: rgba(255, 255, 255, 0.72);
+  border-radius: var(--radius-pill);
+  margin: 0 !important;
+  min-height: 20px;
+}
+
+.maplibregl-ctrl-attrib-inner {
+  font-size: 10px;
+  color: var(--ink-2);
+}
+
+.maplibregl-ctrl-attrib-inner a {
+  color: var(--ink-2);
 }
 
 @media (prefers-reduced-motion: reduce) {

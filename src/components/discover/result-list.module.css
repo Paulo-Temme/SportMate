@@ -1,0 +1,98 @@
+/* Trefferliste und ihre Zustände (F-05, F-06). */
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.skeletonRow {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--line);
+}
+
+.skeletonStack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeletonBlock {
+  display: block;
+  border-radius: 6px;
+  background: #efede8;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.error {
+  margin: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-element);
+  background: #f7e6e2;
+  color: var(--danger);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-2);
+  padding: var(--space-8) var(--space-6);
+}
+
+.emptyIcon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--ink-2);
+  margin-bottom: var(--space-2);
+}
+
+.emptyTitle {
+  font-size: var(--text-m);
+}
+
+.emptyText {
+  color: var(--ink-2);
+  max-width: 300px;
+}
+
+.emptyActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.reset,
+.create {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.reset {
+  background: var(--ink);
+  color: #ffffff;
+}
+
+.create {
+  border: 1px solid var(--line);
+}

@@ -1,0 +1,43 @@
+/* Platzhalter der Entdecken-Ansicht (F-05). */
+.skeleton {
+  position: fixed;
+  inset: 0;
+  background: #f2f1ec;
+}
+
+.search {
+  position: absolute;
+  top: calc(var(--safe-top) + var(--banner-height, 0px) + var(--space-3));
+  left: var(--space-4);
+  right: var(--space-4);
+  height: 48px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+}
+
+.sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--tabbar-height) + var(--safe-bottom));
+  height: 45%;
+  border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  background: var(--surface);
+}
+
+@media (min-width: 1024px) {
+  .search {
+    display: none;
+  }
+
+  .sheet {
+    left: var(--rail-width);
+    top: 0;
+    bottom: 0;
+    right: auto;
+    width: var(--panel-width);
+    height: auto;
+    border-radius: 0;
+  }
+}

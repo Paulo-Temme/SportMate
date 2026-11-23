@@ -1,0 +1,108 @@
+/* Entdecken: Kartenbühne mit schwebenden Bedienelementen (F-05, F-08). */
+.screen {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #f2f1ec;
+}
+
+.mapArea {
+  position: absolute;
+  inset: 0;
+}
+
+.floating {
+  position: absolute;
+  top: calc(var(--safe-top) + var(--banner-height) + var(--space-3));
+  left: var(--space-4);
+  right: var(--space-4);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  pointer-events: none;
+}
+
+.centerButton {
+  position: absolute;
+  z-index: 10;
+  right: var(--space-4);
+  top: calc(var(--safe-top) + var(--banner-height) + var(--space-3) + 48px + var(--space-2) + 44px + var(--space-3));
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-float);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.centerButton:active {
+  transform: scale(0.94);
+}
+
+.panelControls {
+  display: none;
+}
+
+.sheetHeader {
+  display: flex;
+  flex-direction: column;
+  min-height: 44px;
+  justify-content: center;
+}
+
+.count {
+  font-size: var(--text-m);
+  font-weight: 600;
+}
+
+.countHint {
+  font-size: var(--text-xs);
+  color: var(--ink-2);
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0 var(--space-3) 0 var(--space-2);
+  margin-left: calc(-1 * var(--space-2));
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+}
+
+.back:hover {
+  background: var(--bg);
+}
+
+@media (min-width: 1024px) {
+  .mapArea {
+    left: calc(var(--rail-width) + var(--panel-width));
+  }
+
+  .floating {
+    display: none;
+  }
+
+  .panelControls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+
+  .panelControls form {
+    box-shadow: none;
+    border: 1px solid var(--line);
+  }
+
+  .centerButton {
+    top: var(--space-6);
+    right: var(--space-6);
+  }
+}

@@ -1,0 +1,35 @@
+/* App-Rahmen und Demo-Hinweis (F-32). */
+.shell {
+  --banner-height: 0px;
+  min-height: 100dvh;
+}
+
+.shell[data-demo='true'] {
+  --banner-height: 24px;
+}
+
+.demoBanner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  height: calc(var(--banner-height) + var(--safe-top));
+  padding-top: var(--safe-top);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+  .demoBanner {
+    left: var(--rail-width);
+  }
+}
