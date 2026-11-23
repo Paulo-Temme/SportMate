@@ -65,7 +65,7 @@
   padding: 0 var(--space-6);
   border-radius: var(--radius-pill);
   background: var(--ink);
-  color: #ffffff;
+  color: var(--on-accent);
   font-weight: 600;
   text-decoration: none;
 }
@@ -73,5 +73,5 @@
 .skeleton {
   height: 180px;
   border-radius: var(--radius-element);
-  background: #efede8;
+  background: var(--surface-muted);
 }

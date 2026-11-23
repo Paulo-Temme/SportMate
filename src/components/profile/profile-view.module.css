@@ -34,7 +34,7 @@
 
 .primary {
   background: var(--ink);
-  color: #ffffff;
+  color: var(--on-accent);
 }
 
 .secondary,
@@ -63,7 +63,7 @@
   height: 56px;
   border-radius: 50%;
   background: var(--ink);
-  color: #ffffff;
+  color: var(--on-accent);
   font-size: var(--text-l);
   font-weight: 600;
 }
@@ -90,7 +90,7 @@
 .skeleton {
   height: 160px;
   border-radius: var(--radius-element);
-  background: #efede8;
+  background: var(--surface-muted);
 }
 
 /* Eigene Treffen: zwei Zahlen und ein Link, ohne zusätzliche Karte. */

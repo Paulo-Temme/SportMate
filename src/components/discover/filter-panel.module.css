@@ -104,7 +104,7 @@
 .choice input:checked + span {
   background: var(--ink);
   border-color: var(--ink);
-  color: #ffffff;
+  color: var(--on-accent);
 }
 
 .choice input:focus-visible + span {
@@ -158,7 +158,7 @@
   padding: 0 var(--space-6);
   border-radius: var(--radius-pill);
   background: var(--ink);
-  color: #ffffff;
+  color: var(--on-accent);
   font-weight: 600;
 }
 

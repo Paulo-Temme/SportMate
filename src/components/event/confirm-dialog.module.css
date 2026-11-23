@@ -52,7 +52,7 @@
 
 .confirm {
   background: var(--ink);
-  color: #ffffff;
+  color: var(--on-accent);
 }
 
 .confirm[data-tone='danger'] {

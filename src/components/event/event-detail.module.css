@@ -43,7 +43,7 @@
 .cancelled {
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-element);
-  background: #f7e6e2;
+  background: var(--danger-soft);
   color: var(--danger);
   font-weight: 600;
 }
@@ -156,7 +156,7 @@
   margin-top: 2px;
   padding: 2px 8px;
   border-radius: var(--radius-pill);
-  background: #e8f3ed;
+  background: var(--ok-soft);
   color: var(--ok-ink);
   font-size: var(--text-label);
   font-weight: 600;
@@ -228,7 +228,7 @@
 .skeletonButton {
   display: block;
   border-radius: 6px;
-  background: #efede8;
+  background: var(--surface-muted);
   animation: pulse 1.4s ease-in-out infinite;
 }
 

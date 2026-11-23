@@ -193,7 +193,7 @@
 .chip input:checked + span {
   background: var(--ink);
   border-color: var(--ink);
-  color: #ffffff;
+  color: var(--on-accent);
 }
 
 .chip input:focus-visible + span {
@@ -215,7 +215,7 @@
   min-height: 52px;
   border-radius: var(--radius-pill);
   background: var(--ink);
-  color: #ffffff;
+  color: var(--on-accent);
   font-weight: 600;
 }
 
@@ -246,7 +246,7 @@
   height: 80px;
   border-radius: 50%;
   background: var(--ok);
-  color: #ffffff;
+  color: var(--on-accent);
 }
 
 .successText {

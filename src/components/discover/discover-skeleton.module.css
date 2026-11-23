@@ -2,7 +2,7 @@
 .skeleton {
   position: fixed;
   inset: 0;
-  background: #f2f1ec;
+  background: var(--map-bg);
 }
 
 .search {

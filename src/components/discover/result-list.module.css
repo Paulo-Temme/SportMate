@@ -21,7 +21,7 @@
 .skeletonBlock {
   display: block;
   border-radius: 6px;
-  background: #efede8;
+  background: var(--surface-muted);
   animation: pulse 1.4s ease-in-out infinite;
 }
 
@@ -35,7 +35,7 @@
   margin: var(--space-4);
   padding: var(--space-4);
   border-radius: var(--radius-element);
-  background: #f7e6e2;
+  background: var(--danger-soft);
   color: var(--danger);
 }
 
@@ -90,7 +90,7 @@
 
 .reset {
   background: var(--ink);
-  color: #ffffff;
+  color: var(--on-accent);
 }
 
 .create {

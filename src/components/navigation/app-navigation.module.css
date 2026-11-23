@@ -72,7 +72,7 @@
   height: 30px;
   border-radius: var(--radius-pill);
   background: var(--ink);
-  color: #ffffff;
+  color: var(--on-accent);
 }
 
 .primaryLink[data-active='true'] .iconWrap {

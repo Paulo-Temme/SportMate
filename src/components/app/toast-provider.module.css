@@ -20,14 +20,14 @@
   padding: 10px var(--space-4);
   border-radius: var(--radius-element);
   background: var(--ink);
-  color: #ffffff;
+  color: var(--on-accent);
   font-size: var(--text-s);
   font-weight: 500;
   box-shadow: var(--shadow-float);
 }
 
 .toast[data-tone='success'] svg {
-  color: #7fd3ad;
+  color: var(--ok-on-dark);
 }
 
 .toast[data-tone='error'] {

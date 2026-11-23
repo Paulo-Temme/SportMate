@@ -9,7 +9,7 @@
   /* MapLibre setzt "position: relative" auf den Container; die Größe kommt darum zusätzlich über width/height. */
   width: 100%;
   height: 100%;
-  background: #f2f1ec;
+  background: var(--map-bg);
 }
 
 /* Platzhalter bis zum Laden der Vektorkarte: Kartenfarbe, Raster atmet langsam, Hinweis in der Mitte des freien Bereichs. */
@@ -17,7 +17,7 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: #f2f1ec;
+  background: var(--map-bg);
   pointer-events: none;
   transition: opacity var(--duration-slow) var(--ease-out);
 }
@@ -65,7 +65,7 @@
 }
 
 .offline {
-  background: #f2f1ec;
+  background: var(--map-bg);
   overflow: hidden;
 }
 

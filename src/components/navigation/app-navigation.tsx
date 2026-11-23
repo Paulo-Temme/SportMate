@@ -63,7 +63,7 @@ export function AppNavigation() {
       <Link href="/" className={styles.brand} aria-label="SportMate, zur Startansicht">
         <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
           <rect width="32" height="32" rx="8" fill="var(--ink)" />
-          <circle cx="16" cy="16" r="8.5" fill="none" stroke="#fff" strokeWidth="2.5" />
+          <circle cx="16" cy="16" r="8.5" fill="none" stroke="var(--on-accent)" strokeWidth="2.5" />
           <circle cx="16" cy="16" r="3.5" fill="var(--accent)" />
         </svg>
       </Link>

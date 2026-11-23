@@ -20,6 +20,20 @@
   --danger: #b4321f;
   --map-water: #dde4e8;
   --map-park: #e9eee4;
+  /* Kartengrund (wie der angepasste Positron-Hintergrund), auch für Platzhalter und Offline-Karte. */
+  --map-bg: #f2f1ec;
+  /* Gedämpfte Fläche: Lade-Skelette, ausgebuchte Marker. */
+  --surface-muted: #efede8;
+  /* Hover auf weißen Listenzeilen. */
+  --surface-hover: #fbfaf8;
+  /* Text und Icons auf dunklen oder Akzentflächen. */
+  --on-accent: #ffffff;
+  /* Zarte Hintergründe für Zustände: Fehler/Absage und Bestätigung. */
+  --danger-soft: #f7e6e2;
+  --danger-line: #ecd1cb;
+  --ok-soft: #e8f3ed;
+  /* Erfolgsfarbe auf dunklem Toast (Kontrast zu --ink 10:1). */
+  --ok-on-dark: #7fd3ad;
 
   --radius-element: 12px;
   --radius-sheet: 24px;

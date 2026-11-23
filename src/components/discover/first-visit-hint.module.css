@@ -89,7 +89,7 @@
 
 .primary {
   background: var(--ink);
-  color: #ffffff;
+  color: var(--on-accent);
 }
 
 .secondary {

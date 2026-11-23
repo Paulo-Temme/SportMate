@@ -37,6 +37,13 @@ zurückhaltenden Animationen. Kein "KI-Look". Die Karte ist kein eingebettetes F
 | `--accent-strong` | `#D2441B` | Flächen mit weißer Schrift: "Jetzt teilnehmen", ausgewählter Marker (Kontrast Weiß darauf 4,6:1) |
 | `--ok-ink` | `#1B7A50` | Text in Ok-Farbe auf Weiß, z. B. "5 von 10 Plätzen frei", "Dabei" (5,3:1) |
 | `--warn-ink` | `#8F5C12` | Text in Warnfarbe auf Weiß, z. B. "Sucht noch Mitspielende" (5,7:1) |
+| `--on-accent` | `#FFFFFF` | Text und Icons auf dunklen Flächen (`--ink`) und Akzentflächen |
+| `--map-bg` | `#F2F1EC` | Kartengrund, Karten-Platzhalter, Offline-Karte |
+| `--surface-muted` | `#EFEDE8` | Lade-Skelette, gedämpfte (ausgebuchte) Marker |
+| `--surface-hover` | `#FBFAF8` | Hover auf weißen Listenzeilen |
+| `--danger-soft` / `--danger-line` | `#F7E6E2` / `#ECD1CB` | Hintergrund und Rahmen von Fehler- und Absagehinweisen |
+| `--ok-soft` | `#E8F3ED` | Hintergrund positiver Hinweise ("Anfänger willkommen", Teilnahme bestätigt) |
+| `--ok-on-dark` | `#7FD3AD` | Erfolgssymbol auf dunklem Toast (10:1 zu `--ink`) |
 | Radius | 12 px (Elemente), 24 px (Sheets), 999 px (Chips, Suchleiste) | |
 | Schatten | nur `0 1px 2px rgba(21,23,26,.06), 0 8px 24px rgba(21,23,26,.08)` für schwebende Elemente | |
 | Abstand | 4er-Raster (4, 8, 12, 16, 24, 32) | |

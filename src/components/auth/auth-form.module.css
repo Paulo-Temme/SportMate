@@ -22,7 +22,7 @@
   grid-template-columns: 1fr 1fr;
   padding: 4px;
   border-radius: var(--radius-pill);
-  background: #efede8;
+  background: var(--surface-muted);
 }
 
 .switchButton {
@@ -96,7 +96,7 @@
 .formError {
   padding: var(--space-3);
   border-radius: var(--radius-element);
-  background: #f7e6e2;
+  background: var(--danger-soft);
 }
 
 .hint {
@@ -108,7 +108,7 @@
   min-height: 52px;
   border-radius: var(--radius-pill);
   background: var(--ink);
-  color: #ffffff;
+  color: var(--on-accent);
   font-weight: 600;
 }
 

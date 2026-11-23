@@ -51,17 +51,17 @@
 .marker[data-state='selected'] .pill,
 .marker[data-state='selected'] .tip {
   background: var(--accent-strong);
-  color: #ffffff;
+  color: var(--on-accent);
 }
 
 .marker[data-state='selected'] .icon {
   background: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+  color: var(--on-accent);
 }
 
 .marker[data-state='full'] .pill {
   color: var(--ink-2);
-  background: #f1f0ec;
+  background: var(--surface-muted);
 }
 
 .marker[data-state='full'] .icon {
@@ -70,7 +70,7 @@
 }
 
 .marker[data-state='full'] .tip {
-  background: #f1f0ec;
+  background: var(--surface-muted);
 }
 
 .marker:focus-visible {
