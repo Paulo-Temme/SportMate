@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { validInput } from '../../../tests/fixtures/sample-events';
 import { SupabaseAuthGateway } from './supabase-auth-gateway';
 import { SupabaseEventRepository } from './supabase-event-repository';
@@ -53,6 +53,48 @@ describe('F-01: Anmeldung über Supabase ohne Netz', () => {
     await gateway.signOut();
     expect(auth.signOut).toHaveBeenCalled();
     expect(await gateway.getCurrentUser()).toBeNull();
+  });
+});
+
+describe('F-01 (REV-12): Anmeldeänderungen nach dem Abbestellen', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  function createAuthEventClient() {
+    let emit: (event: string, session: null) => void = () => {};
+    const unsubscribe = vi.fn();
+    const auth = {
+      onAuthStateChange: vi.fn((callback: (event: string, session: null) => void) => {
+        emit = callback;
+        return { data: { subscription: { unsubscribe } } };
+      }),
+    };
+    return { client: { auth } as unknown as SupabaseClient, emit: (event: string) => emit(event, null), unsubscribe };
+  }
+
+  it('F-01 AK5: meldet Änderungen verzögert an den Listener', async () => {
+    vi.useFakeTimers();
+    const { client, emit } = createAuthEventClient();
+    const listener = vi.fn();
+    new SupabaseAuthGateway(client).onAuthChange(listener);
+    emit('SIGNED_OUT');
+    await vi.runAllTimersAsync();
+    expect(listener).toHaveBeenCalledWith(null);
+    vi.useRealTimers();
+  });
+
+  it('F-01 AK5: nach dem Abbestellen erreicht ein schon geplanter Rückruf den Listener nicht mehr', async () => {
+    vi.useFakeTimers();
+    const { client, emit, unsubscribe } = createAuthEventClient();
+    const listener = vi.fn();
+    const stop = new SupabaseAuthGateway(client).onAuthChange(listener);
+    emit('SIGNED_OUT');
+    stop();
+    await vi.runAllTimersAsync();
+    expect(unsubscribe).toHaveBeenCalled();
+    expect(listener).not.toHaveBeenCalled();
+    vi.useRealTimers();
   });
 });
 

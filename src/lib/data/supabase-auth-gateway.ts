@@ -58,13 +58,22 @@ export class SupabaseAuthGateway implements AuthGateway {
   }
 
   onAuthChange(listener: (user: AuthUser | null) => void): () => void {
+    // Nach dem Abbestellen darf ein schon geplanter Rückruf nichts mehr melden (REV-12).
+    let active = true;
+    const notify = (user: AuthUser | null) => {
+      if (active) listener(user);
+    };
     const { data } = this.client.auth.onAuthStateChange((_event, session) => {
       // Keine Supabase-Aufrufe direkt im Rückruf (supabase-js kann sonst blockieren), deshalb verzögert.
       setTimeout(() => {
-        void (session ? this.buildUser(session.user) : Promise.resolve(null)).then(listener);
+        if (!active) return;
+        void (session ? this.buildUser(session.user) : Promise.resolve(null)).then(notify);
       }, 0);
     });
-    return () => data.subscription.unsubscribe();
+    return () => {
+      active = false;
+      data.subscription.unsubscribe();
+    };
   }
 
   listDemoAccounts(): AuthUser[] {
