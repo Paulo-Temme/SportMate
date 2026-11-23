@@ -20,8 +20,21 @@ function applyTheme(map: maplibregl.Map): void {
 }
 
 /**
+ * Zusätzliche Einstellungen für reine Ansichten (Startseite, F-31): `interactive: false` ohne Ziehen und Zoomen,
+ * `labels: false` ohne Beschriftungen (Straßen- und Ortsnamen).
+ */
+export type ThemedMapOptions = { interactive?: boolean; labels?: boolean };
+
+function hideLabels(map: maplibregl.Map): void {
+  map
+    .getStyle()
+    .layers.filter((layer) => layer.type === 'symbol')
+    .forEach((layer) => map.setLayoutProperty(layer.id, 'visibility', 'none'));
+}
+
+/**
  * Baut die Karte. Rotation ist aus, die Attribution kompakt; Stilfehler meldet `onUnavailable`.
- * Eingaben: Container, Mittelpunkt, Zoom, Callback bei Ausfall. Rückgabe: Karte.
+ * Eingaben: Container, Mittelpunkt, Zoom, Callback bei Ausfall, optional Einstellungen. Rückgabe: Karte.
  * Fehler: wirft, wenn WebGL fehlt (MapLibre-Konstruktor).
  * Feature: F-08
  */
@@ -30,9 +43,11 @@ export function createThemedMap(
   center: { latitude: number; longitude: number },
   zoom: number,
   onUnavailable: () => void,
+  options: ThemedMapOptions = {},
 ): maplibregl.Map {
   const map = new maplibregl.Map({
     container,
+    interactive: options.interactive ?? true,
     style: styleUrl,
     center: [center.longitude, center.latitude],
     zoom,
@@ -41,7 +56,10 @@ export function createThemedMap(
     dragRotate: false,
   });
   map.touchZoomRotate.disableRotation();
-  map.on('style.load', () => applyTheme(map));
+  map.on('style.load', () => {
+    applyTheme(map);
+    if (options.labels === false) hideLabels(map);
+  });
   // Die kompakte Attribution startet aufgeklappt; zugeklappt bleibt sie dezent und per Info-Knopf lesbar.
   map.on('load', () => container.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show'));
   // Ohne geladenen Stil (Netz weg, Dienst gestört) gibt es keine Karte; einzelne fehlende Kacheln sind kein Ausfall.

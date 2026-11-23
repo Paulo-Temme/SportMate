@@ -1,7 +1,7 @@
 'use client';
 // Entdecken: vollflächige Karte, schwebende Suche und Chips, Bottom Sheet mit Trefferliste oder Details; eine Trefferliste für Karte und Liste (F-05–F-09, F-12).
 import { ArrowLeft, LocateFixed } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAppServices } from '@/components/app/app-services';
 import { EventDetail } from '@/components/event/event-detail';
@@ -12,6 +12,7 @@ import { computeSnapHeights, type SnapHeights, type SnapPoint } from '@/lib/ui/s
 import { useEventList } from '@/hooks/use-event-list';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useParticipation } from '@/hooks/use-participation';
+import { readSportParam } from '@/lib/events/discover-link';
 import { emptyFilters, type EventFilters, type SportEvent } from '@/lib/events/event-model';
 import { describeDayLabel, formatEventTime, summarizePlaces } from '@/lib/events/event-presentation';
 import { FilterPanel } from './filter-panel';
@@ -29,6 +30,12 @@ function readSelectedId(pathname: string | null): string | null {
 
 function hasActiveFilters(filters: EventFilters): boolean {
   return JSON.stringify(filters) !== JSON.stringify(emptyFilters);
+}
+
+// Einstieg von der Startseite: `?sport=Volleyball` wählt die Sportart vor; spätere Änderungen bleiben in der Ansicht (F-31).
+function readInitialFilters(sportParam: string | null): EventFilters {
+  const sport = readSportParam(sportParam);
+  return sport ? { ...emptyFilters, sports: [sport] } : emptyFilters;
 }
 
 function toMarker(event: SportEvent, selectedId: string | null, now: Date): MapMarkerItem {
@@ -105,8 +112,9 @@ export function DiscoverScreen() {
   const pathname = usePathname();
   const router = useRouter();
   const selectedId = readSelectedId(pathname);
+  const searchParams = useSearchParams();
   const isDesktop = useMediaQuery('(min-width: 1024px)');
-  const [filters, setFilters] = useState<EventFilters>(emptyFilters);
+  const [filters, setFilters] = useState<EventFilters>(() => readInitialFilters(searchParams.get('sport')));
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [snap, setSnap] = useState<SnapPoint>('half');
   const [heights, setHeights] = useState<SnapHeights>(() => computeSnapHeights(700));

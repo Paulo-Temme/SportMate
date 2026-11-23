@@ -1,4 +1,4 @@
-// Schlanker Kopf der Startseite: Logo mit Namen und "Anmelden" bzw. Profil, statt Tab-Leiste (F-31).
+// Schlanker Kopf der Startseite: Logo mit Namen, Sprungziele (ab Tablet) und "Anmelden" bzw. Profil, statt Tab-Leiste (F-31).
 import Link from 'next/link';
 import { BrandMark } from '@/components/navigation/brand-mark';
 import styles from './landing-header.module.css';
@@ -40,7 +40,13 @@ export function LandingHeader({ viewer }: { viewer: LandingViewer }) {
             SportMate
           </span>
         </Link>
-        <ViewerLink viewer={viewer} />
+        <div className={styles.end}>
+          <nav aria-label="Startseite" className={styles.nav}>
+            <a href="#so-funktionierts">So funktioniert&apos;s</a>
+            <a href="#sportarten">Sportarten</a>
+          </nav>
+          <ViewerLink viewer={viewer} />
+        </div>
       </div>
     </header>
   );

@@ -1,4 +1,4 @@
-/* Startseite (F-31). Mobil zuerst: eine Spalte mit 16 px Rand; ab 1024 px Text links, Vorschau rechts. */
+/* Startseite (F-31). Mobil zuerst: eine Spalte mit 16 px Rand; ab 1024 px Text links, Karte groß rechts. */
 .page {
   min-height: 100dvh;
   display: flex;
@@ -8,7 +8,7 @@
 .main {
   flex: 1;
   width: 100%;
-  max-width: 1120px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 var(--space-4);
 }
@@ -17,7 +17,7 @@
 .hero {
   display: grid;
   gap: var(--space-8);
-  padding: var(--space-4) 0 var(--space-8);
+  padding: var(--space-6) 0 var(--space-8);
 }
 
 .heroCopy {
@@ -28,29 +28,44 @@
 
 /* Bewusst größer als die App-Typografie (28 px): Die Startseite trägt ihren Satz über die Schrift, nicht über Bilder. */
 .title {
-  font-size: clamp(34px, 9.4vw, 60px);
-  line-height: 1.04;
-  letter-spacing: -0.025em;
+  font-size: clamp(42px, 12.4vw, 80px);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
   font-weight: 600;
-  text-wrap: balance;
 }
 
-.titleSecond {
-  color: var(--ink-2);
+.titleLine {
+  display: block;
 }
 
-.lead {
-  margin-top: var(--space-4);
-  max-width: 36em;
-  color: var(--ink-2);
+.sportLineWrap {
+  margin-top: var(--space-6);
+}
+
+.sportLine {
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+  overflow: hidden;
   font-size: var(--text-m);
-  line-height: 1.5;
+  font-weight: 500;
+}
+
+.sportLineInner {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sportLineIcon {
+  flex: none;
+  color: var(--accent-strong);
 }
 
 .actions {
   display: grid;
   gap: var(--space-2);
-  margin-top: var(--space-6);
+  margin-top: var(--space-8);
 }
 
 .actionWrap {
@@ -89,20 +104,17 @@
   border-color: var(--ink-2);
 }
 
-.actionNote {
-  margin-top: var(--space-3);
-  color: var(--ink-2);
-  font-size: var(--text-xs);
-}
-
 .heroPreview {
   min-width: 0;
+  height: 58vh;
+  min-height: 380px;
+  max-height: 560px;
 }
 
 /* Sanftes Einblenden beim Laden, gestaffelt über --reveal-order; bei reduzierter Bewegung global abgeschaltet. */
 .reveal {
   animation: reveal var(--duration-slow) var(--ease-out) both;
-  animation-delay: calc(var(--reveal-order, 0) * 60ms);
+  animation-delay: calc(var(--reveal-order, 0) * 70ms);
 }
 
 @keyframes reveal {
@@ -120,148 +132,129 @@
 
 /* Abschnitte */
 .section {
-  padding: var(--space-8) 0;
-  border-top: 1px solid var(--line);
+  padding: 56px 0;
+  scroll-margin-top: var(--space-4);
 }
 
 .sectionTitle {
-  font-size: var(--text-l);
+  font-size: clamp(28px, 7vw, 44px);
+  line-height: 1.08;
+  letter-spacing: -0.025em;
 }
 
 /* So funktioniert's */
 .steps {
-  position: relative;
   display: grid;
-  gap: var(--space-6);
-  margin-top: var(--space-6);
+  margin-top: var(--space-8);
 }
 
 .step {
-  position: relative;
   display: grid;
-  grid-template-columns: 32px 1fr;
-  gap: var(--space-4);
-}
-
-/* Verbindungslinie zwischen den Nummern. */
-.step:not(:last-child)::before {
-  content: '';
-  position: absolute;
-  left: 15.5px;
-  top: 40px;
-  bottom: calc(-1 * var(--space-6) + 8px);
-  width: 1px;
-  background: var(--line-strong);
+  grid-template-columns: 40px 1fr;
+  column-gap: var(--space-3);
+  padding: var(--space-6) 0;
+  border-top: 1px solid var(--line);
 }
 
 .stepNumber {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border: 1px solid var(--ink);
-  border-radius: 50%;
-  background: var(--bg);
+  grid-row: span 2;
+  padding-top: 3px;
+  color: var(--ink-3);
   font-size: var(--text-xs);
   font-weight: 600;
-}
-
-.stepBody {
-  min-width: 0;
-  padding-top: 4px;
+  font-variant-numeric: tabular-nums;
 }
 
 .stepTitle {
-  font-size: var(--text-m);
+  font-size: var(--text-l);
+  letter-spacing: -0.01em;
 }
 
 .stepText {
   margin-top: var(--space-1);
   color: var(--ink-2);
-  max-width: 34em;
 }
 
-.example {
-  display: flex;
-  flex-wrap: wrap;
+/* Sportarten */
+.sports {
+  display: grid;
+  margin-top: var(--space-8);
+  list-style: none;
+}
+
+.sportLink {
+  display: grid;
+  grid-template-columns: 24px 1fr auto 18px;
   align-items: center;
-  gap: var(--space-2);
-  margin-top: var(--space-3);
-}
-
-.exampleChip {
-  display: inline-flex;
-  align-items: center;
-  height: 32px;
-  padding: 0 var(--space-3);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
-  background: var(--surface);
-  font-size: var(--text-xs);
-  font-weight: 500;
-}
-
-.exampleChip[data-active='true'] {
-  border-color: transparent;
-  background: var(--accent-soft);
-  color: var(--accent-ink);
-  font-weight: 600;
-}
-
-.exampleButton {
-  display: inline-flex;
-  align-items: center;
-  height: 36px;
-  padding: 0 var(--space-4);
-  border-radius: var(--radius-pill);
-  background: var(--accent-strong);
-  color: var(--on-accent);
-  font-size: var(--text-xs);
-  font-weight: 600;
-}
-
-.exampleNote {
-  color: var(--ok-ink);
-  font-size: var(--text-xs);
-  font-weight: 500;
-}
-
-.examplePlace {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: var(--text-xs);
-  font-weight: 600;
-}
-
-/* Was SportMate nicht ist */
-.omissions {
-  margin-top: var(--space-4);
-}
-
-.omission {
-  padding: var(--space-4) 0;
+  gap: var(--space-3);
+  min-height: 68px;
+  padding: 0 var(--space-1);
   border-top: 1px solid var(--line);
-  line-height: 1.5;
+  color: var(--ink);
+  text-decoration: none;
 }
 
-.omission:first-child {
-  border-top: 0;
-  padding-top: 0;
+.sports li:last-child .sportLink {
+  border-bottom: 1px solid var(--line);
 }
 
-.omissionTitle {
+.sportIcon {
+  color: var(--ink-2);
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.sportName {
+  font-size: var(--text-m);
   font-weight: 600;
 }
 
-.omissionText {
+.sportCount {
   color: var(--ink-2);
+  font-size: var(--text-xs);
+}
+
+.sportArrow {
+  color: var(--ink-3);
+  transition: color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+}
+
+.sportLink:hover .sportIcon,
+.sportLink:hover .sportArrow {
+  color: var(--accent-strong);
+}
+
+.sportLink:hover .sportArrow {
+  transform: translate(2px, -2px);
+}
+
+.sportLink:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -2px;
+  border-radius: var(--radius-element);
+}
+
+/* Abschluss */
+.closing {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-6);
+  margin: var(--space-6) 0 56px;
+  padding: 40px var(--space-6);
+  border-radius: var(--radius-sheet);
+  background: var(--surface);
+}
+
+.closingTitle {
+  font-size: clamp(32px, 8.6vw, 56px);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
 }
 
 /* Fußzeile */
 .footer {
   border-top: 1px solid var(--line);
-  padding: var(--space-6) 0 calc(var(--space-6) + var(--safe-bottom));
+  padding: var(--space-8) 0 calc(var(--space-8) + var(--safe-bottom));
   color: var(--ink-2);
   font-size: var(--text-xs);
 }
@@ -269,10 +262,48 @@
 .footerInner {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
-  max-width: 1120px;
+  gap: var(--space-6);
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 var(--space-4);
+}
+
+.footerTop {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.footerBrand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  color: var(--ink);
+  font-size: var(--text-m);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.footerNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+  font-size: var(--text-s);
+}
+
+.footerNav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.footerNotes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
 }
 
 .footer a {
@@ -284,6 +315,19 @@
     display: flex;
     flex-wrap: wrap;
   }
+
+  .sports {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-8);
+  }
+
+  .sports li:nth-last-child(2) .sportLink {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .closing {
+    padding: 56px 48px;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -292,63 +336,69 @@
   }
 
   .hero {
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     align-items: center;
-    gap: 64px;
-    padding: var(--space-6) 0 72px;
+    gap: 56px;
+    padding: var(--space-2) 0 72px;
   }
 
   .heroPreview {
-    max-width: 440px;
-    justify-self: end;
-    width: 100%;
+    height: clamp(560px, calc(100dvh - 128px), 760px);
+    max-height: none;
   }
 
   .section {
-    padding: 56px 0;
-  }
-
-  .sectionTitle {
-    font-size: var(--text-xl);
+    padding: 88px 0;
   }
 
   .steps {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-8);
-    margin-top: var(--space-8);
+    column-gap: var(--space-8);
+    margin-top: 40px;
   }
 
   .step {
     grid-template-columns: 1fr;
     align-content: start;
-    gap: var(--space-3);
+    row-gap: var(--space-2);
+    padding-top: var(--space-6);
   }
 
-  /* Auf dem Desktop läuft die Linie waagerecht von Nummer zu Nummer. */
-  .step:not(:last-child)::before {
-    left: 44px;
-    right: calc(-1 * var(--space-8) + 12px);
-    top: 15.5px;
-    bottom: auto;
-    width: auto;
-    height: 1px;
+  .stepNumber {
+    grid-row: auto;
+    padding: 0 0 var(--space-4);
   }
 
-  .split {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-    gap: var(--space-8);
+  .sports {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 40px;
   }
 
-  .split .omissions {
-    margin-top: 0;
+  .sports li:nth-last-child(3) .sportLink {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .closing {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 88px;
+    padding: 72px 64px;
   }
 
   .footerInner {
+    padding: 0 var(--space-8);
+  }
+
+  .footerTop {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footerNotes {
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: space-between;
     gap: var(--space-2) var(--space-6);
-    padding: 0 var(--space-8);
   }
 }

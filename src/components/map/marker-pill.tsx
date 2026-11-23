@@ -2,8 +2,29 @@
 // Weiße Marker-Pille mit Sport-Icon und Uhrzeit; ausgewählt in Akzentfarbe mit Federanimation, ausgebucht gedämpft (F-08).
 import { motion, useReducedMotion } from 'motion/react';
 import { SportIcon } from '@/components/event/sport-icon';
+import type { Sport } from '@/lib/events/event-model';
 import type { MapMarkerItem } from './map-marker-item';
 import styles from './marker-pill.module.css';
+
+/**
+ * Inhalt einer Marker-Pille (Pille mit Sport-Icon und Uhrzeit, darunter die Spitze), ohne Bedienelement drumherum.
+ * Den Zustand (ausgewählt, ausgebucht) setzt das umgebende Element mit `styles.marker` und `data-state`.
+ * Eingaben: Sportart, Uhrzeit. Rückgabe: Pille und Spitze.
+ * Feature: F-08, F-31
+ */
+export function MarkerPillFace({ sport, timeLabel }: { sport: Sport; timeLabel: string }) {
+  return (
+    <>
+      <span className={styles.pill} data-part="pill">
+        <span className={styles.icon}>
+          <SportIcon sport={sport} size={14} />
+        </span>
+        <span className={styles.time}>{timeLabel}</span>
+      </span>
+      <span className={styles.tip} aria-hidden="true" />
+    </>
+  );
+}
 
 type MarkerPillProps = { item: MapMarkerItem; onSelect: (id: string) => void };
 
@@ -33,13 +54,7 @@ export function MarkerPill({ item, onSelect }: MarkerPillProps) {
       transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 520, damping: 22 }}
       whileTap={reduceMotion ? undefined : { scale: 0.94 }}
     >
-      <span className={styles.pill} data-part="pill">
-        <span className={styles.icon}>
-          <SportIcon sport={item.sport} size={14} />
-        </span>
-        <span className={styles.time}>{item.timeLabel}</span>
-      </span>
-      <span className={styles.tip} aria-hidden="true" />
+      <MarkerPillFace sport={item.sport} timeLabel={item.timeLabel} />
     </motion.button>
   );
 }

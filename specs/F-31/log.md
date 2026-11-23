@@ -51,3 +51,48 @@ Jeder Agent hängt nach seinem Schritt einen Eintrag an.
     `src/lib/map/preview-frame.ts` nicht (architect). `docs/testing/testfaelle.md` TC-A-10 verweist auf den entfernten Test.
   - Bestehend, nicht Teil von F-31: Der Demo-Hinweis wird bei 360 px Breite links/rechts abgeschnitten (`white-space: nowrap`).
 - Login/Rechte: nicht verändert (nur Links auf `/anmelden` und `/profil`).
+
+## 2026-11-23 · coder (Oberfläche), Überarbeitung nach Team-Feedback
+- Auftrag: Inhalt am Prototyp (`project/src/components/landing/LandingPage.tsx`) ausrichten, Flensburg entfernen, Text
+  deutlich kürzen (keine doppelten Untertexte), Vorschau als echte MapLibre-Karte mit Kamerafahrt.
+- Aufbau neu: Kopf (Logo, ab 768 px Sprungziele „So funktioniert's“/„Sportarten“, „Anmelden“/„Profil“) · Hero
+  „Die Stadt ist das Spielfeld.“ + wechselnde Sportzeile (Fußball „Zusammen auf den Platz.“, Volleyball „Ein Team.
+  Viele gute Bälle.“, Basketball „Zeit für ein paar Körbe.“, Badminton „Einfach den Ball ins Spiel bringen.“; 3,2 s,
+  Gleiten/Überblenden, bei reduzierter Bewegung steht die erste Zeile) + „Treffen entdecken“/„Treffen erstellen“, kein
+  Absatz, kein Kleingedrucktes · Kartenvorschau (Desktop rechts, 7/12 Breite, Höhe bis 760 px, Radius 32 px; mobil
+  unter dem Hero, 58vh, Radius 24 px) · „So funktioniert's“ 01 Sportart wählen / 02 Treffen finden / 03 Bin dabei, je
+  ein Satz · „Was bringt dich in Bewegung?“ alle sechs Sportarten als Zeilenliste mit Icon, Anzahl kommender Treffen und
+  Pfeil, Link `/entdecken?sport=<Sportart>` · Abschluss „Zusammen geht mehr“ + „Jetzt Treffen entdecken“ · Fußzeile
+  (Marke, Sprungziele, Hochschulprojekt, OSM/OpenFreeMap, Beispieltreffen fiktiv). „Was SportMate nicht ist“ entfällt.
+- Seitentitel „SportMate – Sporttreffen in deiner Nähe“, Beschreibung ohne Ortsnamen. Kein „Flensburg“ im Text der
+  Startseite (Treffen-Karte zeigt Titel/Zeit/Plätze, nicht den Treffpunkt; Kartenbeschriftungen ausgeblendet).
+- Vorschau: `preview-map.tsx` (Rahmen, Wahl Karte/Ersatzfläche), `preview-map-canvas.tsx` (MapLibre, per `next/dynamic`
+  erst geladen, wenn das Panel 300 px vor dem Bild ist; `interactive: false`, ohne Beschriftungen; Übersicht per
+  `fitBounds`, dann `flyTo` je Treffen mit Zoom 13,9, Neigung 40°, wechselnder Blickrichtung, 4,2 s), `use-preview-tour.ts`
+  (Station alle 6,5 s; startet erst nach `load`; steht bei Hover, Fokus, < 25 % sichtbar, reduzierter Bewegung),
+  `preview-marker.tsx` (gleiche Pille wie Entdecken über neues `MarkerPillFace`, Link `/treffen/[id]`; Zeigen hebt
+  hervor, ohne die Kamera zu bewegen), `preview-caption.tsx` (eine Treffen-Karte, echte Überblendung, Link zum Treffen;
+  Lade-, Leer-, Fehlerzustand). Ersatzfläche ohne WebGL/Netz/`NEXT_PUBLIC_MAP_MODE=offline`: Kartenfarbe, Marker relativ
+  verteilt, kein Raster, keine gezeichnete Landschaft. Gezeichnete Förde (`preview-shape.ts`) entfernt.
+- Kernlogik: `src/lib/map/preview-frame.ts` neu geschnitten (Auswahl: freie Plätze, ≥ 300 m Abstand, ≤ 15 km vom ersten,
+  höchstens 4; `placeInPreview` für die Ersatzfläche; fester Flensburg-Ausschnitt entfällt), neu
+  `src/lib/events/discover-link.ts` (`buildDiscoverHref`, `readSportParam`). Entdecken liest `?sport=` beim Öffnen und
+  wählt die Sportart vor (`discover-screen.tsx`). `createThemedMap` hat optionale Einstellungen `interactive`, `labels`.
+- Tests zuerst (`eac3b43`): `landing-view.test.tsx` (13), `preview-frame.test.ts` (8), `discover-link.test.ts` (4),
+  `e2e/f-31-landing.spec.ts` (14 je Projekt). Beim Test-Commit: ESLint grün, Vitest 3 Dateien / 14 Tests rot (erwartet).
+- Gefunden beim Umsetzen: MapLibre setzt `position: relative` auf den Container (Karte 0 px hoch) → width/height 100 %;
+  Rundgang lief schon während des Ladens (Treffen-Karte und Kamera auseinander) → Start erst nach `load`; Treffen-Karte
+  war beim Wechsel kurz leer (`mode="wait"`) → übereinanderliegende Überblendung; Unterstreichung der Marker-Links;
+  tabellarische Ziffern sperren bei Schibsted „Heute , 22:15“ → entfernt.
+- Screenshots (Dev-Server Port 3011, Online-Karte mit echten Tiles, Demo-Modus, Chromium mit SwiftShader):
+  `docs/testing/screenshots/landing-desktop.png` (1440×900, nach erster Kamerafahrt), `landing-mobil.png` (Pixel 7, ganze Seite).
+- Befehle (Endstand): `npx tsc --noEmit` 0 Fehler · `npx eslint src e2e tests` 0 Befunde · `npx vitest run` 31 Dateien
+  bestanden, 1 übersprungen; 308 Tests bestanden, 2 übersprungen · `npx playwright test` 142 bestanden, 2 übersprungen
+  (wie bisher F-31 AK7 nur Desktop, F-05 AK2 nur mobil).
+- Offen / für den Orchestrator:
+  - Abschnittsüberschriften `clamp(28px, 7vw, 44px)`, Abschluss bis 56 px, Hero bis 80 px: über der Typo-Skala;
+    `docs/design.md` (Ausnahme Landing, dort noch „Zeile 2 in --ink-2“ und „Fallback mit Rasterlinien“) anpassen.
+  - Sport-Icon der Sportzeile in `--accent-strong` (einziger dekorativer Akzent auf der Seite) – Teamentscheidung.
+  - Backlog-AKs F-31 (neu AK9), `docs/architecture.md` (neue Dateien, `?sport=`), `testfaelle.md` nachziehen.
+  - Kamerafahrt mit echter Karte nur manuell geprüft (E2E läuft mit Offline-Karte).
+- Login/Rechte: nicht verändert.
