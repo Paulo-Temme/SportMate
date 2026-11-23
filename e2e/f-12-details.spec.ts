@@ -18,7 +18,13 @@ test.describe('F-12 Detailansicht', () => {
   test('F-12 AK2: Altersangabe ist eindeutig mit Jahren beschriftet', async ({ page }) => {
     await openDiscover(page);
     await openEventFromList(page, 'Basketball auf dem Exe');
-    await expect(page.getByTestId('event-detail').getByText(/20–25 Jahre/)).toBeVisible();
+    await expect(page.getByTestId('event-detail').getByText('Alter: 20–25 Jahre', { exact: true })).toBeVisible();
+  });
+
+  test('F-12 AK2 (FB-45): Treffen ohne Altersgrenze zeigt "Alter: offen für alle"', async ({ page }) => {
+    await openDiscover(page);
+    await openEventFromList(page, 'Lockere Laufrunde im Volkspark');
+    await expect(page.getByTestId('event-detail').getByText('Alter: offen für alle', { exact: true })).toBeVisible();
   });
 
   test('F-12 AK4: ausgebuchtes Treffen zeigt "Ausgebucht" statt "0 von 4 Plätzen frei"', async ({ page }) => {

@@ -12,13 +12,13 @@ const berlinTimeZone = 'Europe/Berlin';
 /**
  * Beschreibt die Altersgruppe eines Treffens.
  * Eingaben: gespeicherter Wert, auch unvollständig oder falsch typisiert.
- * Rückgabe: Text wie "Altersgruppe: 20–25 Jahre"; leer heißt offen für alle, Unbekanntes heißt "Nicht angegeben".
- * Feature: F-00
+ * Rückgabe: Text wie "Alter: 20–25 Jahre"; leer heißt "Alter: offen für alle" (FB-45), Unbekanntes "Alter: nicht angegeben".
+ * Feature: F-00, F-12
  */
 export function describeAgeGroup(ageGroup: unknown): string {
-  if (ageGroup === '') return 'Altersgruppe: Alle Altersgruppen';
-  if (typeof ageGroup !== 'string' || !ageGroups.some((value) => value === ageGroup)) return 'Altersgruppe: Nicht angegeben';
-  return `Altersgruppe: ${ageGroup} Jahre`;
+  if (ageGroup === '') return 'Alter: offen für alle';
+  if (typeof ageGroup !== 'string' || !ageGroups.some((value) => value === ageGroup)) return 'Alter: nicht angegeben';
+  return `Alter: ${ageGroup} Jahre`;
 }
 
 function hasValidCapacity(capacity: unknown): capacity is number {

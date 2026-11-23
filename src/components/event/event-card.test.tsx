@@ -20,7 +20,13 @@ describe('EventCard', () => {
 
   it('F-12 AK2: beschriftet die Altersangabe eindeutig mit Jahren', () => {
     renderCard();
-    expect(screen.getByText(/20–25 Jahre/)).toBeTruthy();
+    expect(screen.getByText('Alter: 20–25 Jahre')).toBeTruthy();
+  });
+
+  it('F-12 AK2 (FB-45): ohne Altersgrenze steht "Alter: offen für alle"', () => {
+    renderCard({ ageGroup: '' });
+    expect(screen.getByText('Alter: offen für alle')).toBeTruthy();
+    expect(screen.queryByText(/Altersgruppe/)).toBeNull();
   });
 
   it('F-13 AK1: zeigt "Kostenlos" bei Kosten 0', () => {

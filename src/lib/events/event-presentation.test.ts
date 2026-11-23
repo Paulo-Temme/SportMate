@@ -13,11 +13,14 @@ import {
 
 describe('F-00 AK4: Alters-, Platz- und Statusangaben', () => {
   it('F-00 AK4: unterscheidet Altersgruppe, offene Gruppe und fehlende Daten', () => {
-    expect(describeAgeGroup('20–25')).toBe('Altersgruppe: 20–25 Jahre');
-    expect(describeAgeGroup('unter 20')).toBe('Altersgruppe: unter 20 Jahre');
-    expect(describeAgeGroup('über 40')).toBe('Altersgruppe: über 40 Jahre');
-    expect(describeAgeGroup('')).toBe('Altersgruppe: Alle Altersgruppen');
-    for (const age of [undefined, null, 'unbekannt', 22]) expect(describeAgeGroup(age)).toBe('Altersgruppe: Nicht angegeben');
+    expect(describeAgeGroup('20–25')).toBe('Alter: 20–25 Jahre');
+    expect(describeAgeGroup('unter 20')).toBe('Alter: unter 20 Jahre');
+    expect(describeAgeGroup('über 40')).toBe('Alter: über 40 Jahre');
+    for (const age of [undefined, null, 'unbekannt', 22]) expect(describeAgeGroup(age)).toBe('Alter: nicht angegeben');
+  });
+
+  it('F-12 AK2 (FB-45): Treffen ohne Altersgrenze heißt "Alter: offen für alle"', () => {
+    expect(describeAgeGroup('')).toBe('Alter: offen für alle');
   });
 
   it('F-00 AK4: berechnet freie Plätze einschließlich leerer und voller Treffen', () => {
