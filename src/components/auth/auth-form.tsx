@@ -2,6 +2,7 @@
 // Anmelden und Registrieren umschaltbar, im Demo-Modus zusätzlich Demo-Personen; danach Rücksprung zum Ausgangspunkt (F-01, F-02, F-32).
 import { motion, useReducedMotion } from 'motion/react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { useId, useState, type FormEvent } from 'react';
 import { useAppServices } from '@/components/app/app-services';
 import { useToast } from '@/components/app/toast-provider';
@@ -98,14 +99,26 @@ function DemoAccounts({ onDone }: { onDone: (name: string) => void }) {
   );
 }
 
+function AlreadySignedIn({ name }: { name: string }) {
+  return (
+    <div className={styles.page}>
+      <h1 className={styles.title}>Anmelden</h1>
+      <p className={styles.lead}>Du bist bereits angemeldet als {name}.</p>
+      <Link href="/profil" className={`${styles.submit} ${styles.linkButton}`}>
+        Zum Profil
+      </Link>
+    </div>
+  );
+}
+
 /**
  * Formular für Anmelden und Registrieren mit Fehlern direkt am Feld.
- * Liest das Rücksprungziel aus `?weiter=`; ohne Ziel geht es zum Profil.
+ * Liest das Rücksprungziel aus `?weiter=`; ohne Ziel geht es zum Profil. Wer schon angemeldet ist, sieht einen Hinweis.
  * Rückgabe: Formularseite.
  * Feature: F-01, F-02
  */
 export function AuthForm() {
-  const { auth, mode: dataMode } = useAppServices();
+  const { auth, mode: dataMode, user, authReady } = useAppServices();
   const router = useRouter();
   const searchParams = useSearchParams();
   const showToast = useToast();
@@ -115,8 +128,11 @@ export function AuthForm() {
   const [values, setValues] = useState({ displayName: '', email: '', password: '' });
   const [errors, setErrors] = useState<FieldErrors>({});
   const [busy, setBusy] = useState(false);
+  // Nach erfolgreicher Anmeldung hier bleibt das Formular bis zum Rücksprung stehen (kein kurzes Aufblitzen des Hinweises).
+  const [completed, setCompleted] = useState(false);
 
   const finish = (name: string) => {
+    setCompleted(true);
     showToast(`Angemeldet als ${name}`);
     router.replace(returnPath, { scroll: false });
   };
@@ -143,6 +159,8 @@ export function AuthForm() {
     setMode(next);
     setErrors({});
   };
+
+  if (authReady && user && !completed && !busy) return <AlreadySignedIn name={user.displayName} />;
 
   return (
     <div className={styles.page}>

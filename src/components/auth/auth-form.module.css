@@ -170,3 +170,11 @@
   font-size: var(--text-xs);
   font-weight: 600;
 }
+
+/* Link im Stil des Hauptknopfs ("Zum Profil", wenn schon angemeldet). */
+.linkButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
