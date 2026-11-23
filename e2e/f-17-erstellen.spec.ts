@@ -70,7 +70,7 @@ test.describe('F-17 Treffen erstellen', () => {
 
   test('F-17 AK5: "Treffen erstellen" ist auf 360 px ohne Scrollen sichtbar', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 740 });
-    await page.goto('/');
+    await page.goto('/entdecken');
     await expect(page.getByRole('link', { name: 'Treffen erstellen' }).first()).toBeInViewport();
   });
 });

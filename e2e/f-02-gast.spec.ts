@@ -1,6 +1,7 @@
-// Akzeptanztests F-02 und F-31/F-32: Stöbern ohne Konto, Anmeldung erst beim Mitmachen mit Rücksprung, Erstbesuch-Hinweis, Demo-Hinweis.
+// Akzeptanztests F-02 und F-32: Stöbern ohne Konto, Anmeldung erst beim Mitmachen mit Rücksprung, Demo-Hinweis.
+// Der frühere Erstbesuch-Hinweis (F-31) ist durch die Startseite ersetzt; deren Tests stehen in f-31-landing.spec.ts.
 import { expect, test } from '@playwright/test';
-import { eventCards, openDiscover, openEventFromList, readResultCount } from './support';
+import { openDiscover, openEventFromList, readResultCount } from './support';
 
 test.describe('F-02 Ohne Konto stöbern', () => {
   test('F-02 AK1: Gäste sehen Treffen und Details ohne Anmeldeaufforderung', async ({ page }) => {
@@ -32,22 +33,8 @@ test.describe('F-02 Ohne Konto stöbern', () => {
   });
 });
 
-test('F-31 AK1/AK2: Erstbesuch-Hinweis erklärt SportMate in drei Schritten und bleibt nach dem Schließen weg', async ({ page }) => {
-  await page.goto('/');
-  const hint = page.getByRole('complementary', { name: /Sporttreffen in Flensburg/ });
-  await expect(hint).toBeVisible();
-  await expect(hint.getByText('Sportart auswählen')).toBeVisible();
-  await expect(hint.getByText('Treffen finden')).toBeVisible();
-  await expect(hint.getByText('Gemeinsam Sport machen')).toBeVisible();
-  await hint.getByRole('button', { name: 'Treffen entdecken' }).click();
-  await expect(hint).toBeHidden();
-  await page.reload();
-  await expect(eventCards(page).first()).toBeVisible();
-  await expect(page.getByRole('complementary', { name: /Sporttreffen in Flensburg/ })).toHaveCount(0);
-});
-
 test('F-32 AK1: im lokalen Modus steht dauerhaft der Demo-Hinweis', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/entdecken');
   await expect(page.getByText('Demo-Modus – Beispieldaten, Änderungen gehen beim Neuladen verloren')).toBeVisible();
   await page.goto('/profil');
   await expect(page.getByText('Demo-Modus – Beispieldaten, Änderungen gehen beim Neuladen verloren')).toBeVisible();

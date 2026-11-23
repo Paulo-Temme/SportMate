@@ -1,17 +1,10 @@
-// Gemeinsame Schritte der Akzeptanztests: Entdecken öffnen, Hinweis schließen, als Demo-Person anmelden, Karte freilegen (F-05, F-08, F-32).
+// Gemeinsame Schritte der Akzeptanztests: Entdecken öffnen, als Demo-Person anmelden, Karte freilegen (F-05, F-08, F-31, F-32).
 import { expect, type Page } from '@playwright/test';
 
-/** Öffnet Entdecken, wartet auf die Trefferzahl und schließt den Erstbesuch-Hinweis. */
+/** Öffnet Entdecken (seit F-31 unter `/entdecken`) und wartet auf die Trefferzahl. */
 export async function openDiscover(page: Page): Promise<void> {
-  await page.goto('/');
+  await page.goto('/entdecken');
   await expect(page.getByTestId('result-count')).toBeVisible();
-  await dismissFirstVisitHint(page);
-}
-
-/** Schließt den Erstbesuch-Hinweis, falls er sichtbar ist. */
-export async function dismissFirstVisitHint(page: Page): Promise<void> {
-  const close = page.getByRole('button', { name: 'Hinweis schließen' });
-  if (await close.isVisible()) await close.click();
 }
 
 /** Meldet als Demo-Person an (lokaler Modus) und wartet auf das Profil. */

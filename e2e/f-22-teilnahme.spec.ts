@@ -5,15 +5,13 @@ import { eventCards, openEventFromList, readMapEventIds, signInAsDemo } from './
 async function openDiscoverSignedIn(page: import('@playwright/test').Page, name: string) {
   await signInAsDemo(page, name);
   // Neu laden statt Tab-Klick: Die Anmeldung bleibt im Browser, die Demo-Treffen starten frisch.
-  await page.goto('/');
+  await page.goto('/entdecken');
   await expect(page.getByTestId('result-count')).toBeVisible();
-  const close = page.getByRole('button', { name: 'Hinweis schließen' });
-  if (await close.isVisible()) await close.click();
 }
 
 test.describe('F-22 Einem Treffen beitreten', () => {
   test('F-22 AK5: Karten mit freien Plätzen tragen "Jetzt teilnehmen"', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/entdecken');
     const card = eventCards(page).filter({ hasText: 'Basketball auf dem Exe' });
     await expect(card.getByRole('button', { name: /Jetzt teilnehmen/ })).toBeVisible();
   });
@@ -89,6 +87,7 @@ test('F-18 AK1: Organisatorin sagt ab; Treffen ist abgesagt und verschwindet aus
   await expect(page.getByRole('status').getByText('Treffen abgesagt')).toBeVisible();
   await expect(detail.getByText(/^Abgesagt/).first()).toBeVisible();
   await page.getByRole('button', { name: 'Alle Treffen' }).click();
+  await expect(page).toHaveURL(/\/entdecken$/);
   await expect(page.getByRole('link', { name: 'Strandlauf Solitüde' })).toHaveCount(0);
   await expect(page.getByTestId('event-card').first()).toBeVisible();
   expect(await readMapEventIds(page)).not.toContain('demo-laufen-solitude');
@@ -99,7 +98,7 @@ test('F-24 AK4: Profil zählt Treffen "dabei" und "organisiert" wie Meine Treffe
   const summary = page.getByRole('region', { name: 'Deine Treffen' });
   await expect(summary.getByTestId('count-participating')).toHaveText('0');
   await expect(summary.getByTestId('count-organizing')).toHaveText('2');
-  await page.goto('/');
+  await page.goto('/entdecken');
   await openEventFromList(page, 'Basketball auf dem Exe');
   await page.getByTestId('event-detail').getByRole('button', { name: 'Jetzt teilnehmen' }).click();
   await expect(page.getByRole('status').getByText('Du bist dabei', { exact: true })).toBeVisible();

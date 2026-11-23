@@ -77,7 +77,7 @@ test('F-14 AK1: Details nennen den Organisator ohne Kontaktdaten', async ({ page
 test('F-15 AK3: unbekannter Link zeigt "Treffen nicht gefunden" mit Weg zur Übersicht', async ({ page }) => {
   await page.goto('/treffen/gibt-es-nicht');
   await expect(page.getByRole('heading', { name: 'Treffen nicht gefunden' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Zur Übersicht' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Zur Übersicht' })).toHaveAttribute('href', '/entdecken');
 });
 
 test('F-25 AK1: Mindestzahl nicht erreicht zeigt "noch 1"', async ({ page }) => {
