@@ -36,6 +36,39 @@ export function mapMarkers(page: Page) {
   return page.getByTestId('map-marker');
 }
 
+/** Gruppen-Marker (mehrere Treffen an einer Stelle) auf der (Offline-)Karte. */
+export function mapClusters(page: Page) {
+  return page.getByTestId('map-cluster');
+}
+
+/** Kennungen aller Treffen, die die Karte zeigt (einzeln oder in Gruppen), sortiert. */
+export async function readMapEventIds(page: Page): Promise<string[]> {
+  const single = await mapMarkers(page).evaluateAll((nodes) => nodes.map((node) => node.getAttribute('data-event-id') ?? ''));
+  const grouped = await mapClusters(page).evaluateAll((nodes) => nodes.flatMap((node) => (node.getAttribute('data-event-ids') ?? '').split(' ')));
+  return [...single, ...grouped].filter(Boolean).sort();
+}
+
+/** Kennungen der Treffen in der Liste, sortiert. */
+export async function readListEventIds(page: Page): Promise<string[]> {
+  const ids = await eventCards(page).evaluateAll((nodes) => nodes.map((node) => node.getAttribute('data-event-id') ?? ''));
+  return ids.sort();
+}
+
+/** Prüft, dass Karte und Liste genau dieselben Treffen zeigen. */
+export async function expectMapMatchesList(page: Page): Promise<void> {
+  await expect.poll(async () => JSON.stringify(await readMapEventIds(page))).toBe(JSON.stringify(await readListEventIds(page)));
+}
+
+/** Klickt den Marker eines Treffens; liegt er in einer Gruppe, wird die Gruppe vorher aufgefächert. */
+export async function clickMapMarker(page: Page, eventId: string) {
+  const marker = page.locator(`[data-testid="map-marker"][data-event-id="${eventId}"]`);
+  if ((await marker.count()) === 0) {
+    await page.locator(`[data-testid="map-cluster"][data-event-ids~="${eventId}"]`).click();
+  }
+  await marker.click();
+  return marker;
+}
+
 /** Klappt das Sheet auf Mobilgeräten auf die Spitze zusammen, damit die Karte frei liegt. */
 export async function revealMap(page: Page, isMobile: boolean): Promise<void> {
   if (!isMobile) return;

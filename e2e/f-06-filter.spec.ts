@@ -1,6 +1,6 @@
 // Akzeptanztests F-06/F-07/F-09: Filter nach Sportart, Zeitraum, Niveau, Alter und Freitext mit Leerzustand.
 import { expect, test } from '@playwright/test';
-import { eventCards, mapMarkers, openDiscover, readResultCount, withFilterPanel } from './support';
+import { eventCards, expectMapMatchesList, mapClusters, mapMarkers, openDiscover, readMapEventIds, readResultCount, withFilterPanel } from './support';
 
 test.describe('F-06 Filter Sportart und Zeitraum', () => {
   test('F-06 AK1: Volleyball und Laufen zeigen genau diese Sportarten (Liste = Karte)', async ({ page }) => {
@@ -12,7 +12,8 @@ test.describe('F-06 Filter Sportart und Zeitraum', () => {
     expect(count).toBeGreaterThan(1);
     await expect(eventCards(page)).toHaveCount(count);
     for (const text of await eventCards(page).allTextContents()) expect(text).toMatch(/Volleyball|Laufen/);
-    await expect(mapMarkers(page)).toHaveCount(count);
+    await expectMapMatchesList(page);
+    expect(await readMapEventIds(page)).toHaveLength(count);
   });
 
   test('F-06 AK2: "Morgen" zeigt nur Treffen von morgen', async ({ page }) => {
@@ -30,6 +31,7 @@ test.describe('F-06 Filter Sportart und Zeitraum', () => {
     await expect(page.getByRole('heading', { name: 'Keine Treffen gefunden' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Selbst ein Treffen erstellen' })).toBeVisible();
     await expect(mapMarkers(page)).toHaveCount(0);
+    await expect(mapClusters(page)).toHaveCount(0);
   });
 
   test('F-06 AK5: "Filter zurücksetzen" zeigt wieder alle Treffen', async ({ page }) => {
@@ -39,7 +41,8 @@ test.describe('F-06 Filter Sportart und Zeitraum', () => {
     await withFilterPanel(page, () => page.getByRole('radio', { name: 'Heute' }).check());
     await page.getByRole('button', { name: 'Filter zurücksetzen' }).click();
     await expect(page.getByTestId('result-count')).toHaveText(String(all));
-    await expect(mapMarkers(page)).toHaveCount(all);
+    await expectMapMatchesList(page);
+    expect(await readMapEventIds(page)).toHaveLength(all);
   });
 });
 

@@ -23,3 +23,15 @@ export type CameraRequest =
 
 /** Mittelpunkt von Flensburg (Innenstadt am Hafen) und Start-Zoom. */
 export const flensburgCenter = { latitude: 54.7856, longitude: 9.4366, zoom: 12.6 } as const;
+
+/** Mehrere Treffen, die sich auf dem Bildschirm überlappen würden, als ein Gruppen-Marker. */
+export type MapClusterItem = {
+  key: string;
+  ids: string[];
+  latitude: number;
+  longitude: number;
+  members: Array<{ latitude: number; longitude: number }>;
+};
+
+/** Was die Karte zeichnet: ein einzelnes Treffen oder eine Gruppe. */
+export type MapDisplayItem = { kind: 'marker'; key: string; item: MapMarkerItem } | { kind: 'cluster'; key: string; cluster: MapClusterItem };

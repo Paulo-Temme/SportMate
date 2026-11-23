@@ -1,6 +1,6 @@
 // Akzeptanztests F-22/F-23/F-24/F-18: beitreten, voll, zurückziehen, Meine Treffen, absagen.
 import { expect, test } from '@playwright/test';
-import { eventCards, openEventFromList, signInAsDemo } from './support';
+import { eventCards, openEventFromList, readMapEventIds, signInAsDemo } from './support';
 
 async function openDiscoverSignedIn(page: import('@playwright/test').Page, name: string) {
   await signInAsDemo(page, name);
@@ -90,5 +90,6 @@ test('F-18 AK1: Organisatorin sagt ab; Treffen ist abgesagt und verschwindet aus
   await expect(detail.getByText(/^Abgesagt/).first()).toBeVisible();
   await page.getByRole('button', { name: 'Alle Treffen' }).click();
   await expect(page.getByRole('link', { name: 'Strandlauf Solitüde' })).toHaveCount(0);
-  await expect(page.locator('[data-testid="map-marker"][data-event-id="demo-laufen-solitude"]')).toHaveCount(0);
+  await expect(page.getByTestId('event-card').first()).toBeVisible();
+  expect(await readMapEventIds(page)).not.toContain('demo-laufen-solitude');
 });

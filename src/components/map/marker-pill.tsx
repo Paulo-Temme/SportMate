@@ -33,7 +33,7 @@ export function MarkerPill({ item, onSelect }: MarkerPillProps) {
       transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 520, damping: 22 }}
       whileTap={reduceMotion ? undefined : { scale: 0.94 }}
     >
-      <span className={styles.pill}>
+      <span className={styles.pill} data-part="pill">
         <span className={styles.icon}>
           <SportIcon sport={item.sport} size={14} />
         </span>

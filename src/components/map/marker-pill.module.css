@@ -81,3 +81,28 @@
   outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
+
+/* Gruppen-Pille: Anzahl im dunklen Kreis, sonst wie ein normaler Marker. */
+.count {
+  background: var(--ink);
+  color: var(--surface);
+  font-size: var(--text-label);
+  font-weight: 600;
+}
+
+/* Marker blenden nach dem Laden der Karte sanft ein. Nur Deckkraft: die Lage setzt MapLibre per transform. */
+.host {
+  animation: marker-in var(--duration-slow) var(--ease-out) both;
+}
+
+@keyframes marker-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .host {
+    animation: none;
+  }
+}
