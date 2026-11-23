@@ -69,4 +69,18 @@ describe('Filterleiste', () => {
     fireEvent.change(screen.getByRole('searchbox', { name: 'Treffen suchen' }), { target: { value: 'hafen' } });
     expect(readState().query).toBe('hafen');
   });
+
+  it('F-06 AK1 (REV-06): Tab bleibt im Filterdialog', () => {
+    render(<Harness />);
+    const dialog = screen.getByRole('dialog', { name: 'Filter' });
+    const focusable = [...dialog.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled])')];
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    last.focus();
+    fireEvent.keyDown(last, { key: 'Tab' });
+    expect(document.activeElement).toBe(first);
+    fireEvent.keyDown(first, { key: 'Tab', shiftKey: true });
+    expect(document.activeElement).toBe(last);
+  });
 });
+

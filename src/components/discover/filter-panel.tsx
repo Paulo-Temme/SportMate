@@ -2,7 +2,8 @@
 // Filterbereich als Dialog: Zeitraum (Heute, Morgen, Diese Woche, Datum), Niveau, Altersgruppe, Zurücksetzen (F-06, F-07).
 import { X } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { useEffect, useId, useRef } from 'react';
+import { useId, useRef } from 'react';
+import { useDialogFocus } from '@/hooks/use-dialog-focus';
 import { ageGroups, emptyFilters, levels, type EventFilters, type PeriodFilter } from '@/lib/events/event-model';
 import styles from './filter-panel.module.css';
 
@@ -104,17 +105,7 @@ export function FilterPanel({ open, filters, onChange, onClose, resultCount }: F
   const reduceMotion = useReducedMotion();
   const panel = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!open) return;
-    const previous = document.activeElement as HTMLElement | null;
-    panel.current?.focus();
-    const closeOnEscape = (event: KeyboardEvent) => event.key === 'Escape' && onClose();
-    window.addEventListener('keydown', closeOnEscape);
-    return () => {
-      window.removeEventListener('keydown', closeOnEscape);
-      previous?.focus();
-    };
-  }, [open, onClose]);
+  useDialogFocus({ open, container: panel, onEscape: onClose });
 
   return (
     <AnimatePresence>

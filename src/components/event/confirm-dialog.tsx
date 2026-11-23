@@ -1,8 +1,9 @@
 'use client';
 // Bestätigungsdialog für folgenreiche Aktionen wie Absagen oder Teilnahme zurückziehen (F-18, F-23).
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { useEffect, useId, useRef, useSyncExternalStore } from 'react';
+import { useId, useRef, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
+import { useDialogFocus } from '@/hooks/use-dialog-focus';
 import styles from './confirm-dialog.module.css';
 
 const subscribeNever = () => () => {};
@@ -19,7 +20,8 @@ type ConfirmDialogProps = {
 };
 
 /**
- * Modaler Dialog mit "Abbrechen" und einer Bestätigung. Escape und Hintergrund brechen ab; der Fokus startet bei "Abbrechen".
+ * Modaler Dialog mit "Abbrechen" und einer Bestätigung. Escape und Hintergrund brechen ab (nicht während `busy`);
+ * der Fokus startet bei "Abbrechen", bleibt im Dialog und kehrt danach zum Auslöser zurück.
  * Eingaben: offen, Texte, Ton, ob beschäftigt, Callbacks. Rückgabe: Dialog oder nichts.
  * Feature: F-18, F-23
  */
@@ -30,13 +32,8 @@ export function ConfirmDialog({ open, title, description, confirmLabel, tone = '
   const descriptionId = useId();
   const inBrowser = useSyncExternalStore(subscribeNever, () => true, () => false);
 
-  useEffect(() => {
-    if (!open) return;
-    cancelButton.current?.focus();
-    const closeOnEscape = (event: KeyboardEvent) => event.key === 'Escape' && onCancel();
-    window.addEventListener('keydown', closeOnEscape);
-    return () => window.removeEventListener('keydown', closeOnEscape);
-  }, [open, onCancel]);
+  const dialog = useRef<HTMLDivElement>(null);
+  useDialogFocus({ open: open && inBrowser, container: dialog, initialFocus: cancelButton, onEscape: onCancel, escapeBlocked: busy });
 
   // Portal an <body>: Das Sheet ist per transform verschoben und würde "position: fixed" sonst einfangen.
   if (!inBrowser) return null;
@@ -44,8 +41,9 @@ export function ConfirmDialog({ open, title, description, confirmLabel, tone = '
     <AnimatePresence>
       {open && (
         <div className={styles.layer}>
-          <motion.div className={styles.backdrop} onClick={onCancel} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
+          <motion.div className={styles.backdrop} onClick={busy ? undefined : onCancel} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
           <motion.div
+            ref={dialog}
             className={styles.dialog}
             role="alertdialog"
             aria-modal="true"
