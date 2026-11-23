@@ -13,8 +13,7 @@ import {
   describeBringAlong,
   describeCost,
   describeEventStatus,
-  formatEventDate,
-  formatEventTime,
+  formatEventSchedule,
   summarizePlaces,
 } from '@/lib/events/event-presentation';
 import { ConfirmDialog } from './confirm-dialog';
@@ -125,9 +124,7 @@ function DetailFacts({ event }: { event: SportEvent }) {
   return (
     <dl className={styles.facts}>
       <Fact icon={<CalendarDays size={18} aria-hidden="true" />} label="Wann">
-        <span>
-          {formatEventDate(event.startsAt)} · {formatEventTime(event.startsAt)}–{formatEventTime(event.endsAt)} Uhr
-        </span>
+        <span>{formatEventSchedule(event.startsAt, event.endsAt)}</span>
       </Fact>
       <Fact icon={<MapPin size={18} aria-hidden="true" />} label="Treffpunkt">
         {event.locationName && <strong className={styles.factStrong}>{event.locationName}</strong>}

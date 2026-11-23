@@ -8,7 +8,7 @@ test.describe('F-12 Detailansicht', () => {
     await openEventFromList(page, 'Fußball am Campus – Anfänger willkommen');
     const detail = page.getByTestId('event-detail');
     await expect(detail.getByText('Fußball', { exact: true })).toBeVisible();
-    await expect(detail.getByText(/17:00–19:00 Uhr/)).toBeVisible();
+    await expect(detail.getByText(/^[A-Z][a-z], \d{2}\.\d{2}\., 17:00–19:00 Uhr · 2 Std\.$/)).toBeVisible();
     await expect(detail.getByText('Campus Flensburg, Sportplatz (Beispiel)')).toBeVisible();
     await expect(detail.getByText('Niveau: Anfänger')).toBeVisible();
     await expect(detail.getByText('Anfänger willkommen', { exact: true })).toBeVisible();

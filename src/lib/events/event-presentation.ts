@@ -113,3 +113,39 @@ export function formatEventDate(iso: string): string {
 export function formatEventTime(iso: string): string {
   return new Intl.DateTimeFormat('de-DE', { timeZone: berlinTimeZone, hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
 }
+
+function readBerlinParts(date: Date): Record<'weekday' | 'day' | 'month', string> {
+  const parts = new Intl.DateTimeFormat('de-DE', { timeZone: berlinTimeZone, weekday: 'short', day: '2-digit', month: '2-digit' }).formatToParts(date);
+  const pick = (type: Intl.DateTimeFormatPartTypes) => parts.find((part) => part.type === type)?.value ?? '';
+  return { weekday: pick('weekday').replace('.', ''), day: pick('day'), month: pick('month') };
+}
+
+function describeDuration(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  if (hours === 0) return `${rest} Min.`;
+  return rest === 0 ? `${hours} Std.` : `${hours} Std. ${rest} Min.`;
+}
+
+function parseValidDate(iso: string): Date {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) throw new RangeError(`Ungültiges Datum: ${iso}`);
+  return date;
+}
+
+/**
+ * Beschreibt Termin und Dauer eines Treffens in Berliner Zeit, zum Beispiel "Do, 26.11., 18:00–20:00 Uhr · 2 Std.".
+ * Eingaben: Beginn und Ende als ISO-Zeitpunkte.
+ * Rückgabe: Text; liegt das Ende nicht nach dem Beginn, entfallen Endzeit und Dauer ("Do, 26.11., 18:00 Uhr").
+ * Fehler: wirft `RangeError` bei ungültigem Datum.
+ * Feature: F-12
+ */
+export function formatEventSchedule(startsAtIso: string, endsAtIso: string): string {
+  const startsAt = parseValidDate(startsAtIso);
+  const endsAt = parseValidDate(endsAtIso);
+  const { weekday, day, month } = readBerlinParts(startsAt);
+  const prefix = `${weekday}, ${day}.${month}., ${formatEventTime(startsAtIso)}`;
+  const minutes = Math.round((endsAt.getTime() - startsAt.getTime()) / 60_000);
+  if (minutes <= 0) return `${prefix} Uhr`;
+  return `${prefix}–${formatEventTime(endsAtIso)} Uhr · ${describeDuration(minutes)}`;
+}

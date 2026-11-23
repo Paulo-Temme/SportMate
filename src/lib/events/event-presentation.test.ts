@@ -7,6 +7,7 @@ import {
   describeCost,
   describeEventStatus,
   formatEventDate,
+  formatEventSchedule,
   formatEventTime,
   summarizePlaces,
 } from './event-presentation';
@@ -103,5 +104,32 @@ describe('F-13: Kosten und Mitbringen', () => {
   it('F-13 AK3: zeigt Mitbringen oder "nichts Besonderes"', () => {
     expect(describeBringAlong(' Hallenschuhe, Wasser ')).toBe('Mitbringen: Hallenschuhe, Wasser');
     expect(describeBringAlong('  ')).toBe('Mitbringen: nichts Besonderes');
+  });
+});
+
+describe('F-12 AK1: Datum mit Dauer', () => {
+  it('F-12 AK1: zeigt Wochentag, Datum, Uhrzeit und Dauer in Stunden', () => {
+    expect(formatEventSchedule('2026-11-26T17:00:00.000Z', '2026-11-26T19:00:00.000Z')).toBe('Do, 26.11., 18:00–20:00 Uhr · 2 Std.');
+  });
+
+  it('F-12 AK1: zeigt Minuten, Stunden mit Minuten und eine Stunde', () => {
+    expect(formatEventSchedule('2026-11-26T17:00:00.000Z', '2026-11-26T17:45:00.000Z')).toBe('Do, 26.11., 18:00–18:45 Uhr · 45 Min.');
+    expect(formatEventSchedule('2026-11-23T08:30:00.000Z', '2026-11-23T10:00:00.000Z')).toBe('Mo, 23.11., 09:30–11:00 Uhr · 1 Std. 30 Min.');
+    expect(formatEventSchedule('2026-11-28T09:00:00.000Z', '2026-11-28T10:00:00.000Z')).toBe('Sa, 28.11., 10:00–11:00 Uhr · 1 Std.');
+  });
+
+  it('F-12 AK1: rechnet immer in Berliner Zeit, auch im Sommer und über Mitternacht', () => {
+    expect(formatEventSchedule('2026-07-01T16:00:00.000Z', '2026-07-01T18:30:00.000Z')).toBe('Mi, 01.07., 18:00–20:30 Uhr · 2 Std. 30 Min.');
+    expect(formatEventSchedule('2026-11-27T21:00:00.000Z', '2026-11-28T00:00:00.000Z')).toBe('Fr, 27.11., 22:00–01:00 Uhr · 3 Std.');
+  });
+
+  it('F-12 AK1: lässt die Dauer weg, wenn das Ende nicht nach dem Beginn liegt', () => {
+    expect(formatEventSchedule('2026-11-26T17:00:00.000Z', '2026-11-26T17:00:00.000Z')).toBe('Do, 26.11., 18:00 Uhr');
+    expect(formatEventSchedule('2026-11-26T17:00:00.000Z', '2026-11-26T16:00:00.000Z')).toBe('Do, 26.11., 18:00 Uhr');
+  });
+
+  it('F-12 AK1: wirft bei ungültigem Datum', () => {
+    expect(() => formatEventSchedule('kein Datum', '2026-11-26T17:00:00.000Z')).toThrow(RangeError);
+    expect(() => formatEventSchedule('2026-11-26T17:00:00.000Z', 'kein Datum')).toThrow(RangeError);
   });
 });
