@@ -21,6 +21,9 @@ export type GeoPoint = { latitude: number; longitude: number };
 export type EventInput = GeoPoint & {
   title: string;
   sport: Sport;
+  /** Kurzer Ortsname für Liste und Marker, z. B. "Volkspark". Darf leer sein. */
+  locationName: string;
+  /** Treffpunktbeschreibung, Pflichtfeld. */
   meetingPoint: string;
   startsAt: string;
   endsAt: string;
@@ -28,16 +31,36 @@ export type EventInput = GeoPoint & {
   minParticipants: number;
   level: Level;
   ageGroup: AgeGroup;
+  /** Kosten pro Person in Cent, 0 = kostenlos. */
+  costCents: number;
+  /** Was Teilnehmende mitbringen sollen. Leer = nichts Besonderes. */
+  bringAlong: string;
   description: string;
 };
 
-/** Gespeichertes Treffen mit Kennung, organisierender Person, Status und Teilnehmenden. */
+/**
+ * Treffen, wie es die Oberfläche sieht. Wer genau teilnimmt, ist nicht Teil des Modells
+ * (im Supabase-Modus nicht öffentlich lesbar); dafür gibt es `EventRepository.listParticipants`.
+ */
 export type SportEvent = EventInput & {
   id: string;
+  /** Konto der organisierenden Person; leer bei fiktiven Treffen ohne Konto. */
   organizerId: string;
+  /** Anzeigename der organisierenden Person, nie eine E-Mail-Adresse. */
+  organizerName: string;
   status: EventStatus;
-  participants: string[];
+  /** Belegte Plätze einschließlich organisierender Person. */
+  participantCount: number;
+  /** Ob die angemeldete Person teilnimmt (Gäste: immer `false`). */
+  isViewerParticipant: boolean;
+  /** Ob die angemeldete Person das Treffen organisiert (Gäste: immer `false`). */
+  isViewerOrganizer: boolean;
+  /** Fiktives Beispieltreffen, in der Oberfläche als solches gekennzeichnet. */
+  isDemo: boolean;
 };
+
+/** Eintrag der Teilnehmerliste. Enthält bewusst keine Kennung und keine E-Mail-Adresse. */
+export type ParticipantEntry = { displayName: string; isOrganizer: boolean };
 
 /** Zeitraumfilter der Suche. "date" nutzt das Feld `date` (YYYY-MM-DD, Europe/Berlin). */
 export type PeriodFilter = '' | 'today' | 'tomorrow' | 'week' | 'date';

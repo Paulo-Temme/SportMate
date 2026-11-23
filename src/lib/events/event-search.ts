@@ -53,15 +53,15 @@ function matchesPeriod(day: string, filters: EventFilters, window: CalendarWindo
   }
 }
 
-function buildPredicates(filters: EventFilters, userId: string, now: Date): EventPredicate[] {
+function buildPredicates(filters: EventFilters, now: Date): EventPredicate[] {
   const query = filters.query.trim().toLocaleLowerCase('de');
   const window = buildCalendarWindow(now);
   return [
-    (event) => (filters.mine ? event.participants.includes(userId) : event.status === 'published' && new Date(event.startsAt) > now),
+    (event) => (filters.mine ? event.isViewerParticipant || event.isViewerOrganizer : event.status === 'published' && new Date(event.startsAt) > now),
     (event) => filters.sports.length === 0 || filters.sports.includes(event.sport),
     (event) => !filters.level || event.level === filters.level || event.level === 'Alle Niveaus',
     (event) => !filters.ageGroup || !event.ageGroup || event.ageGroup === filters.ageGroup,
-    (event) => !query || `${event.title} ${event.meetingPoint} ${event.sport}`.toLocaleLowerCase('de').includes(query),
+    (event) => !query || `${event.title} ${event.locationName} ${event.meetingPoint} ${event.sport}`.toLocaleLowerCase('de').includes(query),
     (event) => matchesPeriod(toBerlinDay(event.startsAt), filters, window),
   ];
 }
@@ -69,13 +69,13 @@ function buildPredicates(filters: EventFilters, userId: string, now: Date): Even
 /**
  * Sucht Treffen. Sportarten werden mit ODER verknüpft, die Filtergruppen untereinander mit UND.
  * Ohne "Meine Treffen" erscheinen nur veröffentlichte, noch nicht begonnene Treffen;
- * mit "Meine Treffen" alle, an denen die Person teilnimmt, auch abgesagte.
- * Eingaben: Treffen, Filter, Kennung der Person (leer bei Gästen), aktueller Zeitpunkt.
+ * mit "Meine Treffen" alle, die die betrachtende Person organisiert oder an denen sie teilnimmt, auch abgesagte.
+ * Eingaben: Treffen aus Sicht der betrachtenden Person, Filter, aktueller Zeitpunkt.
  * Rückgabe: neue Liste, aufsteigend nach Beginn. Die Eingabe bleibt unverändert.
- * Feature: F-00
+ * Feature: F-05, F-24
  */
-export function searchEvents(events: readonly SportEvent[], filters: EventFilters, userId: string, now = new Date()): SportEvent[] {
-  const predicates = buildPredicates(filters, userId, now);
+export function searchEvents(events: readonly SportEvent[], filters: EventFilters, now = new Date()): SportEvent[] {
+  const predicates = buildPredicates(filters, now);
   return events
     .filter((event) => predicates.every((matches) => matches(event)))
     .sort((first, second) => Date.parse(first.startsAt) - Date.parse(second.startsAt));

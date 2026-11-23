@@ -1,5 +1,7 @@
-// Schnittstelle des Datenzugriffs auf Treffen. Oberfläche und Kernlogik kennen nur diese Schnittstelle (F-00).
-import type { EventFilters, EventInput, SportEvent } from '../events/event-model';
+// Schnittstelle des Datenzugriffs auf Treffen. Oberfläche und Kernlogik kennen nur diese Schnittstelle (F-00, F-20).
+import type { EventFilters, EventInput, ParticipantEntry, SportEvent } from '../events/event-model';
+
+export type { ParticipantEntry } from '../events/event-model';
 
 /**
  * Speicher für Treffen. Umsetzungen: lokal im Browser (`LocalEventRepository`) und Supabase.
@@ -28,4 +30,10 @@ export interface EventRepository {
 
   /** Sagt ein Treffen ab. Fehler: Gast, unbekanntes Treffen, Person organisiert es nicht. */
   cancelEvent(eventId: string): Promise<SportEvent>;
+
+  /**
+   * Anzeigenamen der Teilnehmenden, Organisator zuerst. Nur für Teilnehmende und Organisator;
+   * für alle anderen (auch Gäste) und unbekannte Treffen eine leere Liste. Keine E-Mail-Adressen.
+   */
+  listParticipants(eventId: string): Promise<ParticipantEntry[]>;
 }

@@ -1,5 +1,6 @@
 // Feste Testdaten: drei fiktive Treffen zu einem festen Zeitpunkt, damit Tests nicht von der Uhrzeit abhängen (F-00).
 import type { EventInput, SportEvent } from '../../src/lib/events/event-model';
+import { toViewerEvent, type EventMember, type StoredEvent } from '../../src/lib/events/stored-event';
 
 /** Fester "Jetzt"-Zeitpunkt aller Tests: Montag, 26.10.2026, 12:00 Uhr Berliner Zeit. */
 export const fixedNow = new Date('2026-10-26T12:00:00+01:00');
@@ -8,6 +9,7 @@ export const fixedNow = new Date('2026-10-26T12:00:00+01:00');
 export const validInput: EventInput = {
   title: 'Basketball am Campus',
   sport: 'Basketball',
+  locationName: 'Campus',
   meetingPoint: 'Campus Sportplatz',
   latitude: 54.774,
   longitude: 9.452,
@@ -17,12 +19,27 @@ export const validInput: EventInput = {
   minParticipants: 4,
   level: 'Alle Niveaus',
   ageGroup: '',
+  costCents: 0,
+  bringAlong: '',
   description: '',
 };
 
-/** Fußball morgen 17 Uhr (5/10), Volleyball morgen 18 Uhr (voll, 4/4), Badminton übermorgen 16 Uhr (1/2). */
-export function createSampleEvents(): SportEvent[] {
-  const common = { organizerId: 'alex', status: 'published' as const };
+/** Fiktive Personen der Testdaten mit Anzeigenamen. */
+export function member(id: string): EventMember {
+  return { id, displayName: id.charAt(0).toUpperCase() + id.slice(1) };
+}
+
+/** Fußball morgen 17 Uhr (5/10), Volleyball morgen 18 Uhr (voll, 4/4), Badminton übermorgen 16 Uhr (1/2). Organisiert von alex. */
+export function createSampleStoredEvents(): StoredEvent[] {
+  const common = {
+    organizerId: 'alex',
+    organizerName: 'Alex',
+    status: 'published' as const,
+    locationName: '',
+    costCents: 0,
+    bringAlong: '',
+    isDemo: false,
+  };
   return [
     {
       ...common,
@@ -39,7 +56,7 @@ export function createSampleEvents(): SportEvent[] {
       level: 'Anfänger',
       ageGroup: '20–25',
       description: '',
-      participants: ['alex', 'kim', 'sam', 'nora', 'emi'],
+      participants: [member('alex'), member('kim'), member('sam'), member('nora'), member('emi')],
     },
     {
       ...common,
@@ -56,7 +73,7 @@ export function createSampleEvents(): SportEvent[] {
       level: 'Fortgeschritten',
       ageGroup: '',
       description: '',
-      participants: ['alex', 'kim', 'sam', 'nora'],
+      participants: [member('alex'), member('kim'), member('sam'), member('nora')],
     },
     {
       ...common,
@@ -73,7 +90,12 @@ export function createSampleEvents(): SportEvent[] {
       level: 'Alle Niveaus',
       ageGroup: '',
       description: '',
-      participants: ['alex'],
+      participants: [member('alex')],
     },
   ];
+}
+
+/** Dieselben Treffen aus Sicht einer Person (`null` = Gast). */
+export function createSampleEvents(viewerId: string | null = null): SportEvent[] {
+  return createSampleStoredEvents().map((event) => toViewerEvent(event, viewerId));
 }

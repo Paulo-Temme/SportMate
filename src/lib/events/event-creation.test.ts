@@ -1,23 +1,32 @@
 import { describe, expect, it } from 'vitest';
-import { fixedNow, validInput } from '../../../tests/fixtures/sample-events';
+import { fixedNow, member, validInput } from '../../../tests/fixtures/sample-events';
 import { createEvent } from './event-creation';
 import { EventError } from './event-error';
 import type { EventInput } from './event-model';
-import { findEventInputError } from './event-validation';
+import { describeFieldRule, findEventInputError } from './event-validation';
 
 describe('F-00 AK1: Treffen erstellen und Eingaben prüfen', () => {
   it('F-00 AK1: zählt die organisierende Person automatisch mit und normalisiert die Zeit', () => {
-    const event = createEvent({ ...validInput, title: '  Basketball am Campus  ' }, 'lea', 'neu-1', fixedNow);
+    const event = createEvent(
+      { ...validInput, title: '  Basketball am Campus  ', locationName: ' Campus ', bringAlong: ' Ball ' },
+      member('lea'),
+      'neu-1',
+      fixedNow,
+    );
     expect(event.id).toBe('neu-1');
-    expect(event.participants).toEqual(['lea']);
+    expect(event.participants).toEqual([member('lea')]);
     expect(event.organizerId).toBe('lea');
+    expect(event.organizerName).toBe('Lea');
+    expect(event.isDemo).toBe(false);
+    expect(event.locationName).toBe('Campus');
+    expect(event.bringAlong).toBe('Ball');
     expect(event.status).toBe('published');
     expect(event.title).toBe('Basketball am Campus');
     expect(event.startsAt).toBe('2026-10-28T15:00:00.000Z');
   });
 
   it.each(['', '   '])('F-00 AK1: verweigert das Erstellen für Gäste (Kennung %j)', (userId) => {
-    expect(() => createEvent(validInput, userId, 'neu-1', fixedNow)).toThrow('anmelden');
+    expect(() => createEvent(validInput, { id: userId, displayName: 'Gast' }, 'neu-1', fixedNow)).toThrow('anmelden');
   });
 
   it.each([
@@ -42,11 +51,16 @@ describe('F-00 AK1: Treffen erstellen und Eingaben prüfen', () => {
     [{ minParticipants: 1 }, 'minParticipants'],
     [{ level: 'Profi' }, 'level'],
     [{ ageGroup: 'privat' }, 'ageGroup'],
+    [{ locationName: 'x'.repeat(81) }, 'locationName'],
+    [{ costCents: -1 }, 'costCents'],
+    [{ costCents: 5001 }, 'costCents'],
+    [{ costCents: 1.5 }, 'costCents'],
+    [{ bringAlong: 'x'.repeat(201) }, 'bringAlong'],
     [{ description: 'x'.repeat(301) }, 'description'],
   ])('F-00 AK1: weist ungültige Daten mit Feldangabe ab: %j', (bad, field) => {
     const input = { ...validInput, ...bad } as EventInput;
     expect(findEventInputError(input, fixedNow)?.field).toBe(field);
-    expect(() => createEvent(input, 'lea', 'neu-1', fixedNow)).toThrow(EventError);
+    expect(() => createEvent(input, member('lea'), 'neu-1', fixedNow)).toThrow(EventError);
   });
 
   it.each([
@@ -58,7 +72,25 @@ describe('F-00 AK1: Treffen erstellen und Eingaben prüfen', () => {
     { minParticipants: 10 },
     { ageGroup: 'über 40' },
     { description: 'x'.repeat(300) },
+    { locationName: 'x'.repeat(80) },
+    { costCents: 0 },
+    { costCents: 5000 },
+    { bringAlong: 'x'.repeat(200) },
   ])('F-00 AK1: akzeptiert Randwerte: %j', (edge) => {
     expect(findEventInputError({ ...validInput, ...edge } as EventInput, fixedNow)).toBeNull();
+  });
+});
+
+describe('F-25 AK3: Mindestzahl gegen Plätze prüfen', () => {
+  it('F-25 AK3: meldet eine Mindestzahl über der Kapazität verständlich', () => {
+    expect(findEventInputError({ ...validInput, capacity: 8, minParticipants: 9 }, fixedNow)?.message).toBe(
+      'Mindestzahl darf die Plätze nicht übersteigen.',
+    );
+    expect(findEventInputError({ ...validInput, minParticipants: 1 }, fixedNow)?.message).toBe('Die Mindestzahl muss mindestens 2 sein.');
+  });
+
+  it('F-17 AK4: liefert die Feldmeldung für Serverfehler', () => {
+    expect(describeFieldRule('capacity')).toContain('zwischen 2 und 50');
+    expect(describeFieldRule('id' as keyof EventInput)).toBeNull();
   });
 });

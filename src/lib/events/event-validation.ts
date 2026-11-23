@@ -11,6 +11,9 @@ export const eventLimits = {
   capacityMin: 2,
   capacityMax: 50,
   descriptionMax: 300,
+  locationNameMax: 80,
+  costCentsMax: 5000,
+  bringAlongMax: 200,
 } as const;
 
 type FieldRule = {
@@ -54,6 +57,11 @@ const fieldRules: FieldRule[] = [
     isValid: (input) => isOneOf(sports, input.sport),
   },
   {
+    field: 'locationName',
+    message: `Der Ortsname darf höchstens ${eventLimits.locationNameMax} Zeichen haben.`,
+    isValid: (input) => input.locationName.trim().length <= eventLimits.locationNameMax,
+  },
+  {
     field: 'meetingPoint',
     message: `Bitte den Treffpunkt mit ${eventLimits.meetingPointMin}–${eventLimits.meetingPointMax} Zeichen beschreiben.`,
     isValid: (input) => hasLengthBetween(input.meetingPoint, eventLimits.meetingPointMin, eventLimits.meetingPointMax),
@@ -80,8 +88,13 @@ const fieldRules: FieldRule[] = [
   },
   {
     field: 'minParticipants',
-    message: 'Die Mindestzahl muss zwischen 2 und der maximalen Teilnehmerzahl liegen.',
-    isValid: (input) => isIntegerBetween(input.minParticipants, eventLimits.capacityMin, input.capacity),
+    message: `Die Mindestzahl muss mindestens ${eventLimits.capacityMin} sein.`,
+    isValid: (input) => Number.isInteger(input.minParticipants) && input.minParticipants >= eventLimits.capacityMin,
+  },
+  {
+    field: 'minParticipants',
+    message: 'Mindestzahl darf die Plätze nicht übersteigen.',
+    isValid: (input) => input.minParticipants <= input.capacity,
   },
   {
     field: 'level',
@@ -94,11 +107,30 @@ const fieldRules: FieldRule[] = [
     isValid: (input) => input.ageGroup === '' || isOneOf(ageGroups, input.ageGroup),
   },
   {
+    field: 'costCents',
+    message: `Die Kosten müssen zwischen 0 und ${eventLimits.costCentsMax / 100} € liegen.`,
+    isValid: (input) => isIntegerBetween(input.costCents, 0, eventLimits.costCentsMax),
+  },
+  {
+    field: 'bringAlong',
+    message: `"Mitbringen" darf höchstens ${eventLimits.bringAlongMax} Zeichen haben.`,
+    isValid: (input) => input.bringAlong.trim().length <= eventLimits.bringAlongMax,
+  },
+  {
     field: 'description',
     message: `Die Beschreibung darf höchstens ${eventLimits.descriptionMax} Zeichen enthalten.`,
     isValid: (input) => input.description.length <= eventLimits.descriptionMax,
   },
 ];
+
+/**
+ * Liefert die Meldung der ersten Regel für ein Feld, z. B. um Serverfehler zu übersetzen.
+ * Eingaben: Feld der Eingabe. Rückgabe: deutsche Meldung oder `null`, wenn es keine Regel gibt.
+ * Feature: F-17
+ */
+export function describeFieldRule(field: keyof EventInput): string | null {
+  return fieldRules.find((rule) => rule.field === field)?.message ?? null;
+}
 
 /**
  * Sucht das erste Feld, das gegen eine Fachregel verstößt.

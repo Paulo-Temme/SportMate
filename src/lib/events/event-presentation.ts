@@ -1,11 +1,11 @@
-// Leitet aus vorhandenen Treffendaten Anzeigetexte ab (Plätze, Altersgruppe, Status, Datum). Repariert keine Daten (F-00).
+// Leitet aus vorhandenen Treffendaten Anzeigetexte ab (Plätze, Altersgruppe, Status, Kosten, Datum). Repariert keine Daten (F-00).
 import { ageGroups, type SportEvent } from './event-model';
 
 /** Freie Plätze eines Treffens. `free` ist `null`, wenn die Daten keine ehrliche Aussage erlauben. */
 export type PlaceSummary = { label: string; free: number | null; full: boolean };
 
 /** Fachlicher Zustand eines Treffens aus Sicht der Suchenden. */
-export type EventStatusLabel = 'Abgesagt' | 'Beendet' | 'Läuft bereits' | 'Ausgebucht' | 'Findet statt' | 'Sucht Mitspieler';
+export type EventStatusLabel = 'Abgesagt' | 'Beendet' | 'Läuft bereits' | 'Ausgebucht' | 'Findet statt' | 'Sucht noch Mitspielende';
 
 const berlinTimeZone = 'Europe/Berlin';
 
@@ -21,33 +21,27 @@ export function describeAgeGroup(ageGroup: unknown): string {
   return `Altersgruppe: ${ageGroup} Jahre`;
 }
 
-function isNonEmptyText(value: unknown): boolean {
-  return typeof value === 'string' && value.trim().length > 0;
-}
-
 function hasValidCapacity(capacity: unknown): capacity is number {
   return typeof capacity === 'number' && Number.isInteger(capacity) && capacity > 0;
 }
 
-function hasValidParticipants(participants: unknown, capacity: number): participants is string[] {
-  if (!Array.isArray(participants)) return false;
-  const uniqueIds = new Set(participants);
-  return participants.every(isNonEmptyText) && uniqueIds.size === participants.length && participants.length <= capacity;
+function hasValidCount(count: unknown, capacity: number): count is number {
+  return typeof count === 'number' && Number.isInteger(count) && count >= 0 && count <= capacity;
 }
 
 /**
  * Berechnet die freien Plätze.
- * Eingaben: Treffen mit Kapazität, Teilnehmenden und Status; Felder dürfen fehlen oder ungültig sein.
+ * Eingaben: Treffen mit Kapazität, Belegung (`participantCount`) und Status; Felder dürfen fehlen oder ungültig sein.
  * Rückgabe: Text, Anzahl freier Plätze und ob ausgebucht. Bei abgesagten oder unvollständigen Daten `free: null`.
- * Feature: F-00
+ * Feature: F-05, F-12
  */
-export function summarizePlaces(event: { capacity?: unknown; participants?: unknown; status?: unknown }): PlaceSummary {
+export function summarizePlaces(event: { capacity?: unknown; participantCount?: unknown; status?: unknown }): PlaceSummary {
   if (event.status === 'cancelled') return { label: 'Abgesagt', free: null, full: false };
-  const { capacity, participants } = event;
-  if (!hasValidCapacity(capacity) || !hasValidParticipants(participants, capacity)) {
+  const { capacity, participantCount } = event;
+  if (!hasValidCapacity(capacity) || !hasValidCount(participantCount, capacity)) {
     return { label: 'Platzangabe nicht verfügbar', free: null, full: false };
   }
-  const free = capacity - participants.length;
+  const free = capacity - participantCount;
   return {
     label: free === 0 ? 'Ausgebucht · 0 Plätze frei' : `${free} von ${capacity} Plätzen frei`,
     free,
@@ -56,17 +50,48 @@ export function summarizePlaces(event: { capacity?: unknown; participants?: unkn
 }
 
 /**
+ * Zählt, wie viele Personen bis zur Mindestzahl noch fehlen.
+ * Eingaben: Treffen mit Mindestzahl und Belegung. Rückgabe: 0 oder mehr.
+ * Feature: F-25
+ */
+export function countMissingParticipants(event: Pick<SportEvent, 'minParticipants' | 'participantCount'>): number {
+  return Math.max(0, event.minParticipants - event.participantCount);
+}
+
+/**
  * Bestimmt den Zustand eines Treffens zum Zeitpunkt `now`.
  * Eingaben: Treffen, aktueller Zeitpunkt.
  * Rückgabe: einer der Zustände aus `EventStatusLabel`, Absage und Zeit gehen vor Belegung.
- * Feature: F-00
+ * Feature: F-12, F-25
  */
 export function describeEventStatus(event: SportEvent, now = new Date()): EventStatusLabel {
   if (event.status === 'cancelled') return 'Abgesagt';
   if (new Date(event.endsAt) <= now) return 'Beendet';
   if (new Date(event.startsAt) <= now) return 'Läuft bereits';
-  if (event.participants.length >= event.capacity) return 'Ausgebucht';
-  return event.participants.length >= event.minParticipants ? 'Findet statt' : 'Sucht Mitspieler';
+  if (event.participantCount >= event.capacity) return 'Ausgebucht';
+  return countMissingParticipants(event) === 0 ? 'Findet statt' : 'Sucht noch Mitspielende';
+}
+
+/**
+ * Beschreibt die Kosten pro Person, zum Beispiel "Kostenlos" oder "3,50 € pro Person".
+ * Eingaben: Kosten in Cent. Rückgabe: Text; ungültige Werte ergeben "Kosten nicht angegeben".
+ * Feature: F-13
+ */
+export function describeCost(costCents: unknown): string {
+  if (typeof costCents !== 'number' || !Number.isInteger(costCents) || costCents < 0) return 'Kosten nicht angegeben';
+  if (costCents === 0) return 'Kostenlos';
+  const euros = (costCents / 100).toFixed(2).replace('.', ',');
+  return `${euros} € pro Person`;
+}
+
+/**
+ * Beschreibt, was mitzubringen ist.
+ * Eingaben: Text aus dem Treffen. Rückgabe: "Mitbringen: …" oder "Mitbringen: nichts Besonderes" bei leerem Text.
+ * Feature: F-13
+ */
+export function describeBringAlong(bringAlong: string): string {
+  const text = bringAlong.trim();
+  return `Mitbringen: ${text || 'nichts Besonderes'}`;
 }
 
 /**

@@ -1,6 +1,7 @@
-// Fiktive Treffen an Orten in Flensburg für den Demomodus. Termine relativ zu "jetzt", damit Zeitfilter Treffer haben (F-00).
-import type { SportEvent } from './event-model';
+// Fiktive Treffen an Orten in Flensburg für den Demomodus. Termine relativ zu "jetzt", damit Zeitfilter Treffer haben (F-00, F-32).
+import { demoPeople } from './demo-people';
 import { toBerlinDay } from './event-search';
+import type { EventMember, StoredEvent } from './stored-event';
 
 const minute = 60_000;
 const hour = 60 * minute;
@@ -38,12 +39,19 @@ function plusHours(iso: string, hours: number): string {
   return new Date(Date.parse(iso) + hours * hour).toISOString();
 }
 
-type DemoTemplate = Omit<SportEvent, 'status' | 'endsAt'> & { durationHours: number; status?: SportEvent['status'] };
+type DemoTemplate = Omit<StoredEvent, 'status' | 'endsAt' | 'participants' | 'organizerName' | 'isDemo'> & {
+  durationHours: number;
+  participants: string[];
+  status?: StoredEvent['status'];
+};
 
 function buildTemplates(now: Date): DemoTemplate[] {
   return [
     {
       id: 'demo-laufen-volkspark',
+      locationName: 'Volkspark',
+      costCents: 0,
+      bringAlong: 'Laufschuhe, Wasser',
       title: 'Lockere Laufrunde im Volkspark',
       sport: 'Laufen',
       meetingPoint: 'Volkspark Flensburg, Eingang Mürwiker Straße (Beispiel)',
@@ -61,6 +69,9 @@ function buildTemplates(now: Date): DemoTemplate[] {
     },
     {
       id: 'demo-basketball-exe',
+      locationName: 'Exe',
+      costCents: 0,
+      bringAlong: 'Hallenschuhe oder feste Sportschuhe',
       title: 'Basketball auf dem Exe',
       sport: 'Basketball',
       meetingPoint: 'Exe-Platz Flensburg, Basketballkorb (Beispiel)',
@@ -78,7 +89,10 @@ function buildTemplates(now: Date): DemoTemplate[] {
     },
     {
       id: 'demo-fussball-campus',
-      title: 'Fußball am Campus',
+      locationName: 'Campus',
+      costCents: 0,
+      bringAlong: 'Sportschuhe, Getränk',
+      title: 'Fußball am Campus – Anfänger willkommen',
       sport: 'Fußball',
       meetingPoint: 'Campus Flensburg, Sportplatz (Beispiel)',
       latitude: 54.7753,
@@ -95,6 +109,9 @@ function buildTemplates(now: Date): DemoTemplate[] {
     },
     {
       id: 'demo-volleyball-hafen',
+      locationName: 'Hafenspitze',
+      costCents: 0,
+      bringAlong: '',
       title: 'Volleyball an der Hafenspitze',
       sport: 'Volleyball',
       meetingPoint: 'Flensburg, Hafenspitze (Beispiel)',
@@ -112,6 +129,9 @@ function buildTemplates(now: Date): DemoTemplate[] {
     },
     {
       id: 'demo-badminton-halle',
+      locationName: 'Sporthalle Campus',
+      costCents: 350,
+      bringAlong: 'Hallenschuhe, eigener Schläger falls vorhanden',
       title: 'Badminton zu zweit',
       sport: 'Badminton',
       meetingPoint: 'Campus Flensburg, Sporthalle (Beispiel)',
@@ -129,6 +149,9 @@ function buildTemplates(now: Date): DemoTemplate[] {
     },
     {
       id: 'demo-tischtennis-duburg',
+      locationName: 'Duburg',
+      costCents: 0,
+      bringAlong: 'Tischtennisschläger',
       title: 'Tischtennis in der Duburg',
       sport: 'Tischtennis',
       meetingPoint: 'Duburger Straße, Platten am Spielplatz (Beispiel)',
@@ -146,6 +169,9 @@ function buildTemplates(now: Date): DemoTemplate[] {
     },
     {
       id: 'demo-laufen-solitude',
+      locationName: 'Solitüde',
+      costCents: 0,
+      bringAlong: 'Laufschuhe',
       title: 'Strandlauf Solitüde',
       sport: 'Laufen',
       meetingPoint: 'Strand Solitüde, Parkplatz (Beispiel)',
@@ -163,6 +189,9 @@ function buildTemplates(now: Date): DemoTemplate[] {
     },
     {
       id: 'demo-volleyball-ostseebad',
+      locationName: 'Ostseebad',
+      costCents: 200,
+      bringAlong: 'Sonnencreme, Wasser',
       title: 'Beachvolleyball am Ostseebad',
       sport: 'Volleyball',
       meetingPoint: 'Ostseebad Flensburg, Beachfeld (Beispiel)',
@@ -182,16 +211,23 @@ function buildTemplates(now: Date): DemoTemplate[] {
   ];
 }
 
+function toMember(userId: string): EventMember {
+  return { id: userId, displayName: demoPeople[userId] };
+}
+
 /**
  * Erzeugt die Demotreffen relativ zum Zeitpunkt `now`: zwei heute, zwei morgen, weitere in den nächsten Tagen,
- * darunter ein ausgebuchtes und ein abgesagtes Treffen.
+ * darunter ein ausgebuchtes, ein abgesagtes, ein kostenpflichtiges und ein "Anfänger willkommen"-Treffen.
  * Eingaben: aktueller Zeitpunkt. Rückgabe: neue Liste, bei jedem Aufruf frische Objekte.
- * Feature: F-00
+ * Feature: F-00, F-32
  */
-export function createDemoEvents(now = new Date()): SportEvent[] {
-  return buildTemplates(now).map(({ durationHours, status, ...event }) => ({
+export function createDemoEvents(now = new Date()): StoredEvent[] {
+  return buildTemplates(now).map(({ durationHours, status, participants, ...event }) => ({
     ...event,
     endsAt: plusHours(event.startsAt, durationHours),
     status: status ?? 'published',
+    organizerName: demoPeople[event.organizerId],
+    participants: participants.map(toMember),
+    isDemo: true,
   }));
 }

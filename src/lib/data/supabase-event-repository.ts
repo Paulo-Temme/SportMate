@@ -1,25 +1,23 @@
-// Platzhalter für den Datenzugriff über Supabase. Wird später von architect und coder umgesetzt (F-00).
-import type { EventFilters, EventInput, SportEvent } from '../events/event-model';
+// Datenzugriff über Supabase: Lesen aus Tabellen, Schreiben nur per RPC (F-01, F-17, F-18, F-22, F-23, ADR-0007).
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { EventFilters, EventInput, ParticipantEntry, SportEvent } from '../events/event-model';
 import type { EventRepository } from './event-repository';
-
-/** Verbindungsdaten zu Supabase aus `NEXT_PUBLIC_SUPABASE_URL` und `NEXT_PUBLIC_SUPABASE_ANON_KEY`. */
-export type SupabaseConfig = { url: string; anonKey: string };
 
 const notImplementedMessage = 'Der Datenzugriff über Supabase ist noch nicht umgesetzt.';
 
 /**
- * Supabase-Umsetzung von `EventRepository`. Noch ohne Funktion: jede Methode wirft einen Fehler.
- * Eingaben: Verbindungsdaten. Fehler: jede Methode wirft `Error` mit dem Hinweis "noch nicht umgesetzt".
- * Feature: F-00
+ * Supabase-Umsetzung von `EventRepository`. Noch Platzhalter (Schritt 1 des Vertrags).
+ * Feature: F-01
  */
 export class SupabaseEventRepository implements EventRepository {
-  readonly config: SupabaseConfig;
+  private readonly client: SupabaseClient;
 
-  constructor(config: SupabaseConfig) {
-    this.config = config;
+  constructor(client: SupabaseClient) {
+    this.client = client;
   }
 
   async getCurrentUserId(): Promise<string | null> {
+    void this.client;
     throw new Error(notImplementedMessage);
   }
 
@@ -49,6 +47,11 @@ export class SupabaseEventRepository implements EventRepository {
   }
 
   async cancelEvent(eventId: string): Promise<SportEvent> {
+    void eventId;
+    throw new Error(notImplementedMessage);
+  }
+
+  async listParticipants(eventId: string): Promise<ParticipantEntry[]> {
     void eventId;
     throw new Error(notImplementedMessage);
   }
