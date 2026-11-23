@@ -42,7 +42,8 @@ describe('F-32: Auswahl von Datenzugriff und Anmeldung', () => {
     expect(await events.getCurrentUserId()).toBeNull();
     await auth.signInAsDemo('lea');
     expect(await events.getCurrentUserId()).toBe('lea');
-    expect((await events.createEvent(validInput)).organizerName).toBe('Lea');
+    const future = { ...validInput, startsAt: '2099-01-01T10:00:00Z', endsAt: '2099-01-01T12:00:00Z' };
+    expect((await events.createEvent(future)).organizerName).toBe('Lea');
     await auth.signOut();
     expect(await events.getCurrentUserId()).toBeNull();
   });
