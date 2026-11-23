@@ -369,17 +369,18 @@ Ziel: Z2.2. Kanal ist Annahme (FB-20, FB-36: In-App reicht nicht immer).
 
 ### F-31 Startseite mit Erklärung und zwei Einstiegen
 - **User Story:** Als neuer Besucher möchte ich auf einer Startseite kurz erfahren, was SportMate ist, damit ich nicht mitten in die Anwendung geworfen werde.
-- **Quelle:** FB-58, H-2.
-- **Priorität / Größe / Release 1:** Should / S / nein · **Status:** umgesetzt (23.11.2026, Landing unter `/`, Entdecken unter `/entdecken`; AK1–AK8 E2E grün in `e2e/f-31-landing.spec.ts`, Komponententests `landing-view.test.tsx`). AKs am 23.11.2026 vom Orchestrator an die Umsetzung angepasst (Schritte „Finden → Mitmachen → Spielen“ statt Erstbesuch-Hinweis).
+- **Quelle:** FB-58, H-2; Inhalt nach Teamfeedback vom 23.11.2026 am Prototyp aus P3/P4 orientiert.
+- **Priorität / Größe / Release 1:** Should / S / nein · **Status:** umgesetzt (Landing unter `/`, Entdecken unter `/entdecken`; AK1–AK9 E2E grün in `e2e/f-31-landing.spec.ts`, Komponententests `landing-view.test.tsx`). AKs am 23.11.2026 zweimal an Teamentscheidungen angepasst.
 - **Akzeptanzkriterien:**
-  - AK1: Gegeben die Adresse `/`. Wenn sie geöffnet wird, dann zeigt sie eine Überschrift mit „Sport in Flensburg“, „So funktioniert's“ mit den Schritten „Finden → Mitmachen → Spielen“ und die Einstiege „Treffen entdecken“ und „Treffen erstellen“, ohne Tab-Leiste; Seitentitel „SportMate – Sporttreffen in Flensburg“.
+  - AK1: Gegeben `/`. Dann zeigt sie „Die Stadt ist das Spielfeld.“ mit einer wechselnden Sportzeile (bei „Bewegung reduzieren“ statisch), „So funktioniert's“ mit „Sportart wählen → Treffen finden → Bin dabei“ (je Titel und ein Satz) und die Einstiege „Treffen entdecken“ / „Treffen erstellen“, ohne Tab-Leiste; Seitentitel „SportMate – Sporttreffen in deiner Nähe“; kein „Flensburg“ im sichtbaren Text.
   - AK2: Gegeben die Startseite. Wenn „Treffen entdecken“ gewählt wird, dann öffnet sich `/entdecken` mit Karte und Trefferliste, „Entdecken“ ist in der Navigation aktiv.
   - AK3: Gegeben die Startseite. Wenn „Treffen erstellen“ gewählt wird, dann erscheint für Gäste die Anmeldung (F-02 AK4), für Angemeldete das Formular unter `/erstellen`.
-  - AK4: Gegeben kommende Treffen mit freien Plätzen. Wenn die Startseite geladen ist, dann zeigt die Kartenvorschau 1–4 dieser Treffen als nicht überlappende Marker; ein Marker führt zu `/treffen/[id]`, das hervorgehobene Treffen wird mit Titel und freien Plätzen genannt.
-  - AK5: Gegeben keine kommenden Treffen oder ein Ladefehler. Wenn die Startseite geladen ist, dann zeigt die Vorschau keine Marker, sondern einen erklärenden Text; beide Einstiege bleiben sichtbar.
-  - AK6: Gegeben 360 px Breite bzw. „Bewegung reduzieren“. Wenn die Startseite geöffnet wird, dann gibt es keinen horizontalen Überlauf bzw. sie lädt ohne Konsolen- oder Seitenfehler.
-  - AK7: Gegeben Startseite bzw. Entdecken auf dem Desktop. Der Kopf zeigt Gästen „Anmelden“ (→ `/anmelden`), Angemeldeten „Profil“; das Logo führt von überall zu `/`.
-  - AK8: Gegeben die Startseite. Sie nennt unter „Was SportMate nicht ist“: kein Verein, kein Gruppenchat, keine Hallenbuchung; die Fußzeile nennt „Hochschulprojekt WS 2026/27“, © OpenStreetMap-Mitwirkende, OpenFreeMap und dass Beispieltreffen fiktiv sind.
+  - AK4: Gegeben kommende Treffen mit freien Plätzen. Dann zeigt die Kartenvorschau 1–4 davon als Marker; Marker und Treffen-Karte (Titel, Tag/Uhrzeit, freie Plätze) führen zu `/treffen/[id]`. Mit Online-Karte fährt die Kamera nacheinander zu den Treffen und pausiert bei Hover, Fokus und außerhalb des sichtbaren Bereichs.
+  - AK5: Gegeben keine kommenden Treffen oder ein Ladefehler. Dann zeigt die Vorschau keine Marker, sondern einen erklärenden Text; beide Einstiege bleiben sichtbar.
+  - AK6: Gegeben 360 px Breite bzw. „Bewegung reduzieren“. Dann gibt es keinen horizontalen Überlauf bzw. die Seite lädt ohne Konsolen- oder Seitenfehler.
+  - AK7: Der Kopf zeigt Gästen „Anmelden“ (→ `/anmelden`), Angemeldeten „Profil“; das Logo führt von überall zu `/`.
+  - AK8: Abschluss „Zusammen geht mehr“ mit Einstieg nach `/entdecken`; die Fußzeile nennt „Hochschulprojekt WS 2026/27“, © OpenStreetMap-Mitwirkende, OpenFreeMap und dass Beispieltreffen fiktiv sind.
+  - AK9: Gegeben „Was bringt dich in Bewegung?“ mit allen Sportarten. Wenn eine Sportart gewählt wird, öffnet sich `/entdecken?sport=<Sportart>` mit dieser Sportart vorgewählt, die Liste zeigt nur diese Sportart.
 
 ### F-32 Lokaler Demo-Modus ohne Server
 - **User Story:** Als Team möchte ich die App ohne Server mit gekennzeichneten Demodaten starten, damit Präsentationen und Tests unabhängig von Netz und Supabase funktionieren.
