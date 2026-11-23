@@ -1,7 +1,9 @@
 // Läuft nur gegen eine echte Supabase-Datenbank: SUPABASE_INTEGRATION=1 und beide NEXT_PUBLIC_SUPABASE_* gesetzt.
-// Legt zwei Wegwerf-Konten (*@sportmate-test.de) und ein Treffen an; beides bleibt abgesagt in der Datenbank zurück.
+// Legt Wegwerf-Konten (*@sportmate-test.de) und Treffen "[Test] …" an. Jedes erstellte Treffen sagt der Organisator
+// nach jedem Test ab (afterEach, auch bei Fehlschlag), damit es in der App nicht sichtbar bleibt (BUG-03).
+// Die Konten bleiben zurück (ohne service_role nicht löschbar).
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { SupabaseAuthGateway } from '../../src/lib/data/supabase-auth-gateway';
 import { SupabaseEventRepository } from '../../src/lib/data/supabase-event-repository';
 import { summarizePlaces } from '../../src/lib/events/event-presentation';
@@ -27,20 +29,42 @@ async function registerThrowawayAccount(label: string) {
   return { client, auth, user, events: new SupabaseEventRepository(client) };
 }
 
+type CreatedEvent = { id: string; events: SupabaseEventRepository };
+
+// Alles, was ein Test angelegt hat; afterEach sagt es ab.
+const createdEvents: CreatedEvent[] = [];
+
+async function createTrackedEvent(organizer: { events: SupabaseEventRepository }, input: ReturnType<typeof tomorrowInput>) {
+  const created = await organizer.events.createEvent(input);
+  createdEvents.push({ id: created.id, events: organizer.events });
+  return created;
+}
+
+/** Sagt alle im Test erstellten Treffen ab. Bereits abgesagte bleiben unverändert (idempotent). */
+async function cancelCreatedEvents(): Promise<void> {
+  const pending = createdEvents.splice(0);
+  const results = await Promise.allSettled(pending.map(({ id, events }) => events.cancelEvent(id)));
+  results.forEach((result, index) => {
+    if (result.status === 'rejected') console.warn(`Testtreffen ${pending[index].id} konnte nicht abgesagt werden:`, result.reason);
+  });
+}
+
 function tomorrowInput() {
   const start = new Date(Date.now() + 24 * 60 * 60 * 1000);
   const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
-  return { ...validInput, title: 'Integrationstest Treffen', capacity: 2, minParticipants: 2, startsAt: start.toISOString(), endsAt: end.toISOString() };
+  return { ...validInput, title: '[Test] Integrationstest Treffen', capacity: 2, minParticipants: 2, startsAt: start.toISOString(), endsAt: end.toISOString() };
 }
 
 describe.skipIf(!enabled)('F-01, F-17, F-18, F-22, F-23: Supabase-Datenzugriff gegen die echte Datenbank', () => {
+  afterEach(cancelCreatedEvents, 30_000);
+
   it('F-22 AK1: Beitritt, Vollstand, Rückzug und Absage mit Rechteprüfung', async () => {
     const organizer = await registerThrowawayAccount('orga');
     const member = await registerThrowawayAccount('mitglied');
     expect(await organizer.auth.getCurrentUser()).toMatchObject({ id: organizer.user.id, displayName: 'Test orga' });
 
     // F-17 AK1: Organisator belegt den ersten Platz.
-    const created = await organizer.events.createEvent(tomorrowInput());
+    const created = await createTrackedEvent(organizer, tomorrowInput());
     expect(created).toMatchObject({ participantCount: 1, isViewerOrganizer: true, isViewerParticipant: true, organizerName: 'Test orga' });
 
     // F-22 AK1 + AK3: Beitritt, Wiederholung ändert nichts, danach ausgebucht.
@@ -71,6 +95,8 @@ describe.skipIf(!enabled)('F-01, F-17, F-18, F-22, F-23: Supabase-Datenzugriff g
     await expect(member.events.joinEvent(created.id)).rejects.toThrow('Das Treffen ist abgesagt.');
     expect((await member.events.listEvents()).map((event) => event.id)).not.toContain(created.id);
 
+    // Abmelden erst nach dem Aufräumen, damit afterEach noch als Organisator absagen kann.
+    await cancelCreatedEvents();
     await organizer.auth.signOut();
     expect(await organizer.auth.getCurrentUser()).toBeNull();
   }, 30_000);
@@ -78,11 +104,10 @@ describe.skipIf(!enabled)('F-01, F-17, F-18, F-22, F-23: Supabase-Datenzugriff g
   it('F-22 AK2: lehnt Beitritt bei vollem Treffen ab (EVENT_FULL)', async () => {
     const organizer = await registerThrowawayAccount('orga');
     const member = await registerThrowawayAccount('mitglied');
-    const created = await organizer.events.createEvent({ ...tomorrowInput(), capacity: 2 });
+    const created = await createTrackedEvent(organizer, { ...tomorrowInput(), capacity: 2 });
     await member.events.joinEvent(created.id);
     // Für "voll" braucht es eine dritte Person, weil Organisator und Mitglied die zwei Plätze belegen.
     const outsider = await registerThrowawayAccount('dritte');
     await expect(outsider.events.joinEvent(created.id)).rejects.toThrow('Leider gerade ausgebucht.');
-    await organizer.events.cancelEvent(created.id);
   }, 30_000);
 });
