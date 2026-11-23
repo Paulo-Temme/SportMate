@@ -1,0 +1,3 @@
+Repository: https://github.com/Paulo-Temme/SportMate (Branch develop)
+Live-App: https://sportmate-gamma.vercel.app
+Quellcode-Stand im Archiv: Commit a604df3

@@ -27,3 +27,6 @@ next-env.d.ts
 npm-debug.log*
 .vercel
 .claude/settings.local.json
+
+# Abgabe-Archive werden lokal erzeugt
+abgabe/pdf/**/*.zip
