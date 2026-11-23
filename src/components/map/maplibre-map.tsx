@@ -78,7 +78,8 @@ function flyToRequest(map: maplibregl.Map, request: CameraRequest): void {
     if (request.points.length === 0) return;
     const bounds = new maplibregl.LngLatBounds();
     request.points.forEach((point) => bounds.extend([point.longitude, point.latitude]));
-    map.fitBounds(bounds, { padding, maxZoom: 14.5, duration: 0 });
+    // Oben Platz für Suchleiste und Chips, damit kein Marker darunter verschwindet.
+    map.fitBounds(bounds, { padding: { ...padding, top: 210, left: 32, right: 32 }, maxZoom: 14.5, duration: 0 });
     return;
   }
   const target =
