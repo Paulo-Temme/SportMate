@@ -1,0 +1,64 @@
+/* Bestätigungsdialog (F-18, F-23). */
+.layer {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(21, 23, 26, 0.36);
+}
+
+.dialog {
+  position: relative;
+  width: min(100%, 380px);
+  padding: var(--space-6);
+  border-radius: var(--radius-sheet);
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+}
+
+.title {
+  font-size: var(--text-m);
+}
+
+.description {
+  margin-top: var(--space-2);
+  color: var(--ink-2);
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+}
+
+.cancel,
+.confirm {
+  min-height: 48px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+}
+
+.cancel {
+  border: 1px solid var(--line);
+}
+
+.confirm {
+  background: var(--ink);
+  color: #ffffff;
+}
+
+.confirm[data-tone='danger'] {
+  background: var(--danger);
+}
+
+.confirm:disabled {
+  opacity: 0.6;
+}

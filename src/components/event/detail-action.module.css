@@ -1,0 +1,77 @@
+/* Hauptaktion der Detailansicht (F-22). */
+.primary,
+.disabled,
+.secondary,
+.danger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 52px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-s);
+  font-weight: 600;
+}
+
+.primary {
+  background: var(--accent-strong);
+  color: #ffffff;
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--accent-ink);
+}
+
+.primary:disabled {
+  opacity: 0.7;
+}
+
+.disabled {
+  background: var(--bg);
+  color: var(--ink-2);
+  border: 1px solid var(--line);
+}
+
+.joinedRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.joined {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 52px;
+  border-radius: var(--radius-pill);
+  background: #e8f3ed;
+  color: var(--ok-ink);
+  font-weight: 600;
+}
+
+.secondary {
+  min-height: 44px;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.danger {
+  min-height: 44px;
+  color: var(--danger);
+  border: 1px solid #ecd1cb;
+}
+
+.secondary:hover,
+.danger:hover {
+  background: var(--bg);
+}
+
+.closed {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-element);
+  background: var(--bg);
+  color: var(--ink-2);
+  text-align: center;
+}

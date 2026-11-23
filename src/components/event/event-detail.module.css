@@ -1,0 +1,253 @@
+/* Detailansicht eines Treffens (F-12, F-13). */
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-4) var(--space-8);
+}
+
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+.sportBadge {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.demoTag {
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--ink-2);
+}
+
+.title {
+  margin-top: calc(-1 * var(--space-2));
+  font-size: var(--text-l);
+  line-height: 1.2;
+}
+
+.cancelled {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-element);
+  background: #f7e6e2;
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.places {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.placesRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.placesLabel {
+  font-size: var(--text-m);
+  font-weight: 600;
+  color: var(--ok-ink);
+}
+
+.placesLabel[data-full='true'] {
+  color: var(--ink-2);
+}
+
+.placesCount {
+  display: inline-flex;
+  align-items: baseline;
+  font-size: var(--text-xs);
+  color: var(--ink-2);
+  overflow: hidden;
+}
+
+.countNumber {
+  display: inline-block;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  margin-top: calc(-1 * var(--space-2));
+}
+
+.status[data-tone='ok'] {
+  color: var(--ok-ink);
+}
+
+.status[data-tone='warn'] {
+  color: var(--warn-ink);
+}
+
+.status[data-tone='neutral'] {
+  color: var(--ink-2);
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.statusHint {
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+.facts {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--line);
+}
+
+.fact {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.factIcon {
+  display: flex;
+  padding-top: 1px;
+  color: var(--ink-2);
+}
+
+.factText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.factStrong {
+  font-weight: 600;
+}
+
+.welcome {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: #e8f3ed;
+  color: var(--ok-ink);
+  font-size: var(--text-label);
+  font-weight: 600;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sectionTitle {
+  font-size: var(--text-label);
+  font-weight: 500;
+  color: var(--ink-2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.description {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.muted {
+  color: var(--ink-2);
+}
+
+.people {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.person {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 4px 12px 4px 4px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--bg);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.organizerTag {
+  color: var(--ink-2);
+  font-weight: 400;
+}
+
+.textLink {
+  font-weight: 600;
+  text-underline-offset: 3px;
+}
+
+.skeletonLine,
+.skeletonTitle,
+.skeletonButton {
+  display: block;
+  border-radius: 6px;
+  background: #efede8;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.skeletonLine {
+  height: 14px;
+}
+
+.skeletonTitle {
+  height: 26px;
+  width: 75%;
+}
+
+.skeletonButton {
+  height: 52px;
+  border-radius: var(--radius-pill);
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
