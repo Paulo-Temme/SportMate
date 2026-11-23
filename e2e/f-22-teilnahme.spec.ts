@@ -18,12 +18,12 @@ test.describe('F-22 Einem Treffen beitreten', () => {
     await expect(card.getByRole('button', { name: /Jetzt teilnehmen/ })).toBeVisible();
   });
 
-  test('F-22 AK1: Beitritt zeigt "Du bist angemeldet", danach ausgebucht und unter Meine Treffen', async ({ page }) => {
+  test('F-22 AK1: Beitritt zeigt "Du bist dabei", danach ausgebucht und unter Meine Treffen', async ({ page }) => {
     await openDiscoverSignedIn(page, 'Lea');
     await openEventFromList(page, 'Badminton zu zweit');
     const detail = page.getByTestId('event-detail');
     await detail.getByRole('button', { name: 'Jetzt teilnehmen' }).click();
-    await expect(page.getByRole('status').getByText('Du bist angemeldet')).toBeVisible();
+    await expect(page.getByRole('status').getByText('Du bist dabei', { exact: true })).toBeVisible();
     await expect(detail.getByText('Ausgebucht', { exact: true })).toBeVisible();
     await page.getByRole('link', { name: 'Meine Treffen' }).click();
     await expect(page.getByTestId('my-event').filter({ hasText: 'Badminton zu zweit' })).toContainText('Angemeldet');
@@ -33,7 +33,7 @@ test.describe('F-22 Einem Treffen beitreten', () => {
     await openDiscoverSignedIn(page, 'Lea');
     const card = eventCards(page).filter({ hasText: 'Basketball auf dem Exe' });
     await card.getByRole('button', { name: /Jetzt teilnehmen/ }).click();
-    await expect(page.getByRole('status').getByText('Du bist angemeldet')).toBeVisible();
+    await expect(page.getByRole('status').getByText('Du bist dabei', { exact: true })).toBeVisible();
     await expect(card.getByText('Dabei')).toBeVisible();
     await expect(card.getByText('5 von 10 Plätzen frei')).toBeVisible();
   });
@@ -56,7 +56,7 @@ test('F-23 AK1: Teilnahme zurückziehen gibt den Platz frei und entfernt das Tre
   await expect(detail.getByText('10 von 12 Plätzen frei')).toBeVisible();
   await detail.getByRole('button', { name: 'Teilnahme zurückziehen' }).click();
   await page.getByRole('alertdialog').getByRole('button', { name: 'Zurückziehen' }).click();
-  await expect(page.getByRole('status').getByText('Teilnahme zurückgezogen')).toBeVisible();
+  await expect(page.getByRole('status').getByText('Du bist nicht mehr dabei', { exact: true })).toBeVisible();
   await expect(detail.getByText('11 von 12 Plätzen frei')).toBeVisible();
   await page.getByRole('link', { name: 'Meine Treffen' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Meine Treffen' })).toBeVisible();

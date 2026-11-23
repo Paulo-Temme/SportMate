@@ -20,7 +20,7 @@ test.describe('F-02 Ohne Konto stöbern', () => {
     const detail = page.getByTestId('event-detail');
     await expect(detail.getByText('1 von 2 Plätzen frei')).toBeVisible();
     await detail.getByRole('button', { name: 'Jetzt teilnehmen' }).click();
-    await expect(page.getByRole('status').getByText('Du bist angemeldet')).toBeVisible();
+    await expect(page.getByRole('status').getByText('Du bist dabei', { exact: true })).toBeVisible();
     await expect(detail.getByText('Du bist dabei')).toBeVisible();
   });
 
