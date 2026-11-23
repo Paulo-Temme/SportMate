@@ -10,8 +10,8 @@ import type { SportEvent } from '@/lib/events/event-model';
 type ParticipationAction = 'join' | 'leave' | 'cancel';
 
 const successMessages: Record<ParticipationAction, string> = {
-  join: 'Du bist angemeldet',
-  leave: 'Teilnahme zurückgezogen',
+  join: 'Du bist dabei',
+  leave: 'Du bist nicht mehr dabei',
   cancel: 'Treffen abgesagt',
 };
 
