@@ -1,30 +1,34 @@
+# Befehlsvertrag aus CLAUDE.md. Läuft mit GNU Make unter Linux (CI) und Windows (Git Bash).
+# Jedes Ziel ruft das gleichnamige npm-Skript auf, damit es ohne make genauso geht (npm run <ziel>).
+NPM ?= npm
+
 setup:
-	npm ci
+	$(NPM) ci
 
 lint:
-	npx eslint .
+	$(NPM) run lint
 
 typecheck:
-	npx tsc --noEmit
+	$(NPM) run typecheck
 
 test:
-	npx vitest run --passWithNoTests
+	$(NPM) run test
 
 coverage:
-	npx vitest run --coverage --passWithNoTests
+	$(NPM) run coverage
 
 check: lint typecheck test
 
 build:
-	npm run build
+	$(NPM) run build
 
 e2e:
-	npx playwright test
+	$(NPM) run test:e2e
 
 trace:
-	node scripts/trace.mjs
+	$(NPM) run trace
 
 stats:
-	node scripts/stats.mjs
+	$(NPM) run stats
 
 .PHONY: setup lint typecheck test coverage check build e2e trace stats

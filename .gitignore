@@ -1,0 +1,29 @@
+# Abhängigkeiten
+/node_modules
+.pnp
+.pnp.*
+
+# Tests
+/coverage
+/test-results
+/playwright-report
+/blob-report
+/playwright/.cache
+
+# Next.js
+/.next/
+/out/
+/build
+next-env.d.ts
+*.tsbuildinfo
+
+# Umgebungsvariablen: nur die Vorlage wird eingecheckt
+.env*
+!.env.example
+
+# Sonstiges
+.DS_Store
+*.pem
+npm-debug.log*
+.vercel
+.claude/settings.local.json

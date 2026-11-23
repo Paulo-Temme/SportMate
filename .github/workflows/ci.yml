@@ -2,29 +2,24 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, develop]
 
 jobs:
   check:
     runs-on: ubuntu-latest
+    env:
+      # Ohne Supabase-Variablen läuft alles im lokalen Modus; Build und Tests brauchen keine .env.
+      NEXT_TELEMETRY_DISABLED: 1
     steps:
       - uses: actions/checkout@v4
-      - name: Prüfen, ob schon eine App vorhanden ist
-        id: app
-        run: |
-          if [ -f package.json ]; then echo "vorhanden=ja" >> "$GITHUB_OUTPUT"; else echo "vorhanden=nein" >> "$GITHUB_OUTPUT"; fi
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
       - name: Nachvollziehbarkeit (zeigt Lücken, blockiert nicht)
         run: make trace
       - run: make setup
-        if: steps.app.outputs.vorhanden == 'ja'
       - run: make lint
-        if: steps.app.outputs.vorhanden == 'ja'
       - run: make typecheck
-        if: steps.app.outputs.vorhanden == 'ja'
       - run: make coverage
-        if: steps.app.outputs.vorhanden == 'ja'
       - run: make build
-        if: steps.app.outputs.vorhanden == 'ja'

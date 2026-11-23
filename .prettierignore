@@ -1,0 +1,17 @@
+node_modules
+.next
+coverage
+test-results
+playwright-report
+package-lock.json
+docs
+specs
+abgabe
+# Vorlagendateien des Agententeams bleiben unverändert
+.claude
+.github
+scripts
+supabase
+CLAUDE.md
+AGENTS.md
+README.md

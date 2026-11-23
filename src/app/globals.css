@@ -1,0 +1,96 @@
+/* Globale Design-Tokens und Grundstile laut docs/design.md (F-00). Komponenten nutzen CSS Modules mit diesen Variablen. */
+:root {
+  --bg: #f7f6f2;
+  --surface: #ffffff;
+  --ink: #15171a;
+  --ink-2: #5b6068;
+  --line: #e7e5df;
+  --accent: #e8552b;
+  --accent-soft: #fce9e2;
+  --ok: #1f8a5b;
+  --warn: #b7791f;
+
+  --radius-element: 12px;
+  --radius-sheet: 24px;
+  --radius-pill: 999px;
+  --shadow-float: 0 1px 2px rgba(21, 23, 26, 0.06), 0 8px 24px rgba(21, 23, 26, 0.08);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  --text-xl: 28px;
+  --text-l: 22px;
+  --text-m: 17px;
+  --text-s: 15px;
+  --text-xs: 13px;
+  --text-label: 12px;
+
+  --duration-fast: 150ms;
+  --duration-slow: 350ms;
+
+  --font-family: var(--font-sans), system-ui, sans-serif;
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-family);
+  font-size: var(--text-s);
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
