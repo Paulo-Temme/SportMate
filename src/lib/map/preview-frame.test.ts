@@ -1,7 +1,8 @@
-// Tests der Kartenvorschau auf der Startseite: Lage im festen Flensburg-Ausschnitt und Auswahl der Treffen (F-31).
+// Tests der Kartenvorschau auf der Startseite: Auswahl der Treffen für die Kamerafahrt und Lage auf der Ersatzfläche (F-31).
 import { describe, expect, it } from 'vitest';
 import type { SportEvent } from '@/lib/events/event-model';
-import { pickPreviewEvents, previewBounds, projectToPreview } from './preview-frame';
+import { findMarkerBounds } from './marker-grouping';
+import { pickPreviewEvents, placeInPreview } from './preview-frame';
 
 type PreviewCandidate = Pick<SportEvent, 'id' | 'latitude' | 'longitude' | 'capacity' | 'participantCount' | 'status'>;
 
@@ -16,56 +17,52 @@ const campusFootball = candidate('campus-fussball', 54.77511, 9.45044);
 const campusBadminton = candidate('campus-badminton', 54.77348, 9.45272);
 const volkspark = candidate('volkspark', 54.79953, 9.44624);
 
-describe('F-31 AK4: Vorschau zeigt kommende Treffen an ihrem Ort', () => {
-  it('F-31 AK4: Ecken des Ausschnitts liegen bei 0 und 1, Norden oben', () => {
-    expect(projectToPreview({ latitude: previewBounds.maxLatitude, longitude: previewBounds.minLongitude })).toEqual({ x: 0, y: 0 });
-    expect(projectToPreview({ latitude: previewBounds.minLatitude, longitude: previewBounds.maxLongitude })).toEqual({ x: 1, y: 1 });
-  });
-
-  it('F-31 AK4: ein Punkt in der Mitte liegt bei 0,5 / 0,5', () => {
-    const latitude = (previewBounds.minLatitude + previewBounds.maxLatitude) / 2;
-    const longitude = (previewBounds.minLongitude + previewBounds.maxLongitude) / 2;
-    const position = projectToPreview({ latitude, longitude });
-    expect(position?.x).toBeCloseTo(0.5, 6);
-    expect(position?.y).toBeCloseTo(0.5, 6);
-  });
-
-  it('F-31 AK4: Orte außerhalb des Ausschnitts liefern null', () => {
-    expect(projectToPreview({ latitude: previewBounds.maxLatitude + 0.001, longitude: 9.45 })).toBeNull();
-    expect(projectToPreview({ latitude: previewBounds.minLatitude - 0.001, longitude: 9.45 })).toBeNull();
-    expect(projectToPreview({ latitude: 54.79, longitude: previewBounds.minLongitude - 0.001 })).toBeNull();
-    expect(projectToPreview({ latitude: 54.79, longitude: previewBounds.maxLongitude + 0.001 })).toBeNull();
-  });
-
-  it('F-31 AK4: alle Demo-Orte in Flensburg liegen im Ausschnitt', () => {
-    for (const place of [hafenspitze, solitude, exe, campusFootball, campusBadminton, volkspark]) {
-      expect(projectToPreview(place)).not.toBeNull();
-    }
-  });
-
+describe('F-31 AK4: Vorschau wählt kommende Treffen für die Kamerafahrt', () => {
   it('F-31 AK4: übernimmt Treffen in der gegebenen Reihenfolge, höchstens vier', () => {
     const picked = pickPreviewEvents([hafenspitze, solitude, exe, volkspark, campusFootball]);
-    expect(picked.map((entry) => entry.event.id)).toEqual(['hafen', 'solitude', 'exe', 'volkspark']);
-    expect(picked[0].position).toEqual(projectToPreview(hafenspitze));
+    expect(picked.map((event) => event.id)).toEqual(['hafen', 'solitude', 'exe', 'volkspark']);
   });
 
   it('F-31 AK4: die Höchstzahl lässt sich vorgeben', () => {
     expect(pickPreviewEvents([hafenspitze, solitude, exe], 2)).toHaveLength(2);
   });
 
-  it('F-31 AK4: dicht beieinander liegende Treffen erscheinen nur einmal (keine überlappenden Pillen)', () => {
+  it('F-31 AK4: Treffen näher als 300 m an einem gewählten erscheinen nicht (keine überlappenden Pillen)', () => {
     const picked = pickPreviewEvents([campusFootball, campusBadminton, hafenspitze]);
-    expect(picked.map((entry) => entry.event.id)).toEqual(['campus-fussball', 'hafen']);
+    expect(picked.map((event) => event.id)).toEqual(['campus-fussball', 'hafen']);
   });
 
-  it('F-31 AK4: ausgebuchte, abgesagte und entfernte Treffen werden übersprungen', () => {
+  it('F-31 AK4: ausgebuchte und abgesagte Treffen werden übersprungen', () => {
     const full = candidate('voll', 54.79, 9.44, { participantCount: 10 });
     const cancelled = candidate('abgesagt', 54.8, 9.45, { status: 'cancelled' });
-    const far = candidate('kiel', 54.32, 10.13);
-    expect(pickPreviewEvents([full, cancelled, far, exe]).map((entry) => entry.event.id)).toEqual(['exe']);
+    expect(pickPreviewEvents([full, cancelled, exe]).map((event) => event.id)).toEqual(['exe']);
+  });
+
+  it('F-31 AK4: Treffen weiter als 15 km vom ersten gewählten bleiben draußen (keine Fahrt quer durchs Land)', () => {
+    const far = candidate('weit-weg', 54.32, 10.13);
+    expect(pickPreviewEvents([exe, far, solitude]).map((event) => event.id)).toEqual(['exe', 'solitude']);
   });
 
   it('F-31 AK5: ohne Treffen bleibt die Vorschau leer', () => {
     expect(pickPreviewEvents([])).toEqual([]);
+  });
+});
+
+describe('F-31 AK4: Lage der Marker auf der Ersatzfläche ohne Karte', () => {
+  const places = [hafenspitze, solitude, exe];
+  const bounds = findMarkerBounds(places);
+
+  it('F-31 AK4: Nordwesten oben links, Südosten unten rechts, mit Rand und Platz für die Treffen-Karte unten', () => {
+    expect(placeInPreview({ latitude: bounds.maxLatitude, longitude: bounds.minLongitude }, bounds)).toEqual({ x: 0.16, y: 0.16 });
+    const southEast = placeInPreview({ latitude: bounds.minLatitude, longitude: bounds.maxLongitude }, bounds);
+    expect(southEast.x).toBeCloseTo(0.84, 6);
+    expect(southEast.y).toBeCloseTo(0.62, 6);
+  });
+
+  it('F-31 AK4: ein einzelner Ort liegt waagerecht mittig', () => {
+    const single = findMarkerBounds([exe]);
+    const position = placeInPreview(exe, single);
+    expect(position.x).toBeCloseTo(0.5, 6);
+    expect(position.y).toBeCloseTo(0.39, 6);
   });
 });
