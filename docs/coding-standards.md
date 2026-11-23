@@ -36,7 +36,8 @@ Review (`docs/review-leitfaden.md`, Prüfpunkt in Klammern) · SE-Eval (Messung 
 ## Komplexität und Typen
 | Regel | Begründung | Durchgesetzt durch |
 | --- | --- | --- |
-| Kognitive Komplexität je Funktion höchstens 15 | Misst, wie schwer Code zu verstehen ist (Campbell 2018); 15 ist der Standardwert von SonarSource | Review (C3), SE-Eval (sonarjs) |
+| Kognitive Komplexität je Funktion höchstens 15 | Misst, wie schwer Code zu verstehen ist (Campbell 2018); 15 ist der Standardwert von SonarSource | Review (C3), SE-Eval (sonarjs). **Nicht** im Projekt-ESLint (kein `sonarjs`-Plugin, REV-14) |
+| `as unknown as` nur an der Grenze zu Supabase-Antworten, mit Kommentar | Eine Typbehauptung ohne Prüfung verschiebt Fehler in die Laufzeit (vgl. BUG-01) | Review (C7, REV-13) |
 | Kein `any`, `@ts-ignore`, `@ts-expect-error`, `eslint-disable` | Schaltet genau die Prüfung ab, die Fehler vor der Laufzeit findet | Lint, Review (A6), SE-Eval zählt Umgehungen |
 | `strict` in `tsconfig.json` | Findet fehlende Werte und falsche Typen beim Übersetzen | Typprüfung |
 
@@ -49,6 +50,40 @@ Review (`docs/review-leitfaden.md`, Prüfpunkt in Klammern) · SE-Eval (Messung 
 | Commit beginnt mit Feature-ID, eine Story = ein Branch = ein Pull Request | Jede Änderung führt zu ihrer Anforderung; kleine Pull Requests sind prüfbar | Review (A5), geschützter `main` |
 | Kein Commit auf `main`, kein Push oder Merge durch Agenten | Der Mensch verantwortet, was ins Projekt kommt | Schutz-Hook, Rechte in `.claude/settings.json` |
 | Keine Secrets im Code, `.env` für Agenten gesperrt | Zugangsdaten gehören nicht ins Repo und nicht in Sitzungen | Schutz-Hook, Rechte |
+
+## Projektspezifische Regeln SportMate
+
+### Schichten und Datenzugriff
+| Regel | Begründung | Durchgesetzt durch |
+| --- | --- | --- |
+| `src/lib/events` und `src/lib/auth` importieren nichts aus `src/lib/data`, `src/components`, `src/app`, `src/hooks` | Kernlogik bleibt rein und ohne Browser testbar; Mutation Testing zielt auf `src/lib` (ADR-0003) | Review (E2, Prüfbefehl im Leitfaden) |
+| Oberfläche nutzt Daten nur über `EventRepository`, `AuthGateway`, `data-services`; kein `@supabase/*` außerhalb `src/lib/data` | Lokaler Demo-Modus und Supabase bleiben austauschbar; Tabellen- und Fehlercodes bleiben verborgen | Review (E3) |
+| Fachlogik (Datum, Plätze, Teilnahme, Filter) nur in `src/lib/events`, nicht in Komponenten | Einmal schreiben, einmal testen, mit Mutation messen (Gegenbeispiel REV-04) | Review (E1, E6) |
+| Zeit wird übergeben (`now`), Kernlogik liest keine Uhr | Wiederholbare Tests mit festem Zeitpunkt, Zeitumstellung prüfbar | Review (E5), Unit-Tests mit festem `now` |
+| Grenzwerte und Wertelisten einmal in `event-model.ts`/`eventLimits`; SQL-Checks nennen dieselben Werte | TS und SQL prüfen dieselben Regeln doppelt (ADR-0009); weichen sie ab, verhalten sich die Modi verschieden (BUG-04, REV-08) | Review (E6), Supabase-Integrationstests |
+
+### Sicherheit (immer mit menschlichem Review)
+| Regel | Begründung | Durchgesetzt durch |
+| --- | --- | --- |
+| RLS auf jeder Tabelle; Schreiben nur über RPC-Funktionen | Der Browser spricht direkt mit Supabase (ADR-0007); nur die Datenbank ist Sicherheitsgrenze | Review (S1, S2), Integrationstest „direktes Update wirkungslos“ (TC-I-07), TC-M-10 |
+| `security definer` nur mit `set search_path = ''`, voll qualifizierten Namen, Identität aus `auth.uid()`; `EXECUTE` nur für `authenticated` | Verhindert Rechteausweitung über Suchpfad oder gefälschte Parameter | Review (S2), Mensch liest jede Migration |
+| Fachliche Invarianten in der DB: Zeilensperre plus Check-Constraint | Zwei gleichzeitige Beitritte auf den letzten Platz werden serialisiert (ADR-0006) | Review (S3) |
+| Datenbankfehler als stabiler Code, Übersetzung nur in `supabase-error-translation.ts` | Keine internen Details an Nutzende; eine Stelle für alle Texte | Review (S4, C5), Unit-Tests der Übersetzung |
+
+### Texte und Oberfläche
+| Regel | Begründung | Durchgesetzt durch |
+| --- | --- | --- |
+| Alle sichtbaren Texte und Fehlermeldungen deutsch, kurz, mit Handlungshinweis; eine Quelle je Meldung | Zielgruppe deutschsprachig; doppelte Texte laufen auseinander (REV-11) | Review (C5, U5), Akzeptanztests prüfen Texte wörtlich |
+| Farben, Abstände, Radien, Schatten nur über Tokens aus `src/app/globals.css`, neue Farbe = neues Token in `docs/design.md` | Einheitliches Erscheinungsbild, Anti-Slop-Regeln (`docs/design.md`); harte Werte sind nicht änderbar (REV-07) | Review (U4) |
+| Bedienelemente sind `button`/`a`/`input` mit Beschriftung; Fehler mit `aria-invalid`; Dialoge mit Fokusfalle, Escape und Fokus-Rückgabe; kein `outline: none` ohne sichtbaren Ersatz | Tastatur- und Screenreader-Bedienung; Tests finden Elemente über Rollen | Review (U2, U3), Testing-Library- und Playwright-Abfragen per Rolle |
+| `prefers-reduced-motion` respektieren; kein horizontales Scrollen bei 360 px | Barrierefreiheit, NFR-3 | Review (U6), TC-A-27, TC-A-43 |
+
+### Tests
+| Regel | Begründung | Durchgesetzt durch |
+| --- | --- | --- |
+| Orakel (erwarteter Text, Zahl, URL, Attribut) steht im Test, Hilfsfunktionen bedienen nur | Ein Test ist ohne Nachschlagen prüfbar und kann nicht still „immer grün“ werden | Review (A2), Rolle tester |
+| Supabase-Integrationstests nur bedingt (`describe.skipIf`), nie gegen Produktivdaten ohne Aufräumen | Echte DB findet Fehler, die Mocks nicht finden (BUG-01); Testdaten dürfen nicht sichtbar bleiben (BUG-03) | Review (A6), Teststrategie |
+| Testdaten ohne echte personenbezogene Daten; Passwörter in Tests zur Laufzeit erzeugt | Datenschutz, keine Secrets im Repo | Review (C6), Schutz-Hook |
 
 ## Quellen
 - Beck, K. (2002): Test-Driven Development: By Example. Addison-Wesley.
