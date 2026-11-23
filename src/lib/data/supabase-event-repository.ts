@@ -1,6 +1,5 @@
 // Datenzugriff über Supabase: Lesen aus Tabellen, Schreiben nur per RPC (F-01, F-17, F-18, F-20, F-22, F-23, ADR-0007).
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { EventError } from '../events/event-error';
 import { emptyFilters, type EventFilters, type EventInput, type ParticipantEntry, type SportEvent } from '../events/event-model';
 import { searchEvents } from '../events/event-search';
 import { validateEventInput } from '../events/event-validation';
@@ -9,7 +8,6 @@ import { eventRowColumns, mapEventRow, toCreateEventParams, type EventRow, type 
 import { translateEventError } from './supabase-error-translation';
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const notFoundMessage = 'Dieses Treffen gibt es nicht.';
 const loadFailedMessage = 'Die Treffen konnten nicht geladen werden. Bitte später erneut versuchen.';
 
 // Diese Codes bedeuten bei der Teilnehmerliste "keine Namen sichtbar", nicht "Fehler".
@@ -93,7 +91,7 @@ export class SupabaseEventRepository implements EventRepository {
 
   /** Ruft eine Datenbankfunktion mit `p_event_id` auf und liest das Treffen danach neu (mit Organisatorname und Sicht). */
   private async runEventFunction(name: 'join_event' | 'leave_event' | 'cancel_event', eventId: string): Promise<SportEvent> {
-    if (!uuidPattern.test(eventId)) throw new EventError(notFoundMessage);
+    if (!uuidPattern.test(eventId)) throw translateEventError({ message: 'EVENT_NOT_FOUND' });
     const { error } = await this.client.rpc(name, { p_event_id: eventId });
     if (error) throw translateEventError(error);
     return this.requireEvent(eventId);
@@ -101,7 +99,7 @@ export class SupabaseEventRepository implements EventRepository {
 
   private async requireEvent(eventId: string): Promise<SportEvent> {
     const event = await this.getEvent(eventId);
-    if (!event) throw new EventError(notFoundMessage);
+    if (!event) throw translateEventError({ message: 'EVENT_NOT_FOUND' });
     return event;
   }
 

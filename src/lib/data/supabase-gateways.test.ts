@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { validInput } from '../../../tests/fixtures/sample-events';
 import { SupabaseAuthGateway } from './supabase-auth-gateway';
+import { translateEventError } from './supabase-error-translation';
 import { SupabaseEventRepository } from './supabase-event-repository';
 
 /** Kleiner Ersatz für den Supabase-Client: nur die Teile, die die Umsetzungen ohne Netz aufrufen. */
@@ -134,6 +135,8 @@ describe('F-22: Datenzugriff über Supabase ohne Netz', () => {
     const repository = new SupabaseEventRepository(client);
     expect(await repository.getEvent('demo-fussball')).toBeNull();
     await expect(repository.joinEvent('kein-uuid')).rejects.toThrow('Dieses Treffen gibt es nicht.');
+    // REV-11: dieselbe Meldung wie die Übersetzung des Datenbankcodes EVENT_NOT_FOUND, aus einer Quelle.
+    await expect(repository.joinEvent('kein-uuid')).rejects.toThrow(translateEventError({ message: 'EVENT_NOT_FOUND' }).message);
     expect(rpc).not.toHaveBeenCalled();
   });
 });
