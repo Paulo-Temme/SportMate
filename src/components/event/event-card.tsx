@@ -82,14 +82,14 @@ export function EventCard({ event, selected, onSelect, onJoin, pending = false, 
             {event.title}
           </a>
         </h3>
-        <p className={styles.meta}>
+        <p className={styles.meta} data-part="meta-row">
           <span className={styles.sport}>
             <SportIcon sport={event.sport} size={14} />
             {event.sport}
           </span>
           {event.locationName && <span>{event.locationName}</span>}
         </p>
-        <p className={styles.facts}>
+        <p className={styles.facts} data-part="meta-row">
           <span>{event.level}</span>
           <span>{describeAgeGroup(event.ageGroup)}</span>
           <span>{describeCost(event.costCents)}</span>
