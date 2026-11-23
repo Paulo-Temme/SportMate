@@ -1,13 +1,22 @@
 // Anmeldung über Supabase Auth; Anzeigename aus der Tabelle profiles (F-01).
-import type { SupabaseClient } from '@supabase/supabase-js';
+import type { SupabaseClient, User } from '@supabase/supabase-js';
 import { AuthError, authMessages } from '../auth/auth-error';
 import type { AuthUser } from '../auth/auth-user';
+import { normalizeEmail, validateSignUp } from '../auth/credential-validation';
 import type { AuthGateway, SignInInput, SignUpInput } from './auth-gateway';
+import { translateAuthError } from './supabase-error-translation';
 
-const notImplementedMessage = 'Die Anmeldung über Supabase ist noch nicht umgesetzt.';
+const fallbackDisplayName = 'Neues Mitglied';
+
+function readMetadataName(user: User): string | null {
+  const name: unknown = user.user_metadata?.display_name;
+  return typeof name === 'string' && name.trim() !== '' ? name.trim() : null;
+}
 
 /**
- * Supabase-Umsetzung von `AuthGateway`. Noch Platzhalter (Schritt 1 des Vertrags).
+ * Supabase-Umsetzung von `AuthGateway`. Passwörter und Sitzungen verwaltet Supabase Auth;
+ * der Anzeigename kommt aus `profiles` (vom Trigger bei der Registrierung angelegt).
+ * Eingaben: Supabase-Client. Fehler: `AuthError` mit deutscher Meldung, technische Fehler als `Error`.
  * Feature: F-01
  */
 export class SupabaseAuthGateway implements AuthGateway {
@@ -18,27 +27,44 @@ export class SupabaseAuthGateway implements AuthGateway {
   }
 
   async getCurrentUser(): Promise<AuthUser | null> {
-    void this.client;
-    throw new Error(notImplementedMessage);
+    const { data, error } = await this.client.auth.getSession();
+    if (error) throw new Error(authMessages.unexpected);
+    return data.session ? this.buildUser(data.session.user) : null;
   }
 
   async signUp(input: SignUpInput): Promise<AuthUser> {
-    void input;
-    throw new Error(notImplementedMessage);
+    validateSignUp(input);
+    const { data, error } = await this.client.auth.signUp({
+      email: normalizeEmail(input.email),
+      password: input.password,
+      options: { data: { display_name: input.displayName.trim() } },
+    });
+    if (error) throw translateAuthError(error);
+    // Mit eingeschalteter E-Mail-Bestätigung meldet Supabase vergebene Adressen als Konto ohne Identität.
+    if (data.user?.identities?.length === 0) throw new AuthError(authMessages.emailTaken, 'email');
+    if (!data.session || !data.user) throw new AuthError(authMessages.emailNotConfirmed);
+    return this.buildUser(data.user);
   }
 
   async signIn(input: SignInInput): Promise<AuthUser> {
-    void input;
-    throw new Error(notImplementedMessage);
+    const { data, error } = await this.client.auth.signInWithPassword({ email: normalizeEmail(input.email), password: input.password });
+    if (error) throw translateAuthError(error);
+    return this.buildUser(data.user);
   }
 
   async signOut(): Promise<void> {
-    throw new Error(notImplementedMessage);
+    const { error } = await this.client.auth.signOut();
+    if (error) throw new Error(authMessages.unexpected);
   }
 
   onAuthChange(listener: (user: AuthUser | null) => void): () => void {
-    void listener;
-    return () => undefined;
+    const { data } = this.client.auth.onAuthStateChange((_event, session) => {
+      // Keine Supabase-Aufrufe direkt im Rückruf (supabase-js kann sonst blockieren), deshalb verzögert.
+      setTimeout(() => {
+        void (session ? this.buildUser(session.user) : Promise.resolve(null)).then(listener);
+      }, 0);
+    });
+    return () => data.subscription.unsubscribe();
   }
 
   listDemoAccounts(): AuthUser[] {
@@ -48,5 +74,13 @@ export class SupabaseAuthGateway implements AuthGateway {
   async signInAsDemo(userId: string): Promise<AuthUser> {
     void userId;
     throw new AuthError(authMessages.demoOnlyLocal);
+  }
+
+  /** Person mit Anzeigename aus `profiles`; ist das Profil nicht lesbar, aus den Metadaten der Registrierung. */
+  private async buildUser(user: User): Promise<AuthUser> {
+    const { data } = await this.client.from('profiles').select('display_name').eq('id', user.id).maybeSingle();
+    const profileName: unknown = data?.display_name;
+    const displayName = typeof profileName === 'string' ? profileName : (readMetadataName(user) ?? fallbackDisplayName);
+    return { id: user.id, displayName, email: user.email ?? null };
   }
 }
