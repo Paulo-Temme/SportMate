@@ -1,0 +1,19 @@
+/* Inhaltsseiten ohne Karte (F-05). */
+.frame {
+  min-height: 100dvh;
+  padding: calc(var(--safe-top) + var(--banner-height) + var(--space-6)) var(--space-4)
+    calc(var(--tabbar-height) + var(--safe-bottom) + var(--space-8));
+}
+
+.frame > * {
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 1024px) {
+  .frame {
+    margin-left: var(--rail-width);
+    padding: calc(var(--banner-height) + 64px) var(--space-8) var(--space-8);
+  }
+}
