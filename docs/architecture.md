@@ -542,7 +542,7 @@ erDiagram
 | events | min_participants | smallint | 2…capacity, Standard 2 |
 | events | level | text | `Alle Niveaus`, `Anfänger`, `Fortgeschritten`, `Erfahren` |
 | events | age_group | text | leer (= alle), `unter 20`, `20–25`, `26–30`, `31–40`, `über 40` |
-| events | cost_cents | int | 0–10000, 0 = kostenlos |
+| events | cost_cents | int | 0–5000, 0 = kostenlos (Migration `0002_cost_limit.sql`, REV-08) |
 | events | bring_along | text | ≤ 200 Zeichen |
 | events | participant_count | smallint | ≥ 0, nur Trigger schreibt |
 | events | external_participants | smallint | ≥ 0, nur Seed (ADR-0008) |
