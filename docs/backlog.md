@@ -381,7 +381,7 @@ Ziel: Z2.2. Kanal ist Annahme (FB-20, FB-36: In-App reicht nicht immer).
 - **Quelle:** C-2, Z5, SM-R30; Präsentation 4 („Demodaten werden transparent gekennzeichnet“). Kein Nutzerfeedback.
 - **Priorität / Größe / Release 1:** Must / M / ja · **Status:** umgesetzt (AK1 E2E, AK2–AK4 Unit grün; AK4 zusätzlich manuell (TC-M-01))
 - **Akzeptanzkriterien:**
-  - AK1: Gegeben keine Supabase-Konfiguration. Wenn die App gestartet wird, dann läuft sie im Demo-Modus und zeigt oben dauerhaft „Demo-Modus – Beispieldaten, nichts wird gespeichert“.
+  - AK1: Gegeben keine Supabase-Konfiguration. Wenn die App gestartet wird, dann läuft sie im Demo-Modus und zeigt oben dauerhaft „Demo-Modus – Beispieldaten, Änderungen gehen beim Neuladen verloren“ (Text angepasst 23.11.2026 nach ADR-0010).
   - AK2: Gegeben der Demo-Modus. Wenn die Übersicht geladen wird, dann zeigt sie mindestens 6 Demotreffen mit allen Sportarten aus F-00, darunter mindestens ein ausgebuchtes und eines ohne Altersgruppe.
   - AK3: Gegeben der Demo-Modus. Wenn eine Demo-Person einem Treffen beitritt und die Seite neu lädt, dann ist der Ausgangszustand wiederhergestellt.
   - AK4: Gegeben Supabase-Konfiguration vorhanden. Wenn die App startet, dann erscheint kein Demo-Hinweis und Daten kommen aus Supabase.
