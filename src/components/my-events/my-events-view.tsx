@@ -35,7 +35,7 @@ function EmptyTab({ tab }: { tab: Tab }) {
       <p className={styles.emptyText}>
         {tab === 'participating' ? 'Wenn du bei einem Treffen mitmachst, steht es hier.' : 'Treffen, die du erstellst, stehen hier.'}
       </p>
-      <Link href={tab === 'participating' ? '/' : '/erstellen'} className={styles.primary}>
+      <Link href={tab === 'participating' ? '/entdecken' : '/erstellen'} className={styles.primary}>
         {tab === 'participating' ? 'Zur Übersicht' : 'Treffen erstellen'}
       </Link>
     </div>

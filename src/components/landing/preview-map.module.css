@@ -1,0 +1,222 @@
+/* Gezeichnete Flensburg-Vorschau auf der Startseite (F-31). Marker wie auf der Karte in Entdecken (marker-pill). */
+.figure {
+  width: 100%;
+}
+
+.frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sheet);
+  background: var(--map-bg);
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.water {
+  fill: var(--map-water);
+}
+
+.gridLine {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.park {
+  fill: var(--map-park);
+}
+
+.waterLabel {
+  fill: var(--ink-2);
+  font-size: 12px;
+  font-style: italic;
+  letter-spacing: 0.02em;
+}
+
+.chip {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.marker {
+  position: absolute;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  transform: translate(-50%, -100%);
+  text-decoration: none;
+  color: var(--ink);
+  border-radius: var(--radius-pill);
+}
+
+.marker:focus-visible {
+  outline: none;
+}
+
+.marker:focus-visible .pill {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.markerBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: 50% 100%;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px 0 4px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  box-shadow: 0 0 0 1px rgba(21, 23, 26, 0.08), 0 4px 12px rgba(21, 23, 26, 0.12);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background-color var(--duration-slow) var(--ease-out), color var(--duration-slow) var(--ease-out);
+}
+
+.pillIcon {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--bg);
+  transition: background-color var(--duration-slow) var(--ease-out), color var(--duration-slow) var(--ease-out);
+}
+
+.tip {
+  width: 8px;
+  height: 8px;
+  margin-top: -5px;
+  background: var(--surface);
+  transform: rotate(45deg);
+  border-radius: 1px;
+  box-shadow: 1px 1px 0 0 rgba(21, 23, 26, 0.08);
+  transition: background-color var(--duration-slow) var(--ease-out);
+}
+
+.marker[data-active='true'] .pill,
+.marker[data-active='true'] .tip {
+  background: var(--accent-strong);
+  color: var(--on-accent);
+}
+
+.marker[data-active='true'] .pillIcon {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.caption {
+  position: absolute;
+  left: var(--space-3);
+  right: var(--space-3);
+  bottom: var(--space-3);
+  z-index: 3;
+  min-height: 84px;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-element);
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+  display: flex;
+  align-items: center;
+}
+
+.captionInner {
+  display: block;
+  width: 100%;
+}
+
+.captionEvent {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.captionIcon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg);
+}
+
+.captionText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.captionTitle {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.captionMeta {
+  color: var(--ink-2);
+  font-size: var(--text-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.captionPlaces {
+  color: var(--ok-ink);
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+
+.captionEmpty {
+  display: block;
+  color: var(--ink-2);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
+.captionLoading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.skeleton {
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+  background: var(--surface-muted);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.55;
+  }
+}

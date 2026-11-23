@@ -32,4 +32,9 @@
   .demoBanner {
     left: var(--rail-width);
   }
+
+  /* Startseite ohne Seitenleiste (F-31). */
+  .shell:has([data-page='startseite']) .demoBanner {
+    left: 0;
+  }
 }

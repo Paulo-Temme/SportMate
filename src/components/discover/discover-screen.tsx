@@ -15,7 +15,6 @@ import { useParticipation } from '@/hooks/use-participation';
 import { emptyFilters, type EventFilters, type SportEvent } from '@/lib/events/event-model';
 import { describeDayLabel, formatEventTime, summarizePlaces } from '@/lib/events/event-presentation';
 import { FilterPanel } from './filter-panel';
-import { FirstVisitHint } from './first-visit-hint';
 import { ResultList } from './result-list';
 import { SearchBar } from './search-bar';
 import { SportChips } from './sport-chips';
@@ -98,7 +97,7 @@ function SheetHeader({ count, ready, selected, onBack }: { count: number; ready:
 }
 
 /**
- * Startansicht. Die Route `/treffen/[id]` zeigt dieselbe Ansicht mit geöffneten Details im Sheet.
+ * Entdecken-Ansicht unter `/entdecken`. Die Route `/treffen/[id]` zeigt dieselbe Ansicht mit geöffneten Details im Sheet.
  * Rückgabe: Kartenbühne mit schwebenden Bedienelementen und Sheet.
  * Feature: F-05, F-08
  */
@@ -128,7 +127,7 @@ export function DiscoverScreen() {
     [router],
   );
 
-  const showList = useCallback(() => router.push('/', { scroll: false }), [router]);
+  const showList = useCallback(() => router.push('/entdecken', { scroll: false }), [router]);
   const closeFilters = useCallback(() => setFiltersOpen(false), []);
   const resetFilters = useCallback(() => setFilters(emptyFilters), []);
 
@@ -186,18 +185,15 @@ export function DiscoverScreen() {
         {selectedId ? (
           <EventDetail eventId={selectedId} now={now} />
         ) : (
-          <>
-            <FirstVisitHint />
-            <ResultList
-              state={list}
-              selectedId={selectedId}
-              pendingId={participation.pendingId}
-              onSelect={selectEvent}
-              onJoin={participation.join}
-              onResetFilters={resetFilters}
-              hasFilters={hasActiveFilters(filters)}
-            />
-          </>
+          <ResultList
+            state={list}
+            selectedId={selectedId}
+            pendingId={participation.pendingId}
+            onSelect={selectEvent}
+            onJoin={participation.join}
+            onResetFilters={resetFilters}
+            hasFilters={hasActiveFilters(filters)}
+          />
         )}
       </BottomSheet>
       <FilterPanel open={filtersOpen} filters={filters} onChange={setFilters} onClose={closeFilters} resultCount={list.events.length} />

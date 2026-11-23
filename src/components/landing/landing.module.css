@@ -1,0 +1,354 @@
+/* Startseite (F-31). Mobil zuerst: eine Spalte mit 16 px Rand; ab 1024 px Text links, Vorschau rechts. */
+.page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  flex: 1;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+/* Hero */
+.hero {
+  display: grid;
+  gap: var(--space-8);
+  padding: var(--space-4) 0 var(--space-8);
+}
+
+.heroCopy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Bewusst größer als die App-Typografie (28 px): Die Startseite trägt ihren Satz über die Schrift, nicht über Bilder. */
+.title {
+  font-size: clamp(34px, 9.4vw, 60px);
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  font-weight: 600;
+  text-wrap: balance;
+}
+
+.titleSecond {
+  color: var(--ink-2);
+}
+
+.lead {
+  margin-top: var(--space-4);
+  max-width: 36em;
+  color: var(--ink-2);
+  font-size: var(--text-m);
+  line-height: 1.5;
+}
+
+.actions {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+}
+
+.actionWrap {
+  display: block;
+}
+
+.primary,
+.secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 var(--space-6);
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+}
+
+.primary {
+  background: var(--ink);
+  color: var(--on-accent);
+}
+
+.primary:hover {
+  background: #2a2d31;
+}
+
+.secondary {
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+}
+
+.secondary:hover {
+  border-color: var(--ink-2);
+}
+
+.actionNote {
+  margin-top: var(--space-3);
+  color: var(--ink-2);
+  font-size: var(--text-xs);
+}
+
+.heroPreview {
+  min-width: 0;
+}
+
+/* Sanftes Einblenden beim Laden, gestaffelt über --reveal-order; bei reduzierter Bewegung global abgeschaltet. */
+.reveal {
+  animation: reveal var(--duration-slow) var(--ease-out) both;
+  animation-delay: calc(var(--reveal-order, 0) * 60ms);
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    animation: none;
+  }
+}
+
+/* Abschnitte */
+.section {
+  padding: var(--space-8) 0;
+  border-top: 1px solid var(--line);
+}
+
+.sectionTitle {
+  font-size: var(--text-l);
+}
+
+/* So funktioniert's */
+.steps {
+  position: relative;
+  display: grid;
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+}
+
+.step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: var(--space-4);
+}
+
+/* Verbindungslinie zwischen den Nummern. */
+.step:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 15.5px;
+  top: 40px;
+  bottom: calc(-1 * var(--space-6) + 8px);
+  width: 1px;
+  background: var(--line-strong);
+}
+
+.stepNumber {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  background: var(--bg);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.stepBody {
+  min-width: 0;
+  padding-top: 4px;
+}
+
+.stepTitle {
+  font-size: var(--text-m);
+}
+
+.stepText {
+  margin-top: var(--space-1);
+  color: var(--ink-2);
+  max-width: 34em;
+}
+
+.example {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.exampleChip {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+
+.exampleChip[data-active='true'] {
+  border-color: transparent;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.exampleButton {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--accent-strong);
+  color: var(--on-accent);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.exampleNote {
+  color: var(--ok-ink);
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+
+.examplePlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+/* Was SportMate nicht ist */
+.omissions {
+  margin-top: var(--space-4);
+}
+
+.omission {
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--line);
+  line-height: 1.5;
+}
+
+.omission:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.omissionTitle {
+  font-weight: 600;
+}
+
+.omissionText {
+  color: var(--ink-2);
+}
+
+/* Fußzeile */
+.footer {
+  border-top: 1px solid var(--line);
+  padding: var(--space-6) 0 calc(var(--space-6) + var(--safe-bottom));
+  color: var(--ink-2);
+  font-size: var(--text-xs);
+}
+
+.footerInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+.footer a {
+  text-underline-offset: 2px;
+}
+
+@media (min-width: 600px) {
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+
+@media (min-width: 1024px) {
+  .main {
+    padding: 0 var(--space-8);
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    align-items: center;
+    gap: 64px;
+    padding: var(--space-6) 0 72px;
+  }
+
+  .heroPreview {
+    max-width: 440px;
+    justify-self: end;
+    width: 100%;
+  }
+
+  .section {
+    padding: 56px 0;
+  }
+
+  .sectionTitle {
+    font-size: var(--text-xl);
+  }
+
+  .steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-8);
+    margin-top: var(--space-8);
+  }
+
+  .step {
+    grid-template-columns: 1fr;
+    align-content: start;
+    gap: var(--space-3);
+  }
+
+  /* Auf dem Desktop läuft die Linie waagerecht von Nummer zu Nummer. */
+  .step:not(:last-child)::before {
+    left: 44px;
+    right: calc(-1 * var(--space-8) + 12px);
+    top: 15.5px;
+    bottom: auto;
+    width: auto;
+    height: 1px;
+  }
+
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: var(--space-8);
+  }
+
+  .split .omissions {
+    margin-top: 0;
+  }
+
+  .footerInner {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-6);
+    padding: 0 var(--space-8);
+  }
+}

@@ -244,7 +244,7 @@ export function EventDetail({ eventId, now = new Date() }: { eventId: string; no
             ? 'Vielleicht wurde der Link falsch kopiert oder das Treffen gibt es nicht mehr.'
             : 'Bitte prüfe deine Verbindung und versuche es erneut.'}
         </p>
-        <Link href="/" className={styles.textLink}>
+        <Link href="/entdecken" className={styles.textLink}>
           Zur Übersicht
         </Link>
       </div>

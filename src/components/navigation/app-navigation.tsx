@@ -1,15 +1,16 @@
 'use client';
-// Hauptnavigation: Tab-Leiste unten (mobil) bzw. schmale Leiste links (Desktop) mit Entdecken, Meine Treffen, Erstellen, Profil (F-05, F-17, F-24).
+// Hauptnavigation: Tab-Leiste unten (mobil) bzw. schmale Leiste links (Desktop) mit Entdecken, Meine Treffen, Erstellen, Profil (F-05, F-17, F-24, F-31).
 import { CalendarCheck, Compass, Plus, UserRound } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Suspense } from 'react';
+import { BrandMark } from './brand-mark';
 import styles from './app-navigation.module.css';
 
 type NavigationItem = { href: string; label: string; icon: typeof Compass; primary?: boolean };
 
 const items: NavigationItem[] = [
-  { href: '/', label: 'Entdecken', icon: Compass },
+  { href: '/entdecken', label: 'Entdecken', icon: Compass },
   { href: '/meine-treffen', label: 'Meine Treffen', icon: CalendarCheck },
   { href: '/erstellen', label: 'Erstellen', icon: Plus, primary: true },
   { href: '/profil', label: 'Profil', icon: UserRound },
@@ -17,7 +18,7 @@ const items: NavigationItem[] = [
 
 function isActive(item: NavigationItem, pathname: string | null): boolean {
   if (!pathname) return false;
-  if (item.href === '/') return pathname === '/' || pathname.startsWith('/treffen');
+  if (item.href === '/entdecken') return pathname.startsWith('/entdecken') || pathname.startsWith('/treffen');
   return pathname.startsWith(item.href);
 }
 
@@ -60,12 +61,8 @@ function ActiveNavigationLinks() {
 export function AppNavigation() {
   return (
     <nav className={styles.navigation} aria-label="Hauptnavigation">
-      <Link href="/" className={styles.brand} aria-label="SportMate, zur Startansicht">
-        <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
-          <rect width="32" height="32" rx="8" fill="var(--ink)" />
-          <circle cx="16" cy="16" r="8.5" fill="none" stroke="var(--on-accent)" strokeWidth="2.5" />
-          <circle cx="16" cy="16" r="3.5" fill="var(--accent)" />
-        </svg>
+      <Link href="/" className={styles.brand} aria-label="SportMate, zur Startseite">
+        <BrandMark />
       </Link>
       <Suspense fallback={<NavigationLinks pathname={null} />}>
         <ActiveNavigationLinks />
