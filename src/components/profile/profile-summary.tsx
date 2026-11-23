@@ -12,10 +12,10 @@ const mineFilters = { ...emptyFilters, mine: true };
 function Stat({ value, label, testId }: { value: number | null; label: string; testId: string }) {
   return (
     <div className={styles.stat}>
+      <dt className={styles.statLabel}>{label}</dt>
       <dd className={`${styles.statValue} tabular`} data-testid={testId}>
         {value ?? '–'}
       </dd>
-      <dt className={styles.statLabel}>{label}</dt>
     </div>
   );
 }

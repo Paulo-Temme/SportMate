@@ -64,7 +64,16 @@ export function EventCard({ event, selected, onSelect, onJoin, pending = false, 
     <article className={styles.card} data-selected={selected} data-full={places.full} data-testid="event-card" data-event-id={event.id}>
       <div className={styles.when}>
         <span className={styles.time}>{formatEventTime(event.startsAt)}</span>
-        <span className={styles.day}>{describeDayLabel(event.startsAt, now)}</span>
+        <span className={styles.day}>
+          {/* "Mi., 25. Nov." bricht nach dem Wochentag um, nicht mitten im Datum. */}
+          {describeDayLabel(event.startsAt, now)
+            .split(', ')
+            .map((part, index, parts) => (
+              <span key={part} className={styles.dayPart}>
+                {index < parts.length - 1 ? `${part},` : part}
+              </span>
+            ))}
+        </span>
       </div>
       <div className={styles.body}>
         <h3 className={styles.title}>

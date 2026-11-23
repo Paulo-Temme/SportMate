@@ -49,6 +49,11 @@
   font-weight: 500;
 }
 
+.dayPart {
+  display: block;
+  white-space: nowrap;
+}
+
 .body {
   min-width: 0;
   display: flex;
