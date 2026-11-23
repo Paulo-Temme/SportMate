@@ -1,5 +1,6 @@
 // Leitet aus vorhandenen Treffendaten Anzeigetexte ab (Plätze, Altersgruppe, Status, Kosten, Datum). Repariert keine Daten (F-00).
 import { ageGroups, type SportEvent } from './event-model';
+import { buildCalendarWindow, toBerlinDay } from './event-search';
 
 /** Freie Plätze eines Treffens. `free` ist `null`, wenn die Daten keine ehrliche Aussage erlauben. */
 export type PlaceSummary = { label: string; free: number | null; full: boolean };
@@ -103,6 +104,19 @@ export function formatEventDate(iso: string): string {
   return new Intl.DateTimeFormat('de-DE', { timeZone: berlinTimeZone, weekday: 'short', day: 'numeric', month: 'short' }).format(
     new Date(iso),
   );
+}
+
+/**
+ * Beschreibt den Tag eines Zeitpunkts relativ zu jetzt (Berliner Zeit), für Listen und Marker.
+ * Eingaben: ISO-Zeitpunkt, aktueller Zeitpunkt. Rückgabe: "Heute", "Morgen" oder kurzes Datum wie "Fr., 27. Nov.".
+ * Fehler: wirft `RangeError` bei ungültigem Datum.
+ * Feature: F-05
+ */
+export function describeDayLabel(iso: string, now: Date): string {
+  const day = toBerlinDay(iso);
+  const window = buildCalendarWindow(now);
+  if (day === window.today) return 'Heute';
+  return day === window.tomorrow ? 'Morgen' : formatEventDate(iso);
 }
 
 /**

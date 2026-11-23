@@ -4,7 +4,7 @@ import type { EventFilters, SportEvent } from './event-model';
 type EventPredicate = (event: SportEvent) => boolean;
 
 /** Kalendertage (YYYY-MM-DD, Berliner Zeit), gegen die der Zeitraumfilter prüft. */
-type CalendarWindow = { today: string; tomorrow: string; weekEnd: string };
+export type CalendarWindow = { today: string; tomorrow: string; weekEnd: string };
 
 /**
  * Liefert den Kalendertag eines Zeitpunkts in Berliner Zeit.
@@ -26,8 +26,13 @@ function addDays(day: Date, days: number): Date {
   return result;
 }
 
-// Mittag UTC als Anker, damit Sommer-/Winterzeit den Tag beim Rechnen nicht verschiebt.
-function buildCalendarWindow(now: Date): CalendarWindow {
+/**
+ * Bestimmt heute, morgen und das Ende der laufenden Woche (Sonntag) als Berliner Kalendertage.
+ * Mittag UTC dient als Anker, damit Sommer-/Winterzeit den Tag beim Rechnen nicht verschiebt.
+ * Eingaben: aktueller Zeitpunkt. Rückgabe: drei Tage als "YYYY-MM-DD".
+ * Feature: F-00, F-05
+ */
+export function buildCalendarWindow(now: Date): CalendarWindow {
   const today = toBerlinDay(now);
   const noon = new Date(`${today}T12:00:00Z`);
   const daysUntilSunday = 7 - (noon.getUTCDay() || 7);

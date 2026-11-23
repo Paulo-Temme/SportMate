@@ -3,8 +3,7 @@
 import { Check } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
 import type { SportEvent } from '@/lib/events/event-model';
-import { describeAgeGroup, describeCost, formatEventTime, summarizePlaces } from '@/lib/events/event-presentation';
-import { describeDayLabel } from './day-label';
+import { describeAgeGroup, describeCost, describeDayLabel, formatEventTime, summarizePlaces } from '@/lib/events/event-presentation';
 import { resolveJoinAction } from './join-action';
 import { OccupancyBar } from './occupancy-bar';
 import { SportIcon } from './sport-icon';

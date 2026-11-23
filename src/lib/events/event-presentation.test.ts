@@ -5,6 +5,7 @@ import {
   describeAgeGroup,
   describeBringAlong,
   describeCost,
+  describeDayLabel,
   describeEventStatus,
   formatEventDate,
   formatEventSchedule,
@@ -131,5 +132,29 @@ describe('F-12 AK1: Datum mit Dauer', () => {
   it('F-12 AK1: wirft bei ungültigem Datum', () => {
     expect(() => formatEventSchedule('kein Datum', '2026-11-26T17:00:00.000Z')).toThrow(RangeError);
     expect(() => formatEventSchedule('2026-11-26T17:00:00.000Z', 'kein Datum')).toThrow(RangeError);
+  });
+});
+
+describe('F-05 AK1 (REV-04): Tagesangabe Heute/Morgen', () => {
+  it('F-05 AK1: nennt heute, morgen und sonst das kurze Datum (Berliner Kalendertag)', () => {
+    expect(describeDayLabel('2026-10-26T19:00:00Z', fixedNow)).toBe('Heute');
+    expect(describeDayLabel('2026-10-26T22:59:00Z', fixedNow)).toBe('Heute');
+    expect(describeDayLabel('2026-10-26T23:30:00Z', fixedNow)).toBe('Morgen');
+    expect(describeDayLabel('2026-10-27T22:59:00Z', fixedNow)).toBe('Morgen');
+    expect(describeDayLabel('2026-10-27T23:00:00Z', fixedNow)).toBe('Mi., 28. Okt.');
+    expect(describeDayLabel('2026-10-25T12:00:00Z', fixedNow)).toBe('So., 25. Okt.');
+  });
+
+  it('F-05 AK1: rechnet über die Zeitumstellung im Herbst und Frühjahr richtig', () => {
+    const autumnNow = new Date('2026-10-24T23:30:00Z'); // So., 25.10., 01:30 Sommerzeit; um 03:00 wird auf Winterzeit gestellt
+    expect(describeDayLabel('2026-10-25T22:30:00Z', autumnNow)).toBe('Heute');
+    expect(describeDayLabel('2026-10-25T23:30:00Z', autumnNow)).toBe('Morgen');
+    const springNow = new Date('2026-03-28T23:30:00Z'); // So., 29.03., 00:30 Winterzeit; um 02:00 wird auf Sommerzeit gestellt
+    expect(describeDayLabel('2026-03-29T21:30:00Z', springNow)).toBe('Heute');
+    expect(describeDayLabel('2026-03-29T22:30:00Z', springNow)).toBe('Morgen');
+  });
+
+  it('F-05 AK1: wirft bei ungültigem Datum', () => {
+    expect(() => describeDayLabel('kein Datum', fixedNow)).toThrow(RangeError);
   });
 });

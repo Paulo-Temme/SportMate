@@ -1,10 +1,9 @@
 'use client';
 // Eintrag unter "Meine Treffen": Zeit, Titel, Status (Angemeldet, Organisiert von dir, Abgesagt) und passende Aktion (F-24, F-18, F-23).
 import Link from 'next/link';
-import { describeDayLabel } from '@/components/event/day-label';
 import { SportIcon } from '@/components/event/sport-icon';
 import type { SportEvent } from '@/lib/events/event-model';
-import { describeEventStatus, formatEventTime, summarizePlaces } from '@/lib/events/event-presentation';
+import { describeDayLabel, describeEventStatus, formatEventTime, summarizePlaces } from '@/lib/events/event-presentation';
 import styles from './my-event-row.module.css';
 
 type MyEventRowProps = {
