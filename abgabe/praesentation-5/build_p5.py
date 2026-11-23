@@ -24,34 +24,38 @@ SHOTS = REPO / "docs" / "testing" / "screenshots"
 OUT = HERE / "SportMate_P5_Qualitaet_und_Tests.pptx"
 
 # ---------------------------------------------------------------- ZAHLEN
-# Endlauf 23.11.2026 (docs/testing/testbericht.md, Abschnitt "Endlauf 23.11.2026")
+# Endlauf 23.11.2026, Commit b98064f (Zahlen vom Orchestrator; Ebenen per vitest-JSON und e2e-Zaehlung nachgezaehlt)
 STAND = "23.11.2026"
-COMMIT = "004a9fa"
+COMMIT = "b98064f"
 COMMIT_REVIEW = "9f79927"   # Stand des Gesamt-Reviews (vor den Korrekturen)
+COMMIT_NACHPRUEFUNG = "004a9fa"   # Nachpruefung Endstand im review-protokoll.md
 DATUM_PRAES = "25.11.2026"
 LIVE_URL = "sportmate-gamma.vercel.app"
 TEAM = ["Julien", "Renat", "Paulo", "Niklas"]
 
-# Testfaelle je Ebene (testfaelle.md, Uebersicht; Vitest-JSON-Lauf auf 004a9fa)
-N_UNIT, N_UNIT_DATEIEN = 243, 20      # src/lib
-N_KOMP, N_KOMP_DATEIEN = 34, 6        # src/components (21 Komponententests + 13 Unit-Tests reiner Hilfsfunktionen)
+# Testfaelle je Ebene (Vitest-JSON-Lauf und e2e-Zaehlung auf b98064f)
+N_UNIT, N_UNIT_DATEIEN = 255, 22      # src/lib
+N_KOMP, N_KOMP_DATEIEN = 47, 7        # src/components
+N_KOMP_JSDOM, N_KOMP_HILF = 34, 13    # Komponententests in jsdom / Unit-Tests reiner Hilfsfunktionen
 N_INT, N_INT_LOKAL, N_INT_DB = 8, 6, 2
-N_E2E, N_E2E_PROJEKTE = 59, 2
+N_E2E, N_E2E_PROJEKTE = 72, 2
 N_MANUELL = 10
 N_AUTO = N_UNIT + N_KOMP + N_INT + N_E2E  # automatisierte Testfaelle
 N_KATALOG = 37 + 21 + 8 + 59 + 10       # Eintraege im Testfallkatalog
 
 # Laeufe (testbericht.md, Endlauf)
-VITEST_OK, VITEST_FAIL, VITEST_SKIP, VITEST_DAUER = 283, 0, 2, "2,4 s"
-DB_VOLL_OK, DB_VOLL_FAIL = 285, 0      # voller Vitest-Lauf mit SUPABASE_INTEGRATION=1 (Orchestrator)
-E2E_MOBIL_OK, E2E_DESKTOP_OK, E2E_DESKTOP_SKIP, E2E_FAIL, E2E_DAUER = 59, 58, 1, 0, "48,1 s"
+VITEST_OK, VITEST_FAIL, VITEST_SKIP, VITEST_DAUER = 308, 0, 2, "2,6 s"
+DB_VOLL_OK, DB_VOLL_FAIL = 310, 0      # voller Vitest-Lauf mit SUPABASE_INTEGRATION=1 (Orchestrator)
+E2E_MOBIL_OK, E2E_MOBIL_SKIP, E2E_DESKTOP_OK, E2E_DESKTOP_SKIP, E2E_FAIL, E2E_DAUER = 71, 1, 71, 1, 0, "1,1 min"
+E2E_OK = E2E_MOBIL_OK + E2E_DESKTOP_OK   # 142
 E2E_LAEUFE = N_E2E * N_E2E_PROJEKTE
 MAN_OK, MAN_FAIL = 10, 0
 TSC_FEHLER, ESLINT_BEFUNDE = 0, 0
 UNIT_GRUEN_BEI_BUG01 = 85  # fehlerprotokoll.md, BUG-01
 
-# Coverage src/lib (testbericht.md, Endlauf)
-COV_LIB_ZEILEN, COV_LIB_ZWEIGE = "90,66 %", "85,31 %"
+# Coverage src/lib mit Integrationslauf (SUPABASE_INTEGRATION=1); Supabase-Repository im Standardlauf (make coverage)
+COV_LIB_ZEILEN, COV_LIB_ZWEIGE = "97,29 %", "91,07 %"
+COV_LIB_ANWEISUNGEN, COV_LIB_FUNKTIONEN = "95,52 %", "98,73 %"
 COV_EVENTS_ZEILEN = "100 %"
 COV_SUPA_REPO_ZEILEN = "36,95 %"
 COV_ZIEL = "80 %"
@@ -74,7 +78,7 @@ REV_FARBWERTE, REV_FARB_DATEIEN = 23, 13
 # Backlog / Git
 R1_STORIES, R1_MUST, R1_SHOULD = 14, 13, 1
 R1_UMGESETZT, R1_TEILWEISE = 11, 3
-N_COMMITS = 55   # Commits mit Feature-ID bis 004a9fa (SE-Eval)
+N_COMMITS = 71   # Commits auf develop bis b98064f
 
 # Wer spricht welche Folie (Index ab 1)
 SPRECHER = {1: "Julien", 2: "Julien", 3: "Renat", 4: "Renat", 5: "Renat",
@@ -358,8 +362,8 @@ Redetext:
 Unsere Teststrategie hat vier automatische Ebenen, als Pyramide dargestellt.
 Unten die Unit-Tests: {N_UNIT} Fälle in {N_UNIT_DATEIEN} Dateien. Sie prüfen die Fachregeln, zum Beispiel Validierung, Suche und Filter, Teilnahmeregeln
 und die Übersetzung von Datenbankfehlern. Das geht billig, weil die Fachregeln laut Architektur rein in src/lib liegen, ohne Oberfläche, Netz oder Uhr.
-Darüber {N_KOMP} Tests in src/components, davon 21 Komponententests mit Testing Library: Sie prüfen, was eine Komponente anzeigt, etwa Beschriftungen, Zustände,
-die Fokusfalle in Dialogen und dass ein Fehlerfeld aria-invalid trägt. Die übrigen 13 prüfen reine Hilfsfunktionen der Oberfläche.
+Darüber {N_KOMP} Tests in src/components, davon {N_KOMP_JSDOM} Komponententests mit Testing Library: Sie prüfen, was eine Komponente anzeigt, etwa Beschriftungen, Zustände,
+die Fokusfalle in Dialogen und dass ein Fehlerfeld aria-invalid trägt. Die übrigen {N_KOMP_HILF} prüfen reine Hilfsfunktionen der Oberfläche.
 Dann {N_INT} Integrationstests: {N_INT_LOKAL} prüfen Anmeldung, Repository und Sitzung zusammen im lokalen Modus, {N_INT_DB} laufen gegen die echte Supabase-Datenbank.
 Nur dort lassen sich Row Level Security, RPC-Funktionen und der Überbuchungsschutz wirklich prüfen.
 Oben {N_E2E} Akzeptanztests mit Playwright. Jeder Test ist ein Akzeptanzkriterium als Nutzerweg und läuft in zwei Projekten, Handy und Desktop,
@@ -540,7 +544,7 @@ R = {"color": ACCENT, "bold": True}
 res_rows = [
     ["Unit + Komponente + Integration lokal", [(str(VITEST_OK), G)], [(str(VITEST_FAIL), {})], [(str(VITEST_SKIP), {})], f"{VITEST_DAUER}; 2 = Supabase ohne Zugang"],
     ["Vitest voll gegen echte Supabase-DB", [(str(DB_VOLL_OK), G)], [(str(DB_VOLL_FAIL), {})], "0", "früher 2/2 rot: BUG-01"],
-    ["Akzeptanz Mobile Chrome (Pixel 7)", [(str(E2E_MOBIL_OK), G)], str(E2E_FAIL), "0", ""],
+    ["Akzeptanz Mobile Chrome (Pixel 7)", [(str(E2E_MOBIL_OK), G)], str(E2E_FAIL), str(E2E_MOBIL_SKIP), "1 nur Desktop"],
     ["Akzeptanz Desktop Chrome", [(str(E2E_DESKTOP_OK), G)], str(E2E_FAIL), str(E2E_DESKTOP_SKIP), f"{E2E_LAEUFE} Läufe in {E2E_DAUER}; 1 nur mobil"],
     ["Manuell / explorativ (TC-M-01…10)", [(str(MAN_OK), G)], str(MAN_FAIL), "0", "Befunde BUG-02/03, behoben"],
     ["Typprüfung · Lint", "–", f"{TSC_FEHLER} · {ESLINT_BEFUNDE}", "–", "tsc 0 Fehler, ESLint 0 Befunde"],
@@ -550,7 +554,7 @@ table(s, M, 1.95, [3.25, 1.1, 1.2, 1.05, 2.0], res_rows,
       col_styles={1: {"size": 14}, 2: {"size": 14}, 3: {"size": 14}, 4: {"size": 9.5, "color": INK2}})
 # Coverage
 text(s, M, 5.35, 4, 0.3, "COVERAGE src/lib", size=9, bold=True, color=INK2)
-cov = [(COV_LIB_ZEILEN, "Zeilen gesamt"), (COV_LIB_ZWEIGE, "Zweige gesamt"), (COV_EVENTS_ZEILEN, "Zeilen Fachregeln\nsrc/lib/events"),
+cov = [(COV_LIB_ZEILEN, "Zeilen gesamt\nmit Integrationslauf"), (COV_LIB_ZWEIGE, "Zweige gesamt\nmit Integrationslauf"),(COV_EVENTS_ZEILEN, "Zeilen Fachregeln\nsrc/lib/events"),
        (COV_SUPA_REPO_ZEILEN, "Supabase-Repository\nim Standardlauf")]
 for i, (v, lab) in enumerate(cov):
     x0 = M + i * 2.15
@@ -559,7 +563,7 @@ for i, (v, lab) in enumerate(cov):
 # SE-Eval
 box(s, 9.45, 1.95, 3.28, 4.85, fill=SURFACE, line=LINE, radius=0.05)
 text(s, 9.65, 2.1, 3.0, 0.3, "SE-EVAL (EXTERNE MESSUNG)", size=9, bold=True, color=INK2)
-text(s, 9.65, 2.35, 3.0, 0.3, f"Commit {SE_COMMIT}, Endstand", size=9, color=INK2)
+text(s, 9.65, 2.35, 3.0, 0.3, f"Commit {SE_COMMIT} (Stand 23.11., 14:07)", size=9, color=INK2)
 se = [(f"{SE_KK_MEDIAN} / {SE_KK_P90} / {SE_KK_UEBER15}", "kognitive Komplexität\nMedian / P90 / > 15"),
       (f"{SE_TSC} / {SE_UMGEHUNGEN} / {SE_DUPLIKATE}", "strict-Fehler / Typ-Umgehungen /\nDuplikate"),
       (f"{SE_LINE} / {SE_BRANCH}", "Line / Branch Coverage\nganze App inkl. Oberfläche")]
@@ -577,16 +581,16 @@ Jetzt die Ergebnisse, alle aus dem Endlauf vom {STAND} auf Commit {COMMIT}, nach
 Vitest, also Unit, Komponente und lokale Integration: {VITEST_OK} bestanden, {VITEST_FAIL} fehlgeschlagen, {VITEST_SKIP} übersprungen. Die zwei übersprungenen sind
 die Supabase-Tests, die ohne Zugangsdaten bewusst nicht laufen. Dauer {VITEST_DAUER}.
 Derselbe volle Lauf mit der echten Supabase-Datenbank: {DB_VOLL_OK} von {DB_VOLL_OK} bestanden. Beim allerersten Lauf waren die beiden Datenbank-Tests rot, das war BUG-01.
-Akzeptanztests: {E2E_MOBIL_OK} von {N_E2E} auf dem Handy-Profil und {E2E_DESKTOP_OK} auf Desktop. Einer ist auf Desktop gewollt übersprungen, weil er nur prüft,
-dass eine Zeile auf dem Handy nicht umbricht. Zusammen {E2E_LAEUFE} Läufe in {E2E_DAUER}.
+Akzeptanztests: {E2E_MOBIL_OK} von {N_E2E} auf dem Handy-Profil und {E2E_DESKTOP_OK} auf Desktop. Je einer ist gewollt übersprungen: auf Desktop der Test, dass eine Zeile auf dem Handy nicht umbricht,
+auf dem Handy der Test für das Logo in der Seitenleiste, die es nur auf Desktop gibt. Zusammen {E2E_LAEUFE} Läufe in {E2E_DAUER}.
 Die 10 manuellen Tests im Supabase-Modus waren funktional bestanden und haben zwei Befunde geliefert, BUG-02 und BUG-03, beide inzwischen behoben.
 Typprüfung und Lint: 0 Fehler, 0 Befunde.
 
-Coverage von src/lib: {COV_LIB_ZEILEN} der Zeilen und {COV_LIB_ZWEIGE} der Zweige. Die Fachregeln in src/lib/events sind zu {COV_EVENTS_ZEILEN} der Zeilen abgedeckt.
+Coverage von src/lib im Lauf mit echter Datenbank: {COV_LIB_ZEILEN} der Zeilen, {COV_LIB_ZWEIGE} der Zweige, {COV_LIB_ANWEISUNGEN} der Anweisungen und {COV_LIB_FUNKTIONEN} der Funktionen. Die Fachregeln in src/lib/events sind zu {COV_EVENTS_ZEILEN} der Zeilen abgedeckt.
 Die Schwachstelle ist rot markiert: Das Supabase-Repository ist im Standardlauf nur zu {COV_SUPA_REPO_ZEILEN} abgedeckt, weil der Rest nur von den
 Integrationstests gegen die echte DB erreicht wird. Die liefen vollständig grün, laufen aber nicht in der CI. Das ist der offene Review-Befund REV-02.
 
-Rechts die externe Messung mit SE-Eval auf demselben Commit {SE_COMMIT}.
+Rechts die externe Messung mit SE-Eval auf Commit {SE_COMMIT}; sie wurde nach den letzten Änderungen nicht wiederholt.
 Kognitive Komplexität Median {SE_KK_MEDIAN}, P90 {SE_KK_P90}, keine Funktion über 15. Keine strict-Fehler, keine Typ-Umgehungen, {SE_DUPLIKATE} duplizierte Zeilen.
 Die Coverage dort ist niedriger, {SE_LINE} Zeilen, weil SE-Eval die ganze App inklusive Oberfläche misst, und die Oberfläche prüfen wir mit Playwright, nicht mit Vitest.
 Den Mutation Score haben wir diesmal nicht gemessen. Die erste Messung mit {SE_MUT_SCORE} war ein Messfehler: Baut man einen angeblich überlebenden Mutanten
@@ -655,7 +659,7 @@ belegt durch Unit-Tests mit 12 Stunden und 12 Stunden und einer Minute. Ehrlich:
 """)
 
 # ================================================================ FOLIE 9 Review-Ergebnisse
-s = base(9, f"Review: 15 Befunde, {REV_BEHOBEN} behoben", f"Gesamt-Review von Commit {COMMIT_REVIEW} nach dem Leitfaden, Nachprüfung auf {COMMIT}",
+s = base(9, f"Review: 15 Befunde, {REV_BEHOBEN} behoben", f"Gesamt-Review von Commit {COMMIT_REVIEW} nach dem Leitfaden, Nachprüfung auf {COMMIT_NACHPRUEFUNG}",
          ["Review-Leitfaden", "Ergebnisse"], "docs/testing/review-protokoll.md")
 for i, (n, lab, col) in enumerate([(REV_BLOCK, "blockierend", INK), (REV_WICHTIG, "wichtig", WARN), (REV_HINWEIS, "Hinweise", INK2)]):
     x0 = M + i * 2.1
@@ -689,7 +693,7 @@ for i, (h, t) in enumerate(pos):
     text(s, 7.8, yy + 0.3, 4.75, 0.5, t, size=10.5, color=INK2, spacing=1.0)
 notes(s, 9, f"""
 Redetext:
-Vor der Präsentation haben wir den Gesamtstand nach unserem Leitfaden reviewt, Commit {COMMIT_REVIEW}, und nach den Korrekturen auf {COMMIT} nachgeprüft. Das Ergebnis: {REV_BLOCK + REV_WICHTIG + REV_HINWEIS} Befunde,
+Vor der Präsentation haben wir den Gesamtstand nach unserem Leitfaden reviewt, Commit {COMMIT_REVIEW}, und nach den Korrekturen auf {COMMIT_NACHPRUEFUNG} nachgeprüft. Das Ergebnis: {REV_BLOCK + REV_WICHTIG + REV_HINWEIS} Befunde,
 {REV_BLOCK} blockierend, {REV_WICHTIG} wichtig und {REV_HINWEIS} Hinweise. Jeder Befund steht mit Datei und Zeile im Review-Protokoll.
 
 Vier Beispiele für "wichtig", mit Stand heute:
