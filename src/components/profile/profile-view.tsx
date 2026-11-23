@@ -4,6 +4,7 @@ import { LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { useAppServices } from '@/components/app/app-services';
 import { useToast } from '@/components/app/toast-provider';
+import { describeActionFailure } from '@/lib/events/failure-message';
 import styles from './profile-view.module.css';
 
 /**
@@ -35,8 +36,12 @@ export function ProfileView() {
   }
 
   const signOut = async () => {
-    await auth.signOut();
-    showToast('Abgemeldet');
+    try {
+      await auth.signOut();
+      showToast('Abgemeldet');
+    } catch (error) {
+      showToast(describeActionFailure(error), 'error');
+    }
   };
 
   return (

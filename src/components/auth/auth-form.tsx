@@ -6,6 +6,7 @@ import { useId, useState, type FormEvent } from 'react';
 import { useAppServices } from '@/components/app/app-services';
 import { useToast } from '@/components/app/toast-provider';
 import { AuthError, type AuthField } from '@/lib/data/auth-gateway';
+import { describeActionFailure } from '@/lib/events/failure-message';
 import { resolveReturnPath } from './return-path';
 import styles from './auth-form.module.css';
 
@@ -14,7 +15,7 @@ type FieldErrors = Partial<Record<AuthField | 'form', string>>;
 
 function toFieldErrors(error: unknown): FieldErrors {
   if (error instanceof AuthError) return { [error.field ?? 'form']: error.message };
-  return { form: 'Das hat nicht geklappt. Bitte prüfe deine Verbindung und versuche es erneut.' };
+  return { form: describeActionFailure(error) };
 }
 
 function TextField(props: {

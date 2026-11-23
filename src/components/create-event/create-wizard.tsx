@@ -7,6 +7,7 @@ import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { useAppServices } from '@/components/app/app-services';
 import { useToast } from '@/components/app/toast-provider';
 import { EventError } from '@/lib/events/event-error';
+import { describeActionFailure } from '@/lib/events/failure-message';
 import { buildEventInput, createEmptyDraft, findStepErrors, stepOfField, toDraftErrors, type DraftErrors, type EventDraft, type WizardStep } from './event-draft';
 import { StepBasics } from './step-basics';
 import { StepDetails } from './step-details';
@@ -108,7 +109,7 @@ export function CreateWizard() {
         setStep(stepOfField(error.field));
         setErrors(toDraftErrors(error));
       } else {
-        showToast(error instanceof Error ? error.message : 'Das Treffen konnte nicht gespeichert werden.', 'error');
+        showToast(describeActionFailure(error), 'error');
       }
     } finally {
       setBusy(false);

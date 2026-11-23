@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import { useAppServices } from '@/components/app/app-services';
 import { useToast } from '@/components/app/toast-provider';
-import { EventError } from '@/lib/events/event-error';
+import { describeActionFailure } from '@/lib/events/failure-message';
 import type { SportEvent } from '@/lib/events/event-model';
 
 type ParticipationAction = 'join' | 'leave' | 'cancel';
@@ -14,11 +14,6 @@ const successMessages: Record<ParticipationAction, string> = {
   leave: 'Teilnahme zurückgezogen',
   cancel: 'Treffen abgesagt',
 };
-
-function describeFailure(error: unknown): string {
-  if (error instanceof EventError) return error.message;
-  return 'Das hat nicht geklappt. Bitte prüfe deine Verbindung und versuche es erneut.';
-}
 
 /**
  * Liefert Aktionen rund um die Teilnahme. Jede Aktion meldet Erfolg oder Fehler als Toast und lädt Listen neu.
@@ -44,7 +39,7 @@ export function useParticipation() {
         notifyDataChanged();
         return true;
       } catch (error) {
-        showToast(describeFailure(error), 'error');
+        showToast(describeActionFailure(error), 'error');
         notifyDataChanged();
         return false;
       } finally {
