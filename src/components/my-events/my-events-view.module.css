@@ -1,0 +1,77 @@
+/* "Meine Treffen" (F-24). */
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.title {
+  font-size: var(--text-xl);
+}
+
+.tabs {
+  display: flex;
+  gap: var(--space-6);
+  border-bottom: 1px solid var(--line);
+}
+
+.tab {
+  position: relative;
+  min-height: 44px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.tab[aria-selected='true'] {
+  color: var(--ink);
+}
+
+.tabLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--ink);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-6) 0;
+}
+
+.emptyTitle {
+  font-size: var(--text-m);
+  font-weight: 600;
+}
+
+.emptyText {
+  color: var(--ink-2);
+}
+
+.primary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: var(--space-2);
+  padding: 0 var(--space-6);
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.skeleton {
+  height: 180px;
+  border-radius: var(--radius-element);
+  background: #efede8;
+}
