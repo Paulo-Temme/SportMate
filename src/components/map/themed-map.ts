@@ -1,6 +1,6 @@
 // Erzeugt eine MapLibre-Karte im Positron-Stil, an die App-Tokens angepasst, ohne Standard-Bedienelemente (F-08, F-17).
 import * as maplibregl from 'maplibre-gl';
-import { buildMapTheme } from './map-theme';
+import { buildMapTheme } from '@/lib/map/map-theme';
 
 const styleUrl = 'https://tiles.openfreemap.org/styles/positron';
 

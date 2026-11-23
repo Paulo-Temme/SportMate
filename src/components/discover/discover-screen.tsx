@@ -9,7 +9,7 @@ import { describeDayLabel } from '@/components/event/day-label';
 import { EventMap } from '@/components/map/event-map';
 import type { CameraRequest, MapMarkerItem } from '@/components/map/map-marker-item';
 import { BottomSheet } from '@/components/sheet/bottom-sheet';
-import { computeSnapHeights, type SnapHeights, type SnapPoint } from '@/components/sheet/sheet-snap';
+import { computeSnapHeights, type SnapHeights, type SnapPoint } from '@/lib/ui/sheet-snap';
 import { useEventList } from '@/hooks/use-event-list';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useParticipation } from '@/hooks/use-participation';

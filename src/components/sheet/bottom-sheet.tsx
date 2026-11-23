@@ -2,7 +2,7 @@
 // Ziehbares Bottom Sheet mit drei Rastpunkten (Spitze, halb, voll), Schwung und Tastaturbedienung; ab Desktop feste Seitenleiste (F-05, F-08).
 import { animate, motion, useDragControls, useMotionValue, useReducedMotion, type PanInfo } from 'motion/react';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
-import { chooseSnapPoint, computeSnapHeights, stepSnapPoint, type SnapHeights, type SnapPoint } from './sheet-snap';
+import { chooseSnapPoint, computeSnapHeights, stepSnapPoint, type SnapHeights, type SnapPoint } from '@/lib/ui/sheet-snap';
 import styles from './bottom-sheet.module.css';
 
 type BottomSheetProps = {
