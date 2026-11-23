@@ -177,3 +177,16 @@ beschreiben nicht den hier getesteten Commit).
 - **Kein realer Nutzertest bis P6.**
 - BUG-04 wurde aus dem Code abgeleitet; der Nachweis der Behebung erfolgt über Unit-Tests der Kernlogik, nicht über einen Supabase-E2E-Lauf.
 - Supabase-Integrationslauf (285/285) vom Orchestrator übernommen, in diesem Endlauf nicht selbst wiederholt (keine `.env`-Zugriffe für Agenten).
+
+## Nachtrag: Stand 23.11.2026 abends (Commit b98064f)
+
+Nach Korrektur der Demo-Koordinaten (F-08) und der Landing Page (F-31) erneut ausgeführt:
+
+| Ebene | Befehl | Ergebnis |
+| --- | --- | --- |
+| Unit, Komponente, Integration inkl. echter Supabase-DB | `SUPABASE_INTEGRATION=1 npx vitest run --coverage` | 32 Dateien, **310 / 310 bestanden** (255 Unit, 47 Komponente, 8 Integration) |
+| dito ohne DB (wie CI) | `npx vitest run` | 308 bestanden, 2 übersprungen |
+| Akzeptanz | `npx playwright test` | **142 bestanden**, 2 übersprungen (nur-mobil/nur-desktop), 0 fehlgeschlagen (72 Tests × 2 Projekte) |
+| Statik | `npx tsc --noEmit`, `npx eslint src e2e tests` | 0 Fehler, 0 Befunde |
+
+Coverage `src/lib` mit Integrationslauf: Anweisungen 95,52 %, Zweige 91,07 %, Funktionen 98,73 %, Zeilen 97,29 %. se-eval wurde danach nicht erneut gemessen (letzte Messung 004a9fa).
