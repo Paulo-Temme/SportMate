@@ -93,3 +93,19 @@ test('F-18 AK1: Organisatorin sagt ab; Treffen ist abgesagt und verschwindet aus
   await expect(page.getByTestId('event-card').first()).toBeVisible();
   expect(await readMapEventIds(page)).not.toContain('demo-laufen-solitude');
 });
+
+test('F-24 AK4: Profil zählt Treffen "dabei" und "organisiert" wie Meine Treffen und verlinkt dorthin', async ({ page }) => {
+  await signInAsDemo(page, 'Lea');
+  const summary = page.getByRole('region', { name: 'Deine Treffen' });
+  await expect(summary.getByTestId('count-participating')).toHaveText('0');
+  await expect(summary.getByTestId('count-organizing')).toHaveText('2');
+  await page.goto('/');
+  await openEventFromList(page, 'Basketball auf dem Exe');
+  await page.getByTestId('event-detail').getByRole('button', { name: 'Jetzt teilnehmen' }).click();
+  await expect(page.getByRole('status').getByText('Du bist dabei', { exact: true })).toBeVisible();
+  await page.getByRole('navigation', { name: 'Hauptnavigation' }).getByRole('link', { name: 'Profil' }).click();
+  await expect(summary.getByTestId('count-participating')).toHaveText('1');
+  await summary.getByRole('link', { name: 'Deine Treffen ansehen' }).click();
+  await expect(page).toHaveURL(/\/meine-treffen$/);
+  await expect(page.getByTestId('my-event')).toHaveCount(1);
+});

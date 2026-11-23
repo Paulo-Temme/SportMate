@@ -1,10 +1,11 @@
 'use client';
-// Profil: angemeldet Name, E-Mail und Abmelden; als Gast Anmelden und Registrieren (F-01).
+// Profil: angemeldet Name, E-Mail, eigene Treffen und Abmelden; als Gast Anmelden und Registrieren (F-01, F-24).
 import { LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { useAppServices } from '@/components/app/app-services';
 import { useToast } from '@/components/app/toast-provider';
 import { describeActionFailure } from '@/lib/events/failure-message';
+import { ProfileSummary } from './profile-summary';
 import styles from './profile-view.module.css';
 
 /**
@@ -56,6 +57,7 @@ export function ProfileView() {
           <p className={styles.email}>{user.email ?? 'Demo-Person ohne E-Mail'}</p>
         </div>
       </div>
+      <ProfileSummary />
       {mode === 'local' && <p className={styles.note}>Demo-Modus: Konto und Anmeldung liegen nur in diesem Browser.</p>}
       <button type="button" className={styles.signOut} onClick={signOut}>
         <LogOut size={18} aria-hidden="true" />

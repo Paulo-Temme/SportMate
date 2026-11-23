@@ -92,3 +92,59 @@
   border-radius: var(--radius-element);
   background: #efede8;
 }
+
+/* Eigene Treffen: zwei Zahlen und ein Link, ohne zusätzliche Karte. */
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.summaryTitle {
+  font-size: var(--text-label);
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+}
+
+.statValue {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.statLabel {
+  font-size: var(--text-xs);
+  color: var(--ink-2);
+}
+
+.summaryLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-element);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+@media (hover: hover) {
+  .summaryLink:hover {
+    border-color: var(--line-strong);
+  }
+}

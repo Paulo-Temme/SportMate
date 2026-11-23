@@ -8,6 +8,7 @@ import { ConfirmDialog } from '@/components/event/confirm-dialog';
 import { useEventList } from '@/hooks/use-event-list';
 import { useParticipation } from '@/hooks/use-participation';
 import { emptyFilters, type SportEvent } from '@/lib/events/event-model';
+import { splitViewerEvents } from '@/lib/events/viewer-events';
 import { MyEventRow } from './my-event-row';
 import styles from './my-events-view.module.css';
 
@@ -46,10 +47,10 @@ function MyEventList({ tab }: { tab: Tab }) {
   const participation = useParticipation();
   const [pending, setPending] = useState<Pending>(null);
   const [now] = useState(() => new Date());
-  const items = useMemo(
-    () => list.events.filter((event) => (tab === 'organizing' ? event.isViewerOrganizer : !event.isViewerOrganizer)),
-    [list.events, tab],
-  );
+  const items = useMemo(() => {
+    const split = splitViewerEvents(list.events);
+    return tab === 'organizing' ? split.organizing : split.participating;
+  }, [list.events, tab]);
 
   const confirm = async () => {
     if (!pending) return;
