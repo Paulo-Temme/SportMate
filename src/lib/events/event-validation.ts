@@ -14,7 +14,13 @@ export const eventLimits = {
   locationNameMax: 80,
   costCentsMax: 5000,
   bringAlongMax: 200,
+  durationHoursMax: 12,
 } as const;
+
+/** Meldung, wenn ein Treffen länger als erlaubt dauert. Auch für den gleichnamigen Datenbank-Constraint (BUG-04). */
+export const maxDurationMessage = `Ein Treffen darf höchstens ${eventLimits.durationHoursMax} Stunden dauern.`;
+
+const hourInMilliseconds = 3_600_000;
 
 type FieldRule = {
   field: keyof EventInput;
@@ -80,6 +86,11 @@ const fieldRules: FieldRule[] = [
     field: 'endsAt',
     message: 'Das Ende muss nach dem Beginn liegen.',
     isValid: (input) => isValidDate(input.endsAt) && new Date(input.endsAt) > new Date(input.startsAt),
+  },
+  {
+    field: 'endsAt',
+    message: maxDurationMessage,
+    isValid: (input) => Date.parse(input.endsAt) - Date.parse(input.startsAt) <= eventLimits.durationHoursMax * hourInMilliseconds,
   },
   {
     field: 'capacity',

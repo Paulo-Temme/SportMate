@@ -3,7 +3,7 @@ import { fixedNow, member, validInput } from '../../../tests/fixtures/sample-eve
 import { createEvent } from './event-creation';
 import { EventError } from './event-error';
 import type { EventInput } from './event-model';
-import { describeFieldRule, findEventInputError } from './event-validation';
+import { describeFieldRule, eventLimits, findEventInputError } from './event-validation';
 
 describe('F-00 AK1: Treffen erstellen und Eingaben prüfen', () => {
   it('F-00 AK1: zählt die organisierende Person automatisch mit und normalisiert die Zeit', () => {
@@ -44,6 +44,7 @@ describe('F-00 AK1: Treffen erstellen und Eingaben prüfen', () => {
     [{ startsAt: fixedNow.toISOString() }, 'startsAt'],
     [{ endsAt: validInput.startsAt }, 'endsAt'],
     [{ endsAt: 'ungültig' }, 'endsAt'],
+    [{ endsAt: '2026-10-29T03:01:00Z' }, 'endsAt'],
     [{ capacity: 51 }, 'capacity'],
     [{ capacity: 1 }, 'capacity'],
     [{ capacity: 2.5 }, 'capacity'],
@@ -76,8 +77,24 @@ describe('F-00 AK1: Treffen erstellen und Eingaben prüfen', () => {
     { costCents: 0 },
     { costCents: 5000 },
     { bringAlong: 'x'.repeat(200) },
+    { endsAt: '2026-10-29T03:00:00Z' },
   ])('F-00 AK1: akzeptiert Randwerte: %j', (edge) => {
     expect(findEventInputError({ ...validInput, ...edge } as EventInput, fixedNow)).toBeNull();
+  });
+});
+
+describe('F-17 AK4 (BUG-04): Dauer höchstens 12 Stunden', () => {
+  it('F-17 AK4: 12 Stunden sind erlaubt, 12 Stunden und 1 Minute nicht – mit eigener Meldung', () => {
+    // validInput beginnt am 28.10.2026 um 15:00 UTC.
+    expect(findEventInputError({ ...validInput, endsAt: '2026-10-29T03:00:00Z' }, fixedNow)).toBeNull();
+    const error = findEventInputError({ ...validInput, endsAt: '2026-10-29T03:01:00Z' }, fixedNow);
+    expect(error?.field).toBe('endsAt');
+    expect(error?.message).toBe('Ein Treffen darf höchstens 12 Stunden dauern.');
+    expect(eventLimits.durationHoursMax).toBe(12);
+  });
+
+  it('F-17 AK4: Ende vor Beginn meldet weiterhin die Reihenfolge, nicht die Dauer', () => {
+    expect(findEventInputError({ ...validInput, endsAt: '2026-10-28T14:00:00Z' }, fixedNow)?.message).toBe('Das Ende muss nach dem Beginn liegen.');
   });
 });
 

@@ -2,7 +2,7 @@
 import { AuthError, authMessages, type AuthField } from '../auth/auth-error';
 import { EventError } from '../events/event-error';
 import type { EventInput } from '../events/event-model';
-import { describeFieldRule } from '../events/event-validation';
+import { describeFieldRule, maxDurationMessage } from '../events/event-validation';
 import { fullEventMessage } from '../events/participation';
 
 /** Fehlerform von PostgREST/RPC: Code steht in `message`, bei INVALID_INPUT der Constraint in `details`. */
@@ -42,6 +42,11 @@ const constraintFields: Record<string, keyof EventInput> = {
   events_description_length: 'description',
 };
 
+// Constraints, deren Meldung nicht die erste Regel ihres Feldes ist.
+const constraintMessages: Record<string, string> = {
+  events_max_duration: maxDurationMessage,
+};
+
 const authCodes: Record<string, { message: string; field?: AuthField }> = {
   invalid_credentials: { message: authMessages.wrongCredentials },
   user_already_exists: { message: authMessages.emailTaken, field: 'email' },
@@ -55,7 +60,8 @@ const unexpectedMessage = 'Das hat nicht geklappt. Bitte später erneut versuche
 
 function translateInvalidInput(details: string | null | undefined): EventError {
   const field = details ? constraintFields[details] : undefined;
-  const message = field ? describeFieldRule(field) : null;
+  const specific = details && Object.hasOwn(constraintMessages, details) ? constraintMessages[details] : null;
+  const message = field ? (specific ?? describeFieldRule(field)) : null;
   return field && message ? new EventError(message, field) : new EventError('Bitte die Eingaben prüfen.');
 }
 

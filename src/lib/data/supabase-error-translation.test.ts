@@ -44,6 +44,13 @@ describe('F-22: Fehlercodes der Datenbank in deutsche Meldungen übersetzen', ()
     expect(error.message.length).toBeGreaterThan(5);
   });
 
+  it('F-17 AK4 (BUG-04): events_max_duration ergibt die Meldung zur Höchstdauer, nicht die zur Reihenfolge', () => {
+    const error = translateEventError({ message: 'INVALID_INPUT', details: 'events_max_duration' });
+    expect(error.field).toBe('endsAt');
+    expect(error.message).toBe('Ein Treffen darf höchstens 12 Stunden dauern.');
+    expect(translateEventError({ message: 'INVALID_INPUT', details: 'events_end_after_start' }).message).toBe('Das Ende muss nach dem Beginn liegen.');
+  });
+
   it('F-17: INVALID_INPUT ohne bekanntes Feld ergibt eine allgemeine Meldung', () => {
     const error = translateEventError({ message: 'INVALID_INPUT', details: 'not_null' });
     expect(error.field).toBeUndefined();
