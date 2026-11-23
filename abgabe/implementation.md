@@ -221,16 +221,17 @@ Kopfkommentar „NICHT gegen eine Datenbank ausgeführt“ ist laut Review über
 ## 5. Übereinstimmung mit der Architektur
 
 Ergebnis des Gesamt-Reviews vom 23.11.2026 über Commit `9f79927` (`docs/testing/review-protokoll.md`):
-0 blockierend, 6 wichtig, 9 Hinweise.
+0 blockierend, 6 wichtig, 9 Hinweise. Nachprüfung auf `004a9fa`: 10 behoben (je Befund ein Commit), 5 offen
+(REV-02, REV-09, REV-10, REV-13, REV-14).
 
 | Architekturregel | Ergebnis | Beleg |
 | --- | --- | --- |
 | Abhängigkeitsrichtung (ADR-0003) | eingehalten | Kernlogik importiert weder Datenzugriff noch Oberfläche (E2) |
 | Information Hiding | eingehalten | kein `@supabase/*` außerhalb `src/lib/data` (E3) |
 | Sicherheitsgrenze in der Datenbank (ADR-0002, ADR-0006, ADR-0007) | eingehalten | RLS auf allen Tabellen, Schreiben nur per RPC, Zeilensperre und Check-Constraint (S1–S3) |
-| Kernlogik in `src/lib`, nicht in Komponenten | Abweichung | „Heute/Morgen“-Berechnung doppelt in `src/components/event/day-label.ts` (REV-04) |
-| Gleiche Regeln in TS und SQL (ADR-0009) | Abweichung | 12-h-Regel nur in SQL (REV-01, BUG-04); Kostenobergrenze 5000 vs. 10000 Cent (REV-08) |
-| Design-Tokens (`docs/design.md`) | Abweichung | harte Farbwerte an 23 Stellen in 13 CSS-Dateien (REV-07) |
+| Kernlogik in `src/lib`, nicht in Komponenten | behoben | „Heute/Morgen“-Berechnung als `describeDayLabel` in `src/lib/events` (REV-04, `126600d`) |
+| Gleiche Regeln in TS und SQL (ADR-0009) | behoben | 12-h-Regel in der Kernlogik (REV-01/BUG-04, `ded1894`); Kostenobergrenze 5000 Cent auch im Schema (REV-08, Migration `0002`) |
+| Design-Tokens (`docs/design.md`) | behoben | neue Tokens, keine festen Farbwerte mehr in `src/components/**/*.css` (REV-07, `c369461`) |
 | Reine Logik in `src/lib` statt in der Oberfläche (ADR-0004, ADR-0005) | nachträglich behoben | Commit `ebe3eb4`: `sheet-snap` nach `src/lib/ui`, `map-theme` nach `src/lib/map` verschoben |
 
 Bekannte bewusste Abweichungen laut Architektur: Teilnahmeregeln doppelt in TypeScript und SQL (ADR-0003, ADR-0006),
@@ -240,18 +241,18 @@ Belegungszähler (ADR-0006).
 ## 6. Technische Schulden
 
 `docs/tech-debt.md` enthält noch keine Einträge. Das Review vom 23.11.2026 schlägt folgende Einträge vor
-(`docs/testing/review-protokoll.md`, Abschnitt „Technische Schulden“); eingetragen hat sie der Orchestrator noch nicht:
+(`docs/testing/review-protokoll.md`, Abschnitt „Technische Schulden“); eingetragen hat sie der Orchestrator noch nicht.
+REV-07 ist inzwischen behoben (`c369461`); offen bleiben:
 
 | Befund | Was | Warum aufschiebbar (laut Review) |
 | --- | --- | --- |
-| REV-07 | harte Farbwerte statt Tokens | rein optisch, bis nach Präsentation 5 |
 | REV-10 | `organizer_id` (Konto-Kennung) für anonyme Leser sichtbar | solange nur Kursbetrieb mit Testkonten; vor dem Nutzertest P6 entscheiden |
 | REV-13 | Typbehauptung `as unknown as EventRow` statt generierter Supabase-Typen | Risiko durch Integrationstests abgefedert |
 | REV-14 | Komplexitätsregel nicht im Lint | SE-Eval misst |
 
-Weitere offene Befunde mit Wirkung auf den Code: REV-02 (Supabase-Datenzugriff im Standardlauf nur zu 38–52 % abgedeckt),
-REV-05/REV-06 (Fokusfalle in Dialogen fehlt), REV-11 (doppelter Meldungstext), REV-12 (verspäteter Rückruf in
-`onAuthChange`).
+Weiterer offener Befund mit Wirkung auf den Code: REV-02 (Supabase-Datenzugriff im Standardlauf: `supabase-event-repository.ts`
+36,95 % Zeilen, `supabase-auth-gateway.ts` 71,42 %; der volle Lauf gegen die echte DB war grün, 285/285, läuft aber nicht in der CI)
+und REV-09 (veralteter Kopfkommentar der Migration). Behoben: REV-01, -03, -04, -05, -06, -07, -08, -11, -12, -15.
 
 ## 7. Einsatz von KI bei der Programmierung
 
@@ -268,7 +269,7 @@ Siehe auch `abgabe/LUECKEN.md`.
 
 | Bewertungskriterium | Was fehlt | Was das Team nachliefern muss |
 | --- | --- | --- |
-| Übereinstimmung mit der Architektur | Befunde REV-01 … REV-15 offen; menschliches Review von Migration und Auth-Dateien aussteht | Befunde beheben oder als technische Schuld eintragen; Review vermerken |
+| Übereinstimmung mit der Architektur | 5 Befunde offen (REV-02, -09, -10, -13, -14); menschliches Review von Migration und Auth-Dateien steht aus | Befunde beheben oder als technische Schuld eintragen; Review vermerken |
 | Technische Schulden | `docs/tech-debt.md` leer | Vorschläge aus dem Review eintragen und entscheiden |
 | Begründete Standards | einige Quellen „offen“ (`docs/management/praktiken.md`, Review-Leitfaden zur Größenbegrenzung) | Quellen prüfen und ergänzen |
 | Projektstruktur | `docs/architecture.md` nennt noch `repository-factory`, `auth-gateway (geplant)` | Ordnerstruktur in der Architektur aktualisieren |

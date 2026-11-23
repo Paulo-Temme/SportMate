@@ -152,8 +152,9 @@ Zuordnung Kriterium → Ebene → Test → Datei.
 
 ## 5. Anforderungen je Epic und Story
 
-Vollständig übernommen aus `docs/backlog.md` (Stand 23.11.2026). Specs mit zusätzlichem Szenario und Testzuordnung
-liegen bisher für F-01 und F-22 vor (`specs/`). Der Umsetzungsstand steht in Abschnitt 7.2.
+Vollständig übernommen aus `docs/backlog.md` (Stand nach dem Endlauf vom 23.11.2026, Commit `004a9fa`). Specs mit zusätzlichem
+Szenario und Testzuordnung liegen für F-01 und F-22 vor (`specs/`). Status-Regel: „umgesetzt“ nur, wenn zu jedem AK ein Test
+existiert und im Endlauf grün war; „teilweise“, wenn einzelne AKs fehlen, abweichen oder ungetestet sind. Übersicht in Abschnitt 7.2.
 
 ### E-1 Konto und Anmeldung
 Ziel: Z3, Z5. Besondere Vorsicht: Login und Rechte (im Protokoll markieren).
@@ -161,18 +162,19 @@ Ziel: Z3, Z5. Besondere Vorsicht: Login und Rechte (im Protokoll markieren).
 #### F-01 Registrieren, anmelden, abmelden
 - **User Story:** Als Sportinteressierte möchte ich mich mit E-Mail und Passwort registrieren und anmelden, damit ich Treffen erstellen und ihnen beitreten kann.
 - **Quelle:** DR-1.1.1, DR-1.1.2, DR-1.1.3, SM-R01; FB-35 (Konto zum Mitmachen okay). Offener Konflikt F04: 8 oder 12 Zeichen Mindestlänge – hier gilt DR-1.1.2 (8), bis das Team entscheidet.
-- **Priorität / Größe / Release 1:** Must / M / ja · **Status:** offen
+- **Priorität / Größe / Release 1:** Must / M / ja · **Status:** umgesetzt (AK1–AK6 Akzeptanztests grün (Endlauf 23.11.2026))
 - **Akzeptanzkriterien:**
   - AK1: Gegeben keine Person mit `lea@example.org`. Wenn sie sich mit dieser E-Mail und dem Passwort `sportmate1` registriert, dann ist sie angemeldet und die Kopfzeile zeigt „Abmelden“.
   - AK2: Gegeben das Registrierformular. Wenn das Passwort `kurz12` (6 Zeichen) eingegeben wird, dann wird kein Konto angelegt und „Mindestens 8 Zeichen“ erscheint.
   - AK3: Gegeben ein bestehendes Konto `lea@example.org`. Wenn sich jemand erneut mit dieser E-Mail registriert, dann wird kein zweites Konto angelegt und „Diese E-Mail wird bereits verwendet“ erscheint.
   - AK4: Gegeben ein Konto `lea@example.org` / `sportmate1`. Wenn die Anmeldung mit dem Passwort `falsch123` erfolgt, dann bleibt die Person abgemeldet und „E-Mail oder Passwort falsch“ erscheint.
   - AK5: Gegeben eine angemeldete Person. Wenn sie „Abmelden“ wählt, dann ist sie abgemeldet und „Treffen erstellen“ führt wieder zur Anmeldung.
+  - AK6 (ergänzt 23.11.2026, Test TC-A-53): Gegeben angemeldete `Lea`. Wenn sie `/anmelden` öffnet, dann sieht sie „Du bist bereits angemeldet als Lea.“ mit Link „Zum Profil“ statt des Formulars.
 
 #### F-02 Ohne Konto stöbern, Anmeldung erst beim Mitmachen
 - **User Story:** Als neue Besucherin möchte ich Treffen ohne Konto ansehen und erst beim Mitmachen zur Anmeldung geleitet werden, damit ich vorher prüfen kann, ob es passende Angebote gibt.
 - **Quelle:** DR-1.1.4, SM-R27 (Rücksprung), SM-R21; FB-35.
-- **Priorität / Größe / Release 1:** Must / S / ja · **Status:** offen
+- **Priorität / Größe / Release 1:** Must / S / ja · **Status:** umgesetzt (AK1–AK4 Akzeptanztests grün)
 - **Akzeptanzkriterien:**
   - AK1: Gegeben eine nicht angemeldete Person und 3 kommende Treffen. Wenn sie die Treffenübersicht öffnet, dann sieht sie alle 3 Treffen und deren Details ohne Anmeldeaufforderung.
   - AK2: Gegeben eine nicht angemeldete Person in den Details von Treffen `t-volleyball-1`. Wenn sie „Jetzt teilnehmen“ wählt, dann erscheint die Anmeldung und sie ist nicht Teilnehmerin.
@@ -203,17 +205,18 @@ Ziel: Z1.
 #### F-05 Liste kommender Treffen
 - **User Story:** Als Sportinteressierter möchte ich alle kommenden Treffen in einer Liste mit freien Plätzen sehen, damit ich schnell ein Treffen finde, bei dem noch Platz ist.
 - **Quelle:** SM-R03, DR-2.1.3, DR-2.1.4 (Konflikt F03: begonnene Treffen werden nicht gezeigt); FB-33, FB-46, FB-47, FB-29.
-- **Priorität / Größe / Release 1:** Must / M / ja · **Status:** offen
+- **Priorität / Größe / Release 1:** Must / M / ja · **Status:** umgesetzt (AK1–AK3, AK5 E2E grün, AK4 Unit (TC-U-14) grün)
 - **Akzeptanzkriterien:**
   - AK1: Gegeben jetzt = 2026-11-25 10:00 und Treffen A (heute 18:00), B (morgen 12:00), C (gestern 18:00), D (heute 12:00, abgesagt). Wenn die Liste geladen wird, dann zeigt sie genau A, dann B.
   - AK2: Gegeben Treffen A mit Kapazität 10 und 5 Teilnehmenden. Wenn die Liste angezeigt wird, dann steht auf der Karte von A „5 von 10 Plätzen frei“.
   - AK3: Gegeben Treffen A (heute 18:00, ausgebucht 10 von 10) und B (morgen 12:00, 3 frei) und Sortierung „Ausgebuchte zuletzt“ (Standard). Wenn die Liste angezeigt wird, dann steht B vor A und A trägt „Ausgebucht“.
   - AK4: Gegeben jetzt = 2026-11-25 18:00 und Treffen A mit Beginn 18:00. Wenn die Liste geladen wird, dann ist A nicht enthalten.
+  - AK5 (ergänzt 23.11.2026, Test TC-A-56): Gegeben die Startseite. Wenn nacheinander „Meine Treffen“, „Treffen erstellen“, „Profil“ und „Entdecken“ in der Tab-Leiste angeklickt werden, dann öffnet sich jeweils das Ziel und „Entdecken“ ist am Ende als aktuelle Seite markiert.
 
 #### F-06 Filter Sportart und Zeitraum mit Leerzustand
 - **User Story:** Als Sportinteressierte möchte ich nach Sportarten und Zeitraum filtern, damit ich nicht durch unpassende Treffen scrollen muss.
 - **Quelle:** DR-2.2.1, DR-2.2.2, DR-2.2.3, SM-R04, SM-R28; FB-32, FB-43, FB-21.
-- **Priorität / Größe / Release 1:** Must / M / ja · **Status:** offen
+- **Priorität / Größe / Release 1:** Must / M / ja · **Status:** umgesetzt (AK1, AK2, AK4, AK5 E2E grün, AK2/AK3 zusätzlich Unit/Komponente)
 - **Akzeptanzkriterien:**
   - AK1: Gegeben Treffen Fußball, Volleyball, Laufen. Wenn die Sportarten Volleyball und Laufen gewählt sind, dann zeigt die Liste genau Volleyball und Laufen (ODER-Verknüpfung).
   - AK2: Gegeben jetzt = Mittwoch 2026-11-25 10:00 und Treffen am 25.11. 18:00, 26.11. 18:00, 29.11. 10:00, 02.12. 10:00. Wenn „Heute“ gewählt ist, dann nur 25.11.; „Morgen“ nur 26.11.; „Diese Woche“ 25.11., 26.11. und 29.11.
@@ -224,7 +227,7 @@ Ziel: Z1.
 #### F-07 Filter Niveau und Altersgruppe
 - **User Story:** Als Sportinteressierte möchte ich nach Niveau und Altersgruppe filtern, damit ich mit Leuten spiele, die zu mir passen.
 - **Quelle:** DR-2.3.1, DR-2.3.2; FB-03 (Alter 3/4, Niveau 2/4), FB-12, FB-50.
-- **Priorität / Größe / Release 1:** Must / S / ja · **Status:** offen
+- **Priorität / Größe / Release 1:** Must / S / ja · **Status:** umgesetzt (AK1–AK3 E2E grün)
 - **Akzeptanzkriterien:**
   - AK1: Gegeben Treffen mit Niveau „Anfänger“, „Fortgeschritten“, „Alle Niveaus“. Wenn „Anfänger“ gewählt ist, dann zeigt die Liste „Anfänger“ und „Alle Niveaus“.
   - AK2: Gegeben Treffen mit Altersgruppe „20–25“, „31–40“ und ohne Altersgruppe. Wenn „20–25“ gewählt ist, dann zeigt die Liste „20–25“ und das Treffen ohne Altersgruppe.
@@ -233,17 +236,19 @@ Ziel: Z1.
 #### F-08 Karte mit denselben Treffen wie die Liste
 - **User Story:** Als Neue in Flensburg möchte ich die Treffen auf einer Karte sehen, damit ich erkenne, wo sie stattfinden.
 - **Quelle:** DR-2.1.3, SM-R03; FB-48 (Karte gefällt); Widerspruch FB-33 (Liste reicht) – deshalb Should, Liste ist Must.
-- **Priorität / Größe / Release 1:** Should / M / ja · **Status:** offen
+- **Priorität / Größe / Release 1:** Should / M / ja · **Status:** umgesetzt (AK1–AK6 E2E grün, AK3/AK5/AK6 zusätzlich Unit)
 - **Akzeptanzkriterien:**
-  - AK1: Gegeben 4 Treffen nach Filtern. Wenn die Karte angezeigt wird, dann zeigt sie genau 4 Markierungen.
+  - AK1: Gegeben 4 Treffen nach Filtern. Wenn die Karte angezeigt wird, dann zeigt sie genau diese 4 Treffen, einzeln oder gruppiert (angepasst 23.11.2026 wegen AK5).
   - AK2: Gegeben die Karte mit Treffen `t-volleyball-1`. Wenn die Markierung gewählt wird, dann öffnen sich die Details von `t-volleyball-1`.
   - AK3: Gegeben die Kartenkacheln laden nicht (Netzwerkfehler simuliert). Wenn die Seite angezeigt wird, dann bleibt die Liste vollständig bedienbar und die Karte zeigt „Karte nicht verfügbar“.
   - AK4: Gegeben Bildschirmbreite 360 px. Wenn Karte und Liste angezeigt werden, dann gibt es kein horizontales Scrollen (NFR-3).
+  - AK5 (ergänzt 23.11.2026, Tests TC-A-57, TC-U-31): Gegeben mehrere Treffen nah beieinander. Wenn die Karte angezeigt wird, dann überlappen sich keine Markierungen; überlappende werden zu einer Gruppe mit Anzahl zusammengefasst.
+  - AK6 (ergänzt 23.11.2026, Tests TC-A-58, TC-U-32): Gegeben eine Gruppe mit Anzahl. Wenn sie angeklickt wird, dann erscheinen ihre Treffen einzeln; „Alle Treffen auf der Karte zeigen“ stellt die Gesamtansicht wieder her.
 
 #### F-09 Freitextsuche
 - **User Story:** Als Sportinteressierter möchte ich nach einem Wort suchen, damit ich ein Treffen wiederfinde, von dem ich gehört habe.
 - **Quelle:** Annahme des Teams, nicht validiert (Suchfeld bereits im Datenmodell F-00).
-- **Priorität / Größe / Release 1:** Could / S / nein · **Status:** offen
+- **Priorität / Größe / Release 1:** Could / S / nein · **Status:** umgesetzt (AK1–AK2 E2E grün (vorgezogen, nicht Release 1))
 - **Akzeptanzkriterien:**
   - AK1: Gegeben Treffen „Beachvolleyball Solitüde“ und „Feierabendlauf Hafen“. Wenn `hafen` eingegeben wird, dann zeigt die Liste nur „Feierabendlauf Hafen“ (Groß-/Kleinschreibung egal, Suche in Titel, Treffpunkt, Beschreibung).
   - AK2: Gegeben Suchtext `   ` (nur Leerzeichen). Wenn gesucht wird, dann zeigt die Liste alle Treffen.
@@ -273,18 +278,19 @@ Ziel: Z3. Hypothese H-4.
 #### F-12 Detailansicht mit Treffpunkt, Niveau, eindeutiger Altersangabe und freien Plätzen
 - **User Story:** Als Sportinteressierte möchte ich alle wichtigen Angaben eines Treffens auf einen Blick sehen, damit ich vor der Zusage entscheiden kann.
 - **Quelle:** DR-2.5.1, SM-R05; FB-45 (Altersangabe), FB-46 (Plätze), FB-13 (Treffpunkt), FB-31, FB-15, FB-50.
-- **Priorität / Größe / Release 1:** Must / M / ja · **Status:** offen
+- **Priorität / Größe / Release 1:** Must / M / ja · **Status:** teilweise (AK3–AK5 grün; AK1 und AK2 weichen im Wortlaut ab (siehe Hinweis))
 - **Akzeptanzkriterien:**
   - AK1: Gegeben Treffen Volleyball, 2026-11-26 18:00–20:00, Treffpunkt „Sporthalle Sandberg, Eingang Nord“, Niveau „Anfänger“, Kapazität 12, 7 Teilnehmende. Wenn die Details geöffnet werden, dann stehen dort Sportart, „Do, 26.11.2026, 18:00–20:00 Uhr (2 Std.)“, der Treffpunkttext, „Niveau: Anfänger“ und „5 von 12 Plätzen frei“.
   - AK2: Gegeben Altersgruppe „20–25“. Wenn die Details angezeigt werden, dann steht dort „Alter: 20–25 Jahre (Wunsch des Organisators)“.
   - AK3: Gegeben keine Altersgruppe. Wenn die Details angezeigt werden, dann steht dort „Alter: offen für alle“.
   - AK4: Gegeben ein Treffen mit 12 von 12 Teilnehmenden. Wenn die Details angezeigt werden, dann steht dort „Ausgebucht“ statt „0 von 12 Plätzen frei“.
   - AK5: Gegeben ein abgesagtes Treffen über einen direkten Link. Wenn die Details geöffnet werden, dann steht „Abgesagt“ und es gibt keinen Teilnahme-Button.
+- **Hinweis Umsetzung (23.11.2026):** Die App zeigt den Termin als „Do, 26.11., 18:00–20:00 Uhr · 2 Std.“ (ohne Jahr, Dauer nach Mittelpunkt) und die Altersangabe als „Alter: 20–25 Jahre“ ohne „(Wunsch des Organisators)“. Ob AK1/AK2 an die Umsetzung angepasst oder die Umsetzung nachgezogen wird, entscheidet das Team (offen).
 
 #### F-13 Kosten, Mitbringen und „Was erwartet dich?“
 - **User Story:** Als Neue in Flensburg möchte ich sehen, ob ein Treffen etwas kostet, was ich mitbringen muss und was mich erwartet, damit ich ohne Überraschungen hingehe.
 - **Quelle:** FB-49, FB-31, FB-15, FB-52, FB-30, FB-22, H-4. Neue Felder gegenüber DR/SM-R (Datenbankschema: im Protokoll markieren).
-- **Priorität / Größe / Release 1:** Must / S / ja · **Status:** offen
+- **Priorität / Größe / Release 1:** Must / S / ja · **Status:** teilweise (AK1, AK3 grün; AK2 ohne Kostenhinweis „(Hallenmiete)“ geprüft, AK4 (reiner Text, `<b>` wörtlich) ohne Test)
 - **Akzeptanzkriterien:**
   - AK1: Gegeben ein Treffen mit Kosten 0. Wenn die Details angezeigt werden, dann steht dort „Kostenlos“; in der Liste ebenfalls „Kostenlos“.
   - AK2: Gegeben Kosten 3,50 € pro Person mit Hinweis „Hallenmiete“. Wenn die Details angezeigt werden, dann steht dort „3,50 € pro Person (Hallenmiete)“.
@@ -294,7 +300,7 @@ Ziel: Z3. Hypothese H-4.
 #### F-14 Organisator im Treffen erkennen
 - **User Story:** Als Sportinteressierte möchte ich sehen, wer ein Treffen organisiert, damit ich nicht zu völlig Unbekannten an einen unbekannten Ort gehe.
 - **Quelle:** SM-R05; FB-51, FB-38, FB-15.
-- **Priorität / Größe / Release 1:** Should / S / nein · **Status:** offen
+- **Priorität / Größe / Release 1:** Should / S / nein · **Status:** teilweise (AK2 grün; AK1 nur „Organisiert von …“, ohne Anzahl organisierter Treffen)
 - **Akzeptanzkriterien:**
   - AK1: Gegeben Organisator mit Anzeigename `Max`, der 3 weitere vergangene Treffen organisiert hat. Wenn die Details angezeigt werden, dann steht dort „Organisiert von Max · 4 Treffen organisiert“.
   - AK2: Gegeben derselbe Organisator. Wenn die Details angezeigt werden, dann erscheinen weder E-Mail noch andere Kontaktdaten.
@@ -302,7 +308,7 @@ Ziel: Z3. Hypothese H-4.
 #### F-15 Link zu einem Treffen teilen
 - **User Story:** Als Organisator möchte ich einen Link zu meinem Treffen kopieren, damit meine bestehende WhatsApp-Gruppe sich direkt dort anmelden kann.
 - **Quelle:** SM-R27; FB-21.
-- **Priorität / Größe / Release 1:** Should / S / nein · **Status:** offen
+- **Priorität / Größe / Release 1:** Should / S / nein · **Status:** teilweise (nur AK3 (unbekannter Link) umgesetzt und grün; „Link kopieren“ fehlt)
 - **Akzeptanzkriterien:**
   - AK1: Gegeben Treffen `t-volleyball-1`. Wenn „Link kopieren“ gewählt wird, dann enthält die Zwischenablage `<Basis-URL>/treffen/t-volleyball-1` und „Link kopiert“ erscheint.
   - AK2: Gegeben dieser Link. Wenn er in einem neuen Browser ohne Anmeldung geöffnet wird, dann erscheinen die Details von `t-volleyball-1`.
@@ -321,7 +327,7 @@ Ziel: Z2. Hypothese H-3a. Besondere Vorsicht: Rechte (RLS) – im Protokoll mark
 #### F-17 Treffen erstellen
 - **User Story:** Als Organisatorin möchte ich ein Treffen mit Sportart, Ort, Zeit, Plätzen und Niveau veröffentlichen, damit mir fehlende Mitspieler beitreten.
 - **Quelle:** DR-3.1.1–3.1.5, SM-R07, SM-R23, NFR-2; FB-05, FB-37, FB-22, FB-13, FB-54, FB-53.
-- **Priorität / Größe / Release 1:** Must / M / ja · **Status:** offen
+- **Priorität / Größe / Release 1:** Must / M / ja · **Status:** umgesetzt (AK1–AK5 grün, Höchstdauer 12 h (BUG-04) ergänzt)
 - **Akzeptanzkriterien:**
   - AK1: Gegeben jetzt = 2026-11-25 10:00, angemeldete Person `lea`. Wenn sie Titel „Volleyball am Abend“, Volleyball, Treffpunkt „Halle Sandberg, Eingang Nord“, Kartenpunkt, 2026-11-26 18:00–20:00, Kapazität 8, Niveau „Alle Niveaus“, Kosten 0 eingibt und veröffentlicht, dann erscheint das Treffen in der Liste mit „7 von 8 Plätzen frei“ und `lea` ist erste Teilnehmerin.
   - AK2: Gegeben dasselbe Formular ohne Treffpunkttext. Wenn veröffentlicht wird, dann wird nichts gespeichert und das Feld Treffpunkt ist mit „Pflichtfeld“ markiert.
@@ -332,7 +338,7 @@ Ziel: Z2. Hypothese H-3a. Besondere Vorsicht: Rechte (RLS) – im Protokoll mark
 #### F-18 Eigenes Treffen absagen
 - **User Story:** Als Organisator möchte ich mein Treffen absagen, damit niemand umsonst zum Treffpunkt kommt.
 - **Quelle:** DR-3.3.2, SM-R09, SM-R21; FB-20, FB-41.
-- **Priorität / Größe / Release 1:** Must / S / ja · **Status:** offen
+- **Priorität / Größe / Release 1:** Must / S / ja · **Status:** umgesetzt (AK1 E2E, AK2 Unit/Integration, AK3 Supabase-Integration (echte DB, 285/285) grün)
 - **Akzeptanzkriterien:**
   - AK1: Gegeben `max` organisiert ein kommendes Treffen mit 4 Teilnehmenden. Wenn er „Treffen absagen“ bestätigt, dann ist der Status „Abgesagt“, das Treffen verschwindet aus Liste und Karte und erscheint bei den 4 Teilnehmenden unter „Meine Treffen“ als „Abgesagt“.
   - AK2: Gegeben ein abgesagtes Treffen. Wenn jemand beitreten will, dann wird das abgelehnt.
@@ -351,7 +357,7 @@ Ziel: Z2. Hypothese H-3a. Besondere Vorsicht: Rechte (RLS) – im Protokoll mark
 #### F-20 Teilnehmerliste sehen
 - **User Story:** Als Organisatorin möchte ich sehen, wer zugesagt hat, damit ich ohne Rückfragen weiß, wer kommt.
 - **Quelle:** SM-R13; FB-18, FB-37, FB-56, FB-38 (nur Namen).
-- **Priorität / Größe / Release 1:** Should / S / nein · **Status:** offen
+- **Priorität / Größe / Release 1:** Should / S / nein · **Status:** teilweise (AK1/AK2 Unit und Supabase-Integration grün; AK3 ohne eigenen Test)
 - **Akzeptanzkriterien:**
   - AK1: Gegeben ein Treffen mit Teilnehmenden `Lea`, `Max`, `Tom`. Wenn die Organisatorin oder eine Teilnehmende die Details öffnet, dann sieht sie die drei Anzeigenamen.
   - AK2: Gegeben eine nicht teilnehmende Person. Wenn sie die Details öffnet, dann sieht sie nur „3 Teilnehmende“, keine Namen.
@@ -371,9 +377,9 @@ Ziel: Z1, Z2. Hypothese H-2.
 #### F-22 Einem Treffen beitreten („Jetzt teilnehmen“)
 - **User Story:** Als Sportinteressierte möchte ich mit einem Klick auf „Jetzt teilnehmen“ beitreten und eine Bestätigung sehen, damit ich sicher weiß, dass ich dabei bin.
 - **Quelle:** DR-4.1.1–4.1.4, SM-R10, SM-R11, NFR-5; FB-44, FB-34, FB-19, FB-18, FB-23.
-- **Priorität / Größe / Release 1:** Must / M / ja · **Status:** offen
+- **Priorität / Größe / Release 1:** Must / M / ja · **Status:** teilweise (AK1–AK3, AK5 grün; AK4 nur sequenziell (EVENT_FULL) geprüft, kein Paralleltest)
 - **Akzeptanzkriterien:**
-  - AK1: Gegeben angemeldete `lea`, Treffen mit 4 von 5 Plätzen belegt. Wenn sie „Jetzt teilnehmen“ wählt, dann erscheint „Du bist angemeldet“, das Treffen zeigt „Ausgebucht“ (5 von 5) und steht unter „Meine Treffen“.
+  - AK1: Gegeben angemeldete `lea`, Treffen mit 4 von 5 Plätzen belegt. Wenn sie „Jetzt teilnehmen“ wählt, dann erscheint „Du bist dabei“ (geändert 23.11.2026 wegen BUG-02, vorher „Du bist angemeldet“), das Treffen zeigt „Ausgebucht“ (5 von 5) und steht unter „Meine Treffen“.
   - AK2: Gegeben ein ausgebuchtes Treffen. Wenn die Details angezeigt werden, dann ist statt „Jetzt teilnehmen“ „Ausgebucht“ zu sehen und kein Beitritt möglich.
   - AK3: Gegeben `lea` ist bereits Teilnehmerin. Wenn der Beitritt erneut ausgelöst wird (Doppelklick oder Wiederholung nach Netzfehler), dann bleibt die Teilnehmerzahl gleich.
   - AK4: Gegeben 1 freier Platz und zwei Personen treten gleichzeitig bei. Wenn beide Anfragen an Supabase gehen, dann wird genau eine angenommen, die andere sieht „Leider gerade ausgebucht“ (Integrationstest, NFR-5).
@@ -382,7 +388,7 @@ Ziel: Z1, Z2. Hypothese H-2.
 #### F-23 Teilnahme zurückziehen
 - **User Story:** Als Teilnehmerin möchte ich meine Zusage zurückziehen, damit mein Platz frei wird, wenn etwas dazwischenkommt.
 - **Quelle:** DR-4.2.1, SM-R12; FB-34, FB-16.
-- **Priorität / Größe / Release 1:** Must / S / ja · **Status:** offen
+- **Priorität / Größe / Release 1:** Must / S / ja · **Status:** umgesetzt (AK1 E2E, AK2 Unit, AK3 Integration grün)
 - **Akzeptanzkriterien:**
   - AK1: Gegeben `lea` nimmt an einem Treffen mit 5 von 5 teil. Wenn sie „Teilnahme zurückziehen“ bestätigt, dann zeigt es „1 von 5 Plätzen frei“ und es steht nicht mehr unter ihren „Meine Treffen“.
   - AK2: Gegeben jetzt ist nach Beginn des Treffens. Wenn sie zurückziehen will, dann ist das nicht möglich.
@@ -391,16 +397,17 @@ Ziel: Z1, Z2. Hypothese H-2.
 #### F-24 Meine Treffen
 - **User Story:** Als Nutzerin möchte ich unter „Meine Treffen“ sehen, was ich organisiere und wo ich zugesagt habe, damit ich den Überblick behalte.
 - **Quelle:** DR-4.1.2; FB-57, FB-37.
-- **Priorität / Größe / Release 1:** Must / S / ja · **Status:** offen
+- **Priorität / Größe / Release 1:** Must / S / ja · **Status:** umgesetzt (AK1–AK4 E2E grün)
 - **Akzeptanzkriterien:**
   - AK1: Gegeben `lea` organisiert Treffen A und nimmt an B teil; C kennt sie nicht. Wenn sie „Meine Treffen“ öffnet, dann sieht sie A mit „Organisiert von dir“ und B mit „Angemeldet“, nicht C.
   - AK2: Gegeben B wurde abgesagt. Wenn sie „Meine Treffen“ öffnet, dann steht B mit „Abgesagt“ dort.
   - AK3: Gegeben `lea` hat keine Treffen. Wenn sie „Meine Treffen“ öffnet, dann erscheint „Noch keine Treffen“ mit Link zur Übersicht.
+  - AK4 (ergänzt 23.11.2026, Test TC-A-59): Gegeben `lea` organisiert 2 Treffen und nimmt an keinem teil. Wenn sie einem Treffen beitritt und ihr Profil öffnet, dann zeigt es „1“ Treffen dabei und „2“ organisiert, und „Deine Treffen ansehen“ führt zu „Meine Treffen“.
 
 #### F-25 Mindestteilnehmerzahl mit Status „Sucht Mitspieler“ / „Findet statt“
 - **User Story:** Als Organisatorin möchte ich eine Mindestzahl festlegen, damit alle sehen, ob das Treffen stattfindet.
 - **Quelle:** DR-3.2.1, DR-3.2.2 (Benachrichtigungsanteil in F-26/F-27); FB-06, FB-41.
-- **Priorität / Größe / Release 1:** Should / S / nein · **Status:** offen
+- **Priorität / Größe / Release 1:** Should / S / nein · **Status:** umgesetzt (AK1 E2E, AK2/AK3 Unit grün (vorgezogen, nicht Release 1))
 - **Akzeptanzkriterien:**
   - AK1: Gegeben Mindestzahl 4 und 3 Teilnehmende. Wenn die Details angezeigt werden, dann steht dort „Sucht Mitspieler (noch 1)“.
   - AK2: Gegeben dasselbe Treffen. Wenn eine vierte Person beitritt, dann steht dort „Findet statt“.
@@ -454,7 +461,7 @@ Ziel: Z2.2. Kanal ist Annahme (FB-20, FB-36: In-App reicht nicht immer).
 #### F-31 Startseite mit Erklärung und zwei Einstiegen
 - **User Story:** Als neuer Besucher möchte ich auf einer Startseite kurz erfahren, was SportMate ist, damit ich nicht mitten in die Anwendung geworfen werde.
 - **Quelle:** FB-58, H-2.
-- **Priorität / Größe / Release 1:** Should / S / nein · **Status:** offen
+- **Priorität / Größe / Release 1:** Should / S / nein · **Status:** teilweise (als Erstbesuch-Hinweis auf Entdecken umgesetzt (E2E AK1/AK2 grün), keine eigene Startseite unter `/`)
 - **Akzeptanzkriterien:**
   - AK1: Gegeben die Adresse `/`. Wenn sie geöffnet wird, dann zeigt sie eine Überschrift mit Erklärung, die drei Schritte „Sportart auswählen → Treffen finden → Gemeinsam Sport machen“ und die Buttons „Treffen entdecken“ und „Treffen erstellen“.
   - AK2: Gegeben die Startseite. Wenn „Treffen entdecken“ gewählt wird, dann öffnet sich die Treffenübersicht.
@@ -463,9 +470,9 @@ Ziel: Z2.2. Kanal ist Annahme (FB-20, FB-36: In-App reicht nicht immer).
 #### F-32 Lokaler Demo-Modus ohne Server
 - **User Story:** Als Team möchte ich die App ohne Server mit gekennzeichneten Demodaten starten, damit Präsentationen und Tests unabhängig von Netz und Supabase funktionieren.
 - **Quelle:** C-2, Z5, SM-R30; Präsentation 4 („Demodaten werden transparent gekennzeichnet“). Kein Nutzerfeedback.
-- **Priorität / Größe / Release 1:** Must / M / ja · **Status:** offen
+- **Priorität / Größe / Release 1:** Must / M / ja · **Status:** umgesetzt (AK1 E2E, AK2–AK4 Unit grün; AK4 zusätzlich manuell (TC-M-01))
 - **Akzeptanzkriterien:**
-  - AK1: Gegeben keine Supabase-Konfiguration. Wenn die App gestartet wird, dann läuft sie im Demo-Modus und zeigt oben dauerhaft „Demo-Modus – Beispieldaten, nichts wird gespeichert“.
+  - AK1: Gegeben keine Supabase-Konfiguration. Wenn die App gestartet wird, dann läuft sie im Demo-Modus und zeigt oben dauerhaft „Demo-Modus – Beispieldaten, Änderungen gehen beim Neuladen verloren“ (Text angepasst 23.11.2026 nach ADR-0010).
   - AK2: Gegeben der Demo-Modus. Wenn die Übersicht geladen wird, dann zeigt sie mindestens 6 Demotreffen mit allen Sportarten aus F-00, darunter mindestens ein ausgebuchtes und eines ohne Altersgruppe.
   - AK3: Gegeben der Demo-Modus. Wenn eine Demo-Person einem Treffen beitritt und die Seite neu lädt, dann ist der Ausgangszustand wiederhergestellt.
   - AK4: Gegeben Supabase-Konfiguration vorhanden. Wenn die App startet, dann erscheint kein Demo-Hinweis und Daten kommen aus Supabase.
@@ -498,7 +505,6 @@ Deshalb höchstens Could; die Betreiberseite ist Won't.
 - **Quelle:** DR-5.2.2, DR-5.3.1, SM-R17, SM-R18, SM-R19, SM-R20, SM-R29, NFR-6; FB-24, FB-28. **Won't (Version 1)**, weil kein realer Betreiber als Partner zugesagt hat, kein E-Mail-Versand mit sicheren Aktionslinks festgelegt ist und die Betreiberin keinen zweiten Kalender pflegen will.
 - **Priorität / Größe / Release 1:** Won't / L / nein · **Status:** offen
 - **Akzeptanzkriterien:** werden erst bei Aufnahme formuliert (Orientierung: NFR-6, SM-R18).
-
 
 ## 6. Qualitätsanforderungen und Randbedingungen
 
@@ -550,42 +556,46 @@ grundlegenden Sachen gut funktionieren“). Bei Zeitnot wird zuerst Could, dann 
 
 ### 7.2 Übersicht mit Umsetzungsstand
 
-Spalten Priorität und Release 1 aus `docs/backlog.md`. Spalte „Akzeptanztests vorhanden“ aus den Testnamen in `e2e/`
-(Commit `4fd94ad`). Der Status in `docs/backlog.md` steht für alle Stories noch auf „offen“ (siehe Lücken).
+Spalten aus `docs/backlog.md`. Release 1: 11 von 14 Stories umgesetzt, 3 teilweise (F-12, F-13, F-22); außerhalb von Release 1
+vorgezogen: F-09, F-25 umgesetzt, F-14, F-15, F-20, F-31 teilweise.
 
-| Epic | Story | Priorität | Release 1 | Akzeptanztests vorhanden |
-| --- | --- | --- | --- | --- |
-| E-1 Konto und Anmeldung | F-01 Registrieren, anmelden, abmelden | Must | ja | AK1–AK5 |
-| E-1 | F-02 Ohne Konto stöbern | Must | ja | AK1–AK4 |
-| E-1 | F-03 Profil mit Sportarten, Niveau, Altersgruppe | Should | nein | – |
-| E-1 | F-04 Konto löschen | Could | nein | – |
-| E-2 Treffen entdecken | F-05 Liste kommender Treffen | Must | ja | AK1–AK3 |
-| E-2 | F-06 Filter Sportart und Zeitraum | Must | ja | AK1, AK2, AK4, AK5 |
-| E-2 | F-07 Filter Niveau und Altersgruppe | Must | ja | AK1–AK3 |
-| E-2 | F-08 Karte mit denselben Treffen | Should | ja | AK1–AK4 |
-| E-2 | F-09 Freitextsuche | Could | nein | AK1, AK2 (mit umgesetzt) |
-| E-2 | F-10 Ortssuche und Umkreis | Should | nein | – |
-| E-2 | F-11 Gerätestandort | Could | nein | – |
-| E-3 Treffen-Details | F-12 Detailansicht | Must | ja | AK1, AK2, AK4, AK5 |
-| E-3 | F-13 Kosten, Mitbringen, „Was erwartet dich?“ | Must | ja | AK1–AK3 |
-| E-3 | F-14 Organisator erkennen | Should | nein | AK1 (mit umgesetzt) |
-| E-3 | F-15 Link teilen | Should | nein | AK3 (unbekannter Link) |
-| E-3 | F-16 Route öffnen | Could | nein | – |
-| E-4 Treffen organisieren | F-17 Treffen erstellen | Must | ja | AK1–AK5 |
-| E-4 | F-18 Eigenes Treffen absagen | Must | ja | AK1 (AK3 als Integrationstest TC-I-07) |
-| E-4 | F-19 Bearbeiten | Should | nein | – |
-| E-4 | F-20 Teilnehmerliste | Should | nein | – (Datenschicht im Integrationstest TC-I-07) |
-| E-4 | F-21 Teilnehmende entfernen | Could | nein | – |
-| E-5 Teilnahme | F-22 Beitreten | Must | ja | AK1, AK2, AK5 (AK3 Integration; AK4 Paralleltest offen) |
-| E-5 | F-23 Teilnahme zurückziehen | Must | ja | AK1 (AK3 Integration) |
-| E-5 | F-24 Meine Treffen | Must | ja | AK1–AK3 |
-| E-5 | F-25 Mindestteilnehmerzahl | Should | nein | AK1 (mit umgesetzt) |
-| E-6 Hinweise | F-26 bis F-29 | Should/Could | nein | – |
-| E-6 | F-30 Nachricht an alle | Won't | nein | – |
-| E-7 Einstieg und Betrieb | F-31 Startseite/Erklärung | Should | nein | AK1/AK2 als Erstbesuch-Hinweis |
-| E-7 | F-32 Lokaler Demo-Modus | Must | ja | AK1 |
-| E-8 Buchungspilot | F-33, F-34 | Could | nein | – |
-| E-8 | F-35 Betreiberseite | Won't | nein | – |
+| Epic | Story | Priorität | Release 1 | Status (Endlauf 23.11.2026) | Begründung / Tests |
+| --- | --- | --- | --- | --- | --- |
+| E-1 Konto und Anmeldung | F-01 Registrieren, anmelden, abmelden | Must | ja | umgesetzt | AK1–AK6 Akzeptanztests grün (Endlauf 23.11.2026) |
+| E-1 | F-02 Ohne Konto stöbern, Anmeldung erst beim Mitmachen | Must | ja | umgesetzt | AK1–AK4 Akzeptanztests grün |
+| E-1 | F-03 Profil mit Anzeigename, Sportarten, Niveau, Altersgruppe | Should | nein | offen | – |
+| E-1 | F-04 Konto und eigene Daten löschen | Could | nein | offen | – |
+| E-2 Treffen entdecken | F-05 Liste kommender Treffen | Must | ja | umgesetzt | AK1–AK3, AK5 E2E grün, AK4 Unit (TC-U-14) grün |
+| E-2 | F-06 Filter Sportart und Zeitraum mit Leerzustand | Must | ja | umgesetzt | AK1, AK2, AK4, AK5 E2E grün, AK2/AK3 zusätzlich Unit/Komponente |
+| E-2 | F-07 Filter Niveau und Altersgruppe | Must | ja | umgesetzt | AK1–AK3 E2E grün |
+| E-2 | F-08 Karte mit denselben Treffen wie die Liste | Should | ja | umgesetzt | AK1–AK6 E2E grün, AK3/AK5/AK6 zusätzlich Unit |
+| E-2 | F-09 Freitextsuche | Could | nein | umgesetzt | AK1–AK2 E2E grün (vorgezogen, nicht Release 1) |
+| E-2 | F-10 Ortssuche und Umkreis ohne Standortfreigabe | Should | nein | offen | – |
+| E-2 | F-11 Optional eigenen Gerätestandort verwenden | Could | nein | offen | – |
+| E-3 Treffen-Details | F-12 Detailansicht mit Treffpunkt, Niveau, eindeutiger Altersangabe und freien Plätzen | Must | ja | teilweise | AK3–AK5 grün; AK1 und AK2 weichen im Wortlaut ab (siehe Hinweis) |
+| E-3 | F-13 Kosten, Mitbringen und „Was erwartet dich?“ | Must | ja | teilweise | AK1, AK3 grün; AK2 ohne Kostenhinweis „(Hallenmiete)“ geprüft, AK4 (reiner Text, `<b>` wörtlich) ohne Test |
+| E-3 | F-14 Organisator im Treffen erkennen | Should | nein | teilweise | AK2 grün; AK1 nur „Organisiert von …“, ohne Anzahl organisierter Treffen |
+| E-3 | F-15 Link zu einem Treffen teilen | Should | nein | teilweise | nur AK3 (unbekannter Link) umgesetzt und grün; „Link kopieren“ fehlt |
+| E-3 | F-16 Route zum Treffpunkt in Karten-App öffnen | Could | nein | offen | – |
+| E-4 Treffen organisieren | F-17 Treffen erstellen | Must | ja | umgesetzt | AK1–AK5 grün, Höchstdauer 12 h (BUG-04) ergänzt |
+| E-4 | F-18 Eigenes Treffen absagen | Must | ja | umgesetzt | AK1 E2E, AK2 Unit/Integration, AK3 Supabase-Integration (echte DB, 285/285) grün |
+| E-4 | F-19 Eigenes Treffen bearbeiten | Should | nein | offen | – |
+| E-4 | F-20 Teilnehmerliste sehen | Should | nein | teilweise | AK1/AK2 Unit und Supabase-Integration grün; AK3 ohne eigenen Test |
+| E-4 | F-21 Teilnehmende aus eigenem Treffen entfernen | Could | nein | offen | – |
+| E-5 Teilnahme | F-22 Einem Treffen beitreten („Jetzt teilnehmen“) | Must | ja | teilweise | AK1–AK3, AK5 grün; AK4 nur sequenziell (EVENT_FULL) geprüft, kein Paralleltest |
+| E-5 | F-23 Teilnahme zurückziehen | Must | ja | umgesetzt | AK1 E2E, AK2 Unit, AK3 Integration grün |
+| E-5 | F-24 Meine Treffen | Must | ja | umgesetzt | AK1–AK4 E2E grün |
+| E-5 | F-25 Mindestteilnehmerzahl mit Status „Sucht Mitspieler“ / „Findet statt“ | Should | nein | umgesetzt | AK1 E2E, AK2/AK3 Unit grün (vorgezogen, nicht Release 1) |
+| E-6 Hinweise | F-26 In-App-Hinweis bei Änderung oder Absage | Should | nein | offen | – |
+| E-6 | F-27 Hinweis an Organisator bei Zu- und Absage | Could | nein | offen | – |
+| E-6 | F-28 Hinweis, wenn Mindestzahl 2 Stunden vor Beginn fehlt | Could | nein | offen | – |
+| E-6 | F-29 E-Mail bei kurzfristiger Absage | Could | nein | offen | – |
+| E-6 | F-30 Nachricht an alle Teilnehmenden | Won't | nein | offen | – |
+| E-7 Einstieg und Betrieb | F-31 Startseite mit Erklärung und zwei Einstiegen | Should | nein | teilweise | als Erstbesuch-Hinweis auf Entdecken umgesetzt (E2E AK1/AK2 grün), keine eigene Startseite unter `/` |
+| E-7 | F-32 Lokaler Demo-Modus ohne Server | Must | ja | umgesetzt | AK1 E2E, AK2–AK4 Unit grün; AK4 zusätzlich manuell (TC-M-01) |
+| E-8 Sportstätten-Buchungspilot | F-33 Hallenanfrage mit Status „Angefragt“ | Could | nein | offen | – |
+| E-8 | F-34 Preis und Stornobedingungen vor dem Absenden | Could | nein | offen | – |
+| E-8 | F-35 Betreiber bestätigt oder lehnt ab, keine Doppelbestätigung | Won't | nein | offen | – |
 
 ### 7.3 Nicht-Ziele (bewusst nicht gebaut)
 
@@ -604,66 +614,66 @@ Jede Feedback-Aussage hat eine vorgeschlagene Konsequenz und die betroffenen Sto
 Eine automatisch erzeugte Datei `docs/traceability.md` (Kriterium → Test, `make trace`) liegt im Repository nicht vor;
 die Zuordnung Kriterium → Test steht im Testfallkatalog `docs/testing/testfaelle.md`.
 
-| ID | Konsequenz (Vorschlag) | Stories |
-| --- | --- | --- |
-| FB-01 | Kernumfang Finden, Erstellen, Beitreten bleibt Must; stützt H-1 | F-05, F-17, F-22 |
-| FB-02 | keine Änderung, stützt H-1 | – |
-| FB-03 | Details und Filter für Alter/Niveau/Plätze/Ort; Bewertungen verworfen, weil 0 von 4 Nennungen | F-07, F-12 |
-| FB-04 | Umkreis 2/5/10/20 km, Standard 5 km | F-10 |
-| FB-05 | Treffen erstellen Must; stützt H-3a | F-17 |
-| FB-06 | Mindestteilnehmerzahl mit Status und Hinweis an Organisator | F-25, F-27 |
-| FB-07 | Buchung ist Nebenproblem (1/4): Buchungspilot nur Could | F-33 |
-| FB-08 | verworfen: Bezahlung/Kostenaufteilung in der App, weil bestehende Lösung genügt und kein Bedarf genannt wurde | – |
-| FB-09 | keine Änderung, kein Vorbild für Wettbewerb ableitbar | – |
-| FB-10 | stützt Fokus auf Beitreten mit Fremden; H-5 | F-22 |
-| FB-11 | keine Story; Nutzertest für H-2/NFR-1 muss anders rekrutiert werden (offen) | – |
-| FB-12 | Niveau Pflichtangabe und sichtbar; Hinweis „Anfänger willkommen“ | F-12, F-13, F-17 |
-| FB-13 | Treffpunkttext Pflichtfeld und in Details | F-12, F-17 |
-| FB-14 | Ortssuche ohne Standort; Standort nur optional und nicht gespeichert (SM-R22) | F-10, F-11 |
-| FB-15 | Detailansicht mit allen Angaben | F-12, F-13, F-14 |
-| FB-16 | Zurückziehen Must; Hinweis bei Änderung | F-23, F-26 |
-| FB-17 | Social Feed verworfen (Nicht-Ziel); Buchung Could | F-33 |
-| FB-18 | Kapazität, Ausgebucht-Zustand, Teilnehmerliste; Warteliste verworfen für Version 1, weil laut Aussage nicht nötig | F-17, F-20, F-22 |
-| FB-19 | atomarer Beitritt (NFR-5); Kapazitätsregel beim Bearbeiten | F-22, F-19 |
-| FB-20 | In-App-Hinweis; Benachrichtigung außerhalb der App als Could | F-26, F-29 |
-| FB-21 | Link teilen; Leerzustand mit „Treffen erstellen“; kein Chat | F-15, F-06 |
-| FB-22 | Felder beim Erstellen; private Treffen verworfen für Version 1 | F-17, F-13 |
-| FB-23 | keine eigene Story; Beitritt mit einem Klick (F-22) und Test mit echter Gruppe offen | F-22 |
-| FB-24 | Status „Angefragt – noch keine verbindliche Buchung“ | F-33, F-35 |
-| FB-25 | keine Verfügbarkeitsgarantie; Kalenderintegration verworfen (kein Partner) | F-33, F-35 |
-| FB-26 | Pflichtangaben der Anfrage; NFR-7 | F-33 |
-| FB-27 | Konditionen vor Absenden | F-34 |
-| FB-28 | H-3b nicht bestätigt; Buchungspilot bleibt Could/Won't | F-33, F-34, F-35 |
-| FB-29 | stützt H-1 und Wertversprechen | F-05, F-22 |
-| FB-30 | Niveau inkl. „Alle Niveaus“; Hinweis „Neue willkommen“ | F-12, F-13 |
-| FB-31 | Detailansicht inkl. Kosten und Mitbringen | F-12, F-13 |
-| FB-32 | Filter Sportart und Zeitraum Must, Ort Should | F-06, F-10 |
-| FB-33 | Liste Must, Karte Should | F-05, F-08 |
-| FB-34 | Beitreten mit Bestätigung, Zurückziehen | F-22, F-23 |
-| FB-35 | Stöbern ohne Konto; Profil optional und nachrangig | F-02, F-03 |
-| FB-36 | In-App-Hinweis Should; E-Mail/Push Could | F-26, F-29 |
-| FB-37 | Erstellen, Teilnehmerliste, Meine Treffen; stützt H-3a | F-17, F-20, F-24 |
-| FB-38 | Teilnehmerliste nur mit Anzeigenamen; Organisator sichtbar | F-14, F-20, F-03 |
-| FB-39 | Buchungspilot Could, Konditionen vor Absenden | F-33, F-34 |
-| FB-40 | Chat/Nachrichten Won't; Vorrang Kernabläufe | F-30 |
-| FB-41 | H-5 (offen); Mindestzahl-Status zeigt Ausfallrisiko | F-25 |
-| FB-42 | Szenario für Nutzertest NFR-1/H-2 und E2E-Test | F-22, F-23 |
-| FB-43 | bestätigt Filter | F-06 |
-| FB-44 | Teilnahme-Button auf Karte und in Details; Gegenhinweis zu H-2 | F-22 |
-| FB-45 | Altersangabe eindeutig beschriften | F-12 |
-| FB-46 | Platzanzeige in Liste und Details | F-05, F-12 |
-| FB-47 | Sortierung „Ausgebuchte zuletzt“ | F-05 |
-| FB-48 | Karte bleibt (Should, Release 1) | F-08 |
-| FB-49 | Kosten, Mitbringen, Teilnahmevoraussetzung in Details | F-13 |
-| FB-50 | Niveau bei jedem Treffen Pflicht und sichtbar | F-12, F-17 |
-| FB-51 | Organisator in Details | F-14 |
-| FB-52 | Beschreibung und Treffpunkttext | F-12, F-13 |
-| FB-53 | stützt H-3a | F-17 |
-| FB-54 | Button sichtbar gestalten (AK in F-17) | F-17 |
-| FB-55 | Kapazität; Entfernen (Could); Hinweis bei Absage (Could) | F-17, F-21, F-27 |
-| FB-56 | Teilnehmerliste Should; Nachricht an alle verworfen für Version 1 (Won't), weil andere Befragte WhatsApp behalten wollen und Chat Moderation/Datenschutz erfordert | F-20, F-30 |
-| FB-57 | Meine Treffen, Bearbeiten | F-24, F-19 |
-| FB-58 | Startseite; Gegenhinweis zu H-2 | F-31 |
+| ID | Konsequenz (Vorschlag, Freigabe offen) | Stories | Umsetzung (Stand 23.11.2026) |
+| --- | --- | --- | --- |
+| FB-01 | Kernumfang Finden, Erstellen, Beitreten bleibt Must; stützt H-1 | F-05, F-17, F-22 | umgesetzt (F-05, F-17); teilweise (F-22) |
+| FB-02 | keine Änderung, stützt H-1 | – | – |
+| FB-03 | Details und Filter für Alter/Niveau/Plätze/Ort; Bewertungen verworfen, weil 0 von 4 Nennungen | F-07, F-12 | umgesetzt (F-07); teilweise (F-12) |
+| FB-04 | Umkreis 2/5/10/20 km, Standard 5 km | F-10 | offen |
+| FB-05 | Treffen erstellen Must; stützt H-3a | F-17 | umgesetzt (F-17) |
+| FB-06 | Mindestteilnehmerzahl mit Status und Hinweis an Organisator | F-25, F-27 | umgesetzt (F-25); offen (F-27) |
+| FB-07 | Buchung ist Nebenproblem (1/4): Buchungspilot nur Could | F-33 | offen |
+| FB-08 | verworfen: Bezahlung/Kostenaufteilung in der App, weil bestehende Lösung genügt und kein Bedarf genannt wurde | – | – |
+| FB-09 | keine Änderung, kein Vorbild für Wettbewerb ableitbar | – | – |
+| FB-10 | stützt Fokus auf Beitreten mit Fremden; H-5 | F-22 | teilweise (F-22) |
+| FB-11 | keine Story; Nutzertest für H-2/NFR-1 muss anders rekrutiert werden (offen) | – | – |
+| FB-12 | Niveau Pflichtangabe und sichtbar; Hinweis „Anfänger willkommen“ | F-12, F-13, F-17 | umgesetzt (F-17); teilweise (F-12, F-13) |
+| FB-13 | Treffpunkttext Pflichtfeld und in Details | F-12, F-17 | umgesetzt (F-17 AK2 Pflichtfeld, F-12 AK1 Treffpunkt in Details) |
+| FB-14 | Ortssuche ohne Standort; Standort nur optional und nicht gespeichert (SM-R22) | F-10, F-11 | offen |
+| FB-15 | Detailansicht mit allen Angaben | F-12, F-13, F-14 | teilweise (F-12, F-13, F-14) |
+| FB-16 | Zurückziehen Must; Hinweis bei Änderung | F-23, F-26 | umgesetzt (F-23); offen (F-26) |
+| FB-17 | Social Feed verworfen (Nicht-Ziel); Buchung Could | F-33 | offen |
+| FB-18 | Kapazität, Ausgebucht-Zustand, Teilnehmerliste; Warteliste verworfen für Version 1, weil laut Aussage nicht nötig | F-17, F-20, F-22 | umgesetzt (F-17); teilweise (F-20, F-22) |
+| FB-19 | atomarer Beitritt (NFR-5); Kapazitätsregel beim Bearbeiten | F-22, F-19 | teilweise (F-22); offen (F-19) |
+| FB-20 | In-App-Hinweis; Benachrichtigung außerhalb der App als Could | F-26, F-29 | offen |
+| FB-21 | Link teilen; Leerzustand mit „Treffen erstellen“; kein Chat | F-15, F-06 | umgesetzt (F-06); teilweise (F-15) |
+| FB-22 | Felder beim Erstellen; private Treffen verworfen für Version 1 | F-17, F-13 | umgesetzt (F-17); teilweise (F-13) |
+| FB-23 | keine eigene Story; Beitritt mit einem Klick (F-22) und Test mit echter Gruppe offen | F-22 | teilweise (F-22) |
+| FB-24 | Status „Angefragt – noch keine verbindliche Buchung“ | F-33, F-35 | offen |
+| FB-25 | keine Verfügbarkeitsgarantie; Kalenderintegration verworfen (kein Partner) | F-33, F-35 | offen |
+| FB-26 | Pflichtangaben der Anfrage; NFR-7 | F-33 | offen |
+| FB-27 | Konditionen vor Absenden | F-34 | offen |
+| FB-28 | H-3b nicht bestätigt; Buchungspilot bleibt Could/Won't | F-33, F-34, F-35 | offen |
+| FB-29 | stützt H-1 und Wertversprechen | F-05, F-22 | umgesetzt (F-05); teilweise (F-22) |
+| FB-30 | Niveau inkl. „Alle Niveaus“; Hinweis „Neue willkommen“ | F-12, F-13 | teilweise (F-12, F-13) |
+| FB-31 | Detailansicht inkl. Kosten und Mitbringen | F-12, F-13 | teilweise (F-12, F-13) |
+| FB-32 | Filter Sportart und Zeitraum Must, Ort Should | F-06, F-10 | umgesetzt (F-06); offen (F-10) |
+| FB-33 | Liste Must, Karte Should | F-05, F-08 | umgesetzt (F-05, F-08) |
+| FB-34 | Beitreten mit Bestätigung, Zurückziehen | F-22, F-23 | umgesetzt (F-23); teilweise (F-22) |
+| FB-35 | Stöbern ohne Konto; Profil optional und nachrangig | F-02, F-03 | umgesetzt (F-02); offen (F-03) |
+| FB-36 | In-App-Hinweis Should; E-Mail/Push Could | F-26, F-29 | offen |
+| FB-37 | Erstellen, Teilnehmerliste, Meine Treffen; stützt H-3a | F-17, F-20, F-24 | umgesetzt (F-17, F-24); teilweise (F-20) |
+| FB-38 | Teilnehmerliste nur mit Anzeigenamen; Organisator sichtbar | F-14, F-20, F-03 | teilweise (F-14, F-20); offen (F-03) |
+| FB-39 | Buchungspilot Could, Konditionen vor Absenden | F-33, F-34 | offen |
+| FB-40 | Chat/Nachrichten Won't; Vorrang Kernabläufe | F-30 | offen |
+| FB-41 | H-5 (offen); Mindestzahl-Status zeigt Ausfallrisiko | F-25 | umgesetzt (F-25) |
+| FB-42 | Szenario für Nutzertest NFR-1/H-2 und E2E-Test | F-22, F-23 | umgesetzt (F-23); teilweise (F-22) |
+| FB-43 | bestätigt Filter | F-06 | umgesetzt (F-06) |
+| FB-44 | Teilnahme-Button auf Karte und in Details; Gegenhinweis zu H-2 | F-22 | umgesetzt (F-22 AK5 Button auf der Karte, F-12/F-22 in Details) |
+| FB-45 | Altersangabe eindeutig beschriften | F-12 | umgesetzt (F-12 AK2/AK3: „Alter: 20–25 Jahre“ / „Alter: offen für alle“, `18af5af`) |
+| FB-46 | Platzanzeige in Liste und Details | F-05, F-12 | umgesetzt (F-05 AK2 Liste, F-12 AK1/AK4 Details) |
+| FB-47 | Sortierung „Ausgebuchte zuletzt“ | F-05 | umgesetzt (F-05) |
+| FB-48 | Karte bleibt (Should, Release 1) | F-08 | umgesetzt (F-08) |
+| FB-49 | Kosten, Mitbringen, Teilnahmevoraussetzung in Details | F-13 | teilweise (F-13) |
+| FB-50 | Niveau bei jedem Treffen Pflicht und sichtbar | F-12, F-17 | umgesetzt (F-17); teilweise (F-12) |
+| FB-51 | Organisator in Details | F-14 | teilweise (F-14) |
+| FB-52 | Beschreibung und Treffpunkttext | F-12, F-13 | teilweise (F-12, F-13) |
+| FB-53 | stützt H-3a | F-17 | umgesetzt (F-17) |
+| FB-54 | Button sichtbar gestalten (AK in F-17) | F-17 | umgesetzt (F-17) |
+| FB-55 | Kapazität; Entfernen (Could); Hinweis bei Absage (Could) | F-17, F-21, F-27 | umgesetzt (F-17); offen (F-21, F-27) |
+| FB-56 | Teilnehmerliste Should; Nachricht an alle verworfen für Version 1 (Won't), weil andere Befragte WhatsApp behalten wollen und Chat Moderation/Datenschutz erfordert | F-20, F-30 | teilweise (F-20); offen (F-30) |
+| FB-57 | Meine Treffen, Bearbeiten | F-24, F-19 | umgesetzt (F-24); offen (F-19) |
+| FB-58 | Startseite; Gegenhinweis zu H-2 | F-31 | teilweise (F-31) |
 
 ## 9. Änderungen an den Anforderungen über die Laufzeit
 
@@ -687,7 +697,7 @@ Siehe auch `abgabe/LUECKEN.md`.
 | Belege für Validierung | Nutzertest (NFR-1, H-2) nicht durchgeführt; alle Feedback-Konsequenzen nur „Vorschlag“ | Nutzertest P6 durchführen und dokumentieren; Konsequenzen entscheiden |
 | Detailgrad | Specs nur für F-01 und F-22; übrige Stories nur im Backlog ohne Szenario | Specs für alle Release-1-Stories oder Hinweis, dass das Backlog als Spec dient |
 | Freigaben | Vision, Backlog, Specs „Freigabe offen“ | Freigaben mit Datum und Name eintragen |
-| Konsistenz | Backlog-Status aller Stories „offen“, obwohl Release-1-Stories umgesetzt sind | Status in `docs/backlog.md` nachziehen |
+| Konsistenz | erledigt: Backlog-Status nach Endlauf gesetzt. Offen: F-12 AK1/AK2 Wortlaut weicht von der Umsetzung ab (Termin ohne Jahr, Alter ohne „Wunsch des Organisators“) | Team entscheidet: AK anpassen oder Umsetzung nachziehen |
 | Offene Entscheidungen | Passwortlänge 8 oder 12 (F04), Messdefinition NFR-2 | Teamentscheidung |
 
 <div class="pagebreak"></div>

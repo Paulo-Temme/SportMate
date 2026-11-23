@@ -94,7 +94,8 @@ Ausführlich mit Prüfschritten: `supabase/README.md`. Der `service_role`-Schlü
 | Supabase-Integration (echte Datenbank, Variablen in der Shell gesetzt) | `SUPABASE_INTEGRATION=1 npx vitest run tests/integration/supabase-event-repository.int.test.ts` |
 
 Playwright startet selbst einen Server auf Port 3010 (Demo-Modus, Offline-Karte). Vorher einen laufenden
-`npm run dev` beenden; Next.js 16 erlaubt nur einen Dev-Server je Projektordner.
+`npm run dev` beenden; Next.js 16 erlaubt nur einen Dev-Server je Projektordner. Erwartetes Ergebnis auf dem Stand
+`004a9fa` (Endlauf 23.11.2026): Vitest 283 bestanden / 2 übersprungen, Playwright 117 bestanden / 1 übersprungen.
 
 ## 4. Bereitstellung auf Vercel
 

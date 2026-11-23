@@ -22,15 +22,17 @@ Hochschul-Softwareprojekt im Wintersemester 2026/27 · Team: Julien, Renat, Paul
 
 ## Funktionsumfang Release 1 (Stand 23.11.2026)
 
-Release 1 ist der Umfang für Präsentation 5 am 25.11.2026 (`docs/backlog.md`). Umgesetzt und durch Akzeptanztests belegt
-(`docs/testing/testfaelle.md`):
+Release 1 ist der Umfang für Präsentation 5 am 25.11.2026 (`docs/backlog.md`). Stand nach dem Endlauf vom 23.11.2026:
+11 von 14 Release-1-Stories umgesetzt (jedes Akzeptanzkriterium mit grünem Test), 3 teilweise – F-12 (Wortlaut von Termin und
+Altersangabe weicht vom AK ab), F-13 (Kostenhinweis und reiner Text ohne Test), F-22 (kein automatischer Paralleltest auf den
+letzten Platz). Tests je Kriterium: `docs/testing/testfaelle.md`.
 
 | Bereich | Was die App kann | Stories |
 | --- | --- | --- |
-| Entdecken | Vollbild-Karte (MapLibre, OpenFreeMap) mit Bottom Sheet und Trefferliste; Karte und Liste zeigen dieselben Treffer; „x von y Plätzen frei“, Ausgebuchte zuletzt; Offline-Karte als Rückfall | F-05, F-08 |
+| Entdecken | Vollbild-Karte (MapLibre, OpenFreeMap) mit Bottom Sheet und Trefferliste; Karte und Liste zeigen dieselben Treffer; überlappende Marker werden zu Gruppen mit Anzahl, Klick fächert auf; „x von y Plätzen frei“, Ausgebuchte zuletzt; Offline-Karte als Rückfall | F-05, F-08 |
 | Suchen und Filtern | Suchleiste, Sportarten-Chips, Filterdialog mit Zeitraum, Niveau und Altersgruppe, Leerzustand mit „Selbst ein Treffen erstellen“ | F-06, F-07, F-09 |
 | Details | Termin mit Dauer, Treffpunkt, Niveau, eindeutige Altersangabe, Plätze, Kosten, Mitbringen, „Was erwartet dich?“, Organisator, Hinweis „Sucht Mitspieler (noch n)“; eigene Adresse je Treffen (`/treffen/<id>`), unbekannte Adresse zeigt „Treffen nicht gefunden“ | F-12, F-13, F-14, F-25 (AK1), F-15 (AK3) |
-| Konto | Registrieren, Anmelden, Abmelden, Profil; Stöbern ohne Konto, Anmeldung erst beim Mitmachen mit Rücksprung | F-01, F-02 |
+| Konto | Registrieren, Anmelden, Abmelden, Profil mit Zählern „dabei“/„organisiert“; Stöbern ohne Konto, Anmeldung erst beim Mitmachen mit Rücksprung | F-01, F-02 |
 | Organisieren | Erstellen-Assistent in drei Schritten mit Ortswahl auf der Karte und Feldvalidierung; eigenes Treffen absagen | F-17, F-18 |
 | Teilnahme | „Jetzt teilnehmen“, Teilnahme zurückziehen, „Meine Treffen“ mit Reitern; Überbuchungsschutz in der Datenbank | F-22, F-23, F-24 |
 | Betrieb | Lokaler Demo-Modus ohne Server mit gekennzeichneten Beispieldaten; Erstbesuch-Hinweis „So funktioniert's“ | F-32, F-31 |
@@ -100,8 +102,10 @@ Playwright startet selbst einen Dev-Server auf Port 3010 im Demo-Modus mit Offli
 Dev-Server je Projektordner; läuft bereits `npm run dev`, diesen vorher beenden.
 Die Supabase-Integrationstests werden ohne `SUPABASE_INTEGRATION=1` übersprungen und laufen nicht in der CI.
 
-Letzter dokumentierter Lauf (`docs/testing/testbericht.md`, 23.11.2026): Vitest 243 bestanden / 2 übersprungen,
-Playwright 102/102 bestanden (51 Tests × 2 Geräteprofile), Coverage `src/lib` 87,6 % Zeilen.
+Endlauf (`docs/testing/testbericht.md`, 23.11.2026, Commit `004a9fa`): Vitest 283 bestanden / 2 übersprungen (29 Dateien),
+mit echter Supabase-DB 285/285; Playwright 117 bestanden / 1 gewollt übersprungen (59 Tests × 2 Geräteprofile, 48,1 s);
+`tsc` 0 Fehler, ESLint 0 Befunde; Coverage `src/lib` 90,66 % Zeilen / 85,31 % Zweige. Gefundene Fehler: 4, alle behoben.
+Review: 15 Befunde, 10 behoben, 5 offen.
 
 ## Deployment
 
@@ -172,11 +176,12 @@ Alle entwickeln und reviewen.
 
 ## Offene Punkte (ehrlich)
 
-- Backlog-Status der Stories steht in `docs/backlog.md` noch auf „offen“, obwohl Release-1-Stories umgesetzt sind; Specs
-  gibt es bisher nur für F-01 und F-22 (Datenschicht), keine `review.md` je Story.
-- Offener Fehler BUG-04: Treffen über 12 Stunden werden im Demo- und im Supabase-Modus unterschiedlich behandelt.
-  BUG-02 (mehrdeutiger Toast) und BUG-03 (Testdaten in der echten DB) sind laut Commits `6b9a4d9` und `d5d8a62`
-  behoben; das Fehlerprotokoll `docs/testing/fehlerprotokoll.md` ist darauf noch nicht nachgezogen.
+- Drei Release-1-Stories nur teilweise umgesetzt (F-12, F-13, F-22, siehe oben); Specs gibt es nur für F-01 und F-22,
+  keine `review.md` je Story.
+- Offene Review-Befunde: REV-02 (Supabase-Integrationstests nicht in der CI), REV-09 (veralteter Kommentar in der Migration),
+  REV-10 (Organisator-Kennung öffentlich lesbar, Entscheidung offen), REV-13 (Zeilentypen ohne Laufzeitprüfung),
+  REV-14 (Komplexitätsregel nicht im Lint).
+- Mutation Score nicht verwertbar (Messfehler unter Windows), Messung unter Linux offen.
 - Menschliches Review der Migration und der Anmelde-/Datenzugriffsdateien steht laut Review-Protokoll aus.
 - Kein automatischer Paralleltest auf den letzten Platz; Schutz durch Zeilensperre und Check-Constraint (ADR-0006).
 - Nutzertest mit fünf echten Personen (NFR-1) ist für Präsentation 6 geplant und noch nicht durchgeführt.

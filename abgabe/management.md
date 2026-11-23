@@ -158,14 +158,15 @@ Vision, Architektur, ADRs, Backlog und Specs tragen „Freigabe offen“; alle F
 
 Beobachtbare Einhaltung (geprüft am 23.11.2026):
 
-- **Feature-ID in jeder Commit-Nachricht:** 42 von 43 Commits beginnen mit `F-xx:`; Ausnahme ist der „Initial commit“.
+- **Feature-ID in jeder Commit-Nachricht:** 55 von 56 Commits bis zum Endlauf-Commit `004a9fa` beginnen mit `F-xx:`; Ausnahme ist der „Initial commit“.
 - **Tests vor Code, getrennt committet:** z. B. `5b05ecf` (Tests Kernlogik) vor `1c5de92` (Kernlogik), `d93e8de`
   (Akzeptanztests F-22) vor `90cf99b` (Umsetzung F-22), `787d9f8` vor `08cd177` (F-06).
 - **CI:** `.github/workflows/ci.yml` mit `make trace`, `setup`, `lint`, `typecheck`, `coverage`, `build` bei jedem PR und
   Push auf `main`/`develop`.
 - **Entscheidungsnotizen:** 10 ADRs in `docs/decisions/`.
-- **Protokolle der Agenten:** `specs/F-00`, `F-01`, `F-22`, `F-32` (`log.md`).
-- **Nicht eingehalten bzw. nicht belegt:** ein Branch und PR je Story (alle 42 Agenten-Commits liegen direkt auf `develop`,
+- **Protokolle der Agenten:** `specs/F-00`, `F-01`, `F-05`, `F-06`, `F-07`, `F-08`, `F-12`, `F-13`, `F-17`, `F-18`, `F-22`, `F-23`, `F-24`, `F-32` (`log.md`).
+- **Ausnahme Tests vor Code:** `ded1894` (BUG-04) enthält Test und Umsetzung in einem Commit.
+- **Nicht eingehalten bzw. nicht belegt:** ein Branch und PR je Story (alle 55 Agenten-Commits liegen direkt auf `develop`,
   Branches im Repository nur `main` und `develop`); Retrospektiven (nur Vorlage); Zeiterfassung (leer).
 
 ## 5. Werkzeuge
@@ -190,7 +191,7 @@ Beobachtbare Einhaltung (geprüft am 23.11.2026):
 | bis 27.10.2026 | Feedbackrunde mit 4 Personen zur MVP-Demo | FB-43 – FB-58 |
 | P4, Datum offen | Projektfortschritt seit P3: Architektur und Implementierung, Coding-Standards | `P4.pptx` |
 | 10.11.2026 | Repository angelegt („Initial commit“) | `git log` |
-| 23.11.2026 | Agentenvorlage übernommen, Next.js-Grundgerüst, Datenschicht, Release-1-Oberfläche, Tests, Testdokumentation, Präsentation 5 (42 Commits) | `git log`, `docs/testing/testbericht.md` |
+| 23.11.2026 | Agentenvorlage übernommen, Next.js-Grundgerüst, Datenschicht, Release-1-Oberfläche, Tests, Testdokumentation, Präsentation 5, Behebung aller 4 Fehler und von 10 Review-Befunden, Endlauf (55 Commits bis `004a9fa`) | `git log`, `docs/testing/testbericht.md` |
 | P5, 25.11.2026 | Qualität und Tests | Release 1 auf Vercel |
 | P6, Termin offen | geplant: Nutzertest mit 5 Personen (NFR-1) | offen |
 | P7, Termin offen | Abschluss und Reflexion | offen |
@@ -211,10 +212,12 @@ wird hier deshalb nicht wiedergegeben (Regel der Rolle reporter). Siehe Lücken.
 | Datum | Problem | Auswirkung | Lösung | Status | Quelle |
 | --- | --- | --- | --- | --- | --- |
 | 23.11.2026 | Supabase-Modus lud keine Treffen (PostgREST `PGRST201`, mehrdeutige Einbettung) | Kernablauf im Supabase-Modus nicht nutzbar | Beziehung im Abfragecode ausdrücklich benannt | behoben | BUG-01, Commit `67a90f1` |
-| 23.11.2026 | Integrationstests hinterließen sichtbare Testtreffen in der echten Datenbank | Testdaten für alle Nutzenden sichtbar | Altdaten gelöscht; Test sagt jedes Treffen in `afterEach` ab, Titel mit „[Test]“ | laut Commit behoben | BUG-03, REV-03, Commit `d5d8a62` |
-| 23.11.2026 | Toast „Du bist angemeldet“ nach Beitritt klang nach Login | Missverständnis | erst Akzeptanztests umgestellt, dann Text „Du bist dabei“ | laut Commit behoben | BUG-02, Commits `49eb701`, `6b9a4d9` |
+| 23.11.2026 | Integrationstests hinterließen sichtbare Testtreffen in der echten Datenbank | Testdaten für alle Nutzenden sichtbar | Altdaten gelöscht; Test sagt jedes Treffen in `afterEach` ab, Titel mit „[Test]“ | behoben, live geprüft (4/4 Testtreffen abgesagt) | BUG-03, REV-03, Commit `d5d8a62` |
+| 23.11.2026 | Toast „Du bist angemeldet“ nach Beitritt klang nach Login | Missverständnis | erst Akzeptanztests umgestellt, dann Text „Du bist dabei“ | behoben, Akzeptanztests grün im Endlauf | BUG-02, Commits `49eb701`, `6b9a4d9` |
 | 23.11.2026 | Playwright startete nicht, weil parallel ein zweiter Dev-Server lief (Next.js 16 erlaubt einen je Ordner) | kein Testergebnis im Projektordner | Lauf auf sauberer Kopie des Commits (`git archive`, `npm ci`) | umgangen | `docs/testing/testbericht.md` |
 | 23.11.2026 | Mutation Score 7,69 % trotz 100 % Zeilen-Coverage der Kernlogik | Kennzahl nicht verwertbar | als Messfehler unter Windows eingestuft, Wiederholung unter Linux offen | offen | `docs/teststrategie.md` Abschnitt 8 |
+| 23.11.2026 | Treffen > 12 h: lokal angenommen, im Supabase-Modus falsche Meldung | unterschiedliches Verhalten der Modi | 12-h-Regel in der Kernlogik mit eigener Meldung | behoben, Unit-Tests grün | BUG-04, REV-01, Commit `ded1894` |
+| 23.11.2026 | Beim Endlauf fehlten die Playwright-Browser auf dem Rechner (118 Abbrüche vor dem ersten Test) | kein E2E-Ergebnis | `npx playwright install chromium`, danach 117 bestanden, 1 gewollt übersprungen | gelöst | `docs/testing/testbericht.md` |
 | 23.11.2026 | Playwright brauchte einen neueren Chromium-Build | E2E im Setup nicht lauffähig | Mensch führt `npx playwright install chromium` aus | gelöst | `specs/F-00/log.md` |
 | P2/P3 → 23.11.2026 | Interviews waren in den Originaldateien als KI-Simulation vermerkt; Team stuft sie als reale Gespräche ein | Belastbarkeit der Erhebung unklar | Teamentscheidung dokumentiert, alte IDs SIM-01…04 durch INT-01…04 ersetzt | dokumentiert, Belege offen | `docs/feedback.md` |
 | 23.11.2026 | Regel „höchstens 12 Stunden“ nur in SQL | Modi verhalten sich verschieden, falsche Meldung | Test und Regel in der Kernlogik geplant | offen | BUG-04, REV-01 |
@@ -234,35 +237,38 @@ wird hier deshalb nicht wiedergegeben (Regel der Rolle reporter). Siehe Lücken.
 
 ## 10. Statistik
 
-Gezählt am 23.11.2026 aus `git log` des Branches `develop`, Stand Commit `d5d8a62` (43 Commits). Während der Zusammenstellung kamen weitere Commits hinzu; vor der Abgabe neu zählen. `make stats` (`docs/management/statistik.md`)
-wurde nicht ausgeführt, weil der reporter nur in `abgabe/` schreibt; die Zahlen unten stammen direkt aus `git log`.
+Gezählt am 23.11.2026 aus `git log` des Branches `develop`, Stand Endlauf-Commit `004a9fa` (56 Commits). Danach folgten nur
+Dokumentations-Commits (Testberichte, Backlog, Architektur, Präsentation, Abgabe). `make stats` (`docs/management/statistik.md`)
+wurde nicht ausgeführt; die Zahlen unten stammen direkt aus `git log`. SE-Eval zählt für denselben Stand 55 Commits ohne Merges
+(ohne „Initial commit“ im Sprint), Commit-Größe Median 121 Zeilen, P90 1.028 Zeilen, 100 % mit KI-Co-Autor.
 
 ### 10.1 Commits je Person und Woche
 
 | Git-Konto | Person (laut Git-Konto) | KW 46 (10.11.2026) | KW 48 (23.11.2026) | Summe |
 | --- | --- | ---: | ---: | ---: |
 | `Paulo-Temme` | Paulo | 1 | 0 | 1 |
-| `nife1060` | Niklas | 0 | 42 | 42 |
+| `nife1060` | Niklas | 0 | 55 | 55 |
 | Julien, Renat | – | 0 | 0 | 0 |
 
-Alle 42 Commits von `nife1060` stammen vom 23.11.2026 und wurden im Agentenprozess erzeugt. Die Commits zeigen daher,
+Alle 55 Commits von `nife1060` stammen vom 23.11.2026 und wurden im Agentenprozess erzeugt. Die Commits zeigen daher,
 **über welches Konto** eingecheckt wurde, nicht, wer wie viel beigetragen hat. Arbeit vor dem 23.11.2026 (Erhebung,
 Präsentationen P1–P4, Prototyp aus P3) liegt außerhalb dieses Repositorys.
 
 ### 10.2 Commits je Story
 
-| Feature-ID | F-00 | F-01 | F-02 | F-05 | F-06 | F-08 | F-12 | F-17 | F-22 | F-32 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Commits | 8 | 3 | 1 | 5 | 2 | 5 | 4 | 2 | 9 | 3 |
+| Feature-ID | F-00 | F-01 | F-02 | F-05 | F-06 | F-08 | F-12 | F-13 | F-17 | F-18 | F-22 | F-24 | F-32 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Commits | 9 | 5 | 1 | 10 | 2 | 5 | 4 | 1 | 3 | 1 | 10 | 1 | 3 |
 
 ### 10.3 Codezuwachs
 
 | | hinzugefügt | entfernt |
 | --- | ---: | ---: |
-| alle Textdateien (Binärdateien nicht gezählt) | 27.373 | 690 |
-| ohne `package-lock.json` | 19.037 | 690 |
+| alle Textdateien (Binärdateien nicht gezählt) | 31.497 | 808 |
+| ohne `package-lock.json` | 23.161 | 808 |
 
-Stand Commit `d5d8a62`: 251 versionierte Dateien, davon 140 unter `src/`; 7.614 Zeilen in `src/**/*.ts(x)` (einschließlich Tests).
+Stand Commit `004a9fa`: 299 versionierte Dateien, davon 146 unter `src/`; 8.012 Zeilen in `src/**/*.ts(x)` (einschließlich Tests).
+SE-Eval misst 4.990 Codezeilen App (SLOC, ohne Tests) und 34,13 % Anteil Testcode.
 
 ### 10.4 Hauptbeitragende je Datei
 
@@ -278,7 +284,7 @@ Tätigkeiten Anforderungen | Architektur | Implementierung | QA | Management). E
 
 Im Repository sind keine Verbesserungsideen des Teams aus Retrospektiven dokumentiert. Aus den Prüfdokumenten
 vorgeschlagene Maßnahmen (keine Teambewertung): Supabase-Integrationstests vor jedem Merge mit Datenzugriffsänderungen
-ausführen (REV-02), BUG-02 als Mini-Story mit Test-Commit vor Code-Commit abwickeln (REV-15), Mutation Testing unter
+ausführen (REV-02, offen), Supabase-Integration in die CI holen, Mutation Testing unter
 Linux/CI wiederholen (`docs/teststrategie.md`), Komplexitätsregel per ESLint-Plugin prüfen (REV-14).
 
 ## 12. Literatur

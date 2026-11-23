@@ -6,7 +6,7 @@
 | Team | Julien, Renat, Paulo, Niklas |
 | Hauptverantwortlich | Renat (Rolle „Architektur und Entwurf“ laut Präsentation 1 vom 30.09.2026; vom Team zu bestätigen) |
 | Autorinnen und Autoren mit Anteil in % | |
-| Stand | Entwurf vom 23.11.2026, zusammengestellt von der Agentenrolle reporter aus `docs/architecture.md` und `docs/decisions/` |
+| Stand | Entwurf vom 23.11.2026, zusammengestellt von der Agentenrolle reporter aus `docs/architecture.md` und `docs/decisions/`; Abschnitte 4–6, 8, 11, 12 nach dem Abgleich mit Commit `004a9fa` neu übernommen |
 | Repository | <https://github.com/Paulo-Temme/SportMate> (Branch `develop`) |
 | Live-App | <https://sportmate-gamma.vercel.app> |
 
@@ -95,43 +95,48 @@ Martin Fowler, "Patterns of Enterprise Application Architecture" (2002).
 
 ```mermaid
 flowchart TD
-  subgraph UI["Oberfläche (src/app, src/components)"]
-    Pages["Seiten / Routen<br/>Entdecken, Meine Treffen, Erstellen, Profil, Anmelden"]
-    MapStage["Kartenbühne<br/>components/map (MapLibre)"]
-    Sheet["Bottom Sheet + Trefferliste + Detail<br/>components/sheet, components/event"]
+  subgraph UI["Oberfläche (src/app, src/components, src/hooks)"]
+    Pages["Seiten / Routen<br/>Entdecken, Treffen-Detail, Meine Treffen, Erstellen, Profil, Anmelden"]
+    MapStage["Kartenbühne<br/>components/map (MapLibre, Offline-Karte, Marker-/Gruppen-Pillen)"]
+    Sheet["Bottom Sheet + Trefferliste + Detail<br/>components/sheet, discover, event"]
     Form["Erstellen-Assistent<br/>components/create-event"]
     Nav["Tab-Leiste / Seitenleiste<br/>components/navigation"]
+    Hooks["Hooks<br/>use-event-list, use-event-detail, use-participation, use-dialog-focus"]
+    Services["app-services<br/>stellt DataServices bereit"]
   end
-  subgraph CORE["Kernlogik (src/lib/events, src/lib/map) – rein, ohne I/O"]
-    Model["event-model<br/>Typen, Wertelisten"]
-    Validation["event-validation"]
-    Search["event-search"]
+  subgraph CORE["Kernlogik (src/lib/events, src/lib/auth, src/lib/map, src/lib/ui) – rein, ohne I/O"]
+    Model["event-model, stored-event<br/>Typen, Wertelisten"]
+    Validation["event-validation<br/>inkl. Höchstdauer 12 h"]
+    Search["event-search<br/>Filter, Kalenderfenster"]
     Participation["participation<br/>Teilnahmeregeln"]
-    Presentation["event-presentation<br/>Plätze, Zustand, Datum"]
-    MapLogic["map (geplant)<br/>Marker-Daten, Stil-Anpassung"]
+    Presentation["event-presentation<br/>Plätze, Zustand, Termin mit Dauer, Heute/Morgen"]
+    AuthCore["auth<br/>credential-validation, AuthError"]
+    MapLogic["map<br/>map-theme, marker-grouping"]
+    UiLogic["ui<br/>sheet-snap, focus-trap"]
   end
   subgraph DATA["Datenzugriff (src/lib/data)"]
     Port["EventRepository<br/>(Schnittstelle)"]
-    Factory["repository-factory"]
-    Local["LocalEventRepository<br/>localStorage + Demopersonen"]
-    Remote["SupabaseEventRepository<br/>supabase-js"]
-    Auth["AuthGateway (geplant)<br/>Anmelden, Registrieren"]
+    AuthPort["AuthGateway<br/>(Schnittstelle)"]
+    Factory["data-services<br/>Wahl lokal/Supabase"]
+    Local["LocalEventRepository + LocalAuthGateway<br/>Treffen im Arbeitsspeicher, Konten/Sitzung in localStorage (ADR-0010)"]
+    Remote["SupabaseEventRepository + SupabaseAuthGateway<br/>supabase-js, Fehlerübersetzung"]
   end
   Supa[("Supabase<br/>Auth + Postgres/RLS + RPC")]
   Tiles["OpenFreeMap<br/>Vektorkacheln + Stil"]
 
-  Pages --> Sheet & MapStage & Form & Nav
-  Sheet --> Presentation & Search
+  Pages --> Sheet & MapStage & Form & Nav & Hooks
+  Hooks -->|K1 Methodenaufruf| Services
+  Services --> Factory
+  Sheet --> Presentation & UiLogic
   Form --> Validation
   MapStage --> MapLogic
-  Pages -->|K1 Methodenaufruf| Port
   Factory --> Local & Remote
-  Local -.implementiert.-> Port
-  Remote -.implementiert.-> Port
+  Local -.implementiert.-> Port & AuthPort
+  Remote -.implementiert.-> Port & AuthPort
   Local --> Participation & Search & Validation
-  Remote --> Model
+  Remote --> Search & Validation & AuthCore
   Remote -->|K2 HTTPS REST/RPC, JWT| Supa
-  Auth -->|K3 HTTPS Auth| Supa
+  Remote -->|K3 HTTPS Auth| Supa
   MapStage -->|K4 HTTPS Kacheln| Tiles
   Validation & Search & Participation & Presentation --> Model
 ```
@@ -142,17 +147,19 @@ Supabase Data API (PostgREST: Tabellenlesen, `rpc()`), Nutzer-JWT im Header; **K
 
 | Baustein | Aufgabe | Darf abhängen von | Verbirgt (Information Hiding) |
 | --- | --- | --- | --- |
-| Seiten (`src/app`) | Routen, Seitenzustand, Verdrahtung von Repository und Komponenten | Komponenten, Kernlogik, `EventRepository`, `createEventRepository` | – |
-| Kartenbühne (`components/map`) | MapLibre initialisieren, Tokens anwenden, Marker, Flug zum Treffen, Fallback "Karte offline" | `src/lib/map`, Kernlogik-Typen | MapLibre-API, Stil-Layer-Namen |
-| Bottom Sheet / Liste / Detail | Rastpunkte, Gesten, Trefferliste, Detailansicht, Teilnehmen-Knopf | Kernlogik (Presentation, Participation-Vorabprüfung) | Gestenberechnung, Animation (`motion`) |
-| Erstellen-Assistent | Drei Schritte, Feldvalidierung | `event-validation`, `EventRepository` | Schrittzustand |
-| `src/lib/events` | Fachregeln: Validierung, Suche/Filter, Teilnahmeregeln, abgeleitete Zustände, Anzeigetexte | nichts (nur Standard-JS, `Intl`) | Regeldetails hinter wenigen exportierten Funktionen |
-| `src/lib/map` (geplant) | reine Kartenlogik: Treffen → Marker-Daten, Stil-Anpassungen als Daten | Kernlogik-Typen | – |
-| `EventRepository` | Vertrag für Lesen/Schreiben von Treffen | Kernlogik-Typen | Speicherort |
-| `LocalEventRepository` | Demo-Modus: Zustand in localStorage, Demopersonen, tägliches Neu-Befüllen | Kernlogik | Speicherschlüssel, JSON-Format |
-| `SupabaseEventRepository` | Supabase-Modus: Abfragen, RPC-Aufrufe, Abbildung Zeile ↔ `SportEvent`, Fehlercode → `EventError` | Kernlogik-Typen, `@supabase/supabase-js` | Tabellen-/Spaltennamen, SQL-Fehlercodes |
-| `AuthGateway` (geplant) | Anmelden, Registrieren, Abmelden, aktuelle Person | `@supabase/supabase-js` bzw. Demopersonen | Sitzungsdetails |
-| `repository-factory` | Wahl lokal/Supabase anhand der Umgebungsvariablen | beide Umsetzungen | Konfiguration |
+| Seiten (`src/app`) | Routen, Seitenzustand, Verdrahtung der Komponenten | Komponenten, Hooks, Kernlogik | – |
+| Hooks (`src/hooks`) | Laden der Treffer/Details, Teilnahme-Aktionen mit Rückmeldung, Dialog-Fokus, Medienabfrage | `DataServices` (über `app-services`), Kernlogik | Ladezustand, Fehlerbehandlung |
+| Kartenbühne (`components/map`) | MapLibre initialisieren, Tokens anwenden, Marker und Gruppen mit Anzahl, Auffächern, Flug zum Treffen, Offline-Karte | `src/lib/map`, Kernlogik-Typen | MapLibre-API, Stil-Layer-Namen |
+| Bottom Sheet / Liste / Detail | Rastpunkte, Gesten, Trefferliste, Detailansicht, Teilnehmen-Knopf, Bestätigungsdialog | Kernlogik (Presentation, Participation-Vorabprüfung, `src/lib/ui`) | Gestenberechnung, Animation (`motion`) |
+| Erstellen-Assistent | Drei Schritte, Feldvalidierung, Ortswahl per Karte | `event-validation`, `EventRepository` | Schrittzustand |
+| `src/lib/events` | Fachregeln: Validierung, Suche/Filter, Teilnahmeregeln, abgeleitete Zustände, Anzeigetexte, Demodaten | nichts (nur Standard-JS, `Intl`) | Regeldetails hinter wenigen exportierten Funktionen |
+| `src/lib/auth` | Prüfung der Registrierungseingaben, `AuthError`, Typ `AuthUser` | nichts | Regeln für E-Mail/Passwort |
+| `src/lib/map` | reine Kartenlogik: Kartenfarben aus Tokens (`buildMapTheme`), Marker-Gruppen ohne Überlappung (`groupOverlappingMarkers`, `canSpreadGroup`, `findMarkerBounds`), Offline-Projektion (`placeOnOfflinePlane`) | Kernlogik-Typen | Gruppierungsverfahren |
+| `src/lib/ui` | reine Bedienlogik: Rastpunkte des Bottom Sheets (`sheet-snap`), Fokusfalle (`findTrapTarget`) | nichts | Berechnung |
+| `EventRepository` / `AuthGateway` | Verträge für Treffen bzw. Anmeldung | Kernlogik-Typen | Speicherort |
+| `LocalEventRepository`, `LocalAuthGateway`, `LocalSession` | Demo-Modus: Treffen nur im Arbeitsspeicher (Neuladen = Ausgangszustand, ADR-0010), Demo-Konten und Sitzung in `localStorage`, Demopersonen | Kernlogik | Speicherschlüssel, JSON-Format |
+| `SupabaseEventRepository`, `SupabaseAuthGateway` | Supabase-Modus: Abfragen, RPC-Aufrufe, Abbildung Zeile ↔ `SportEvent` (`event-row-mapping`), Fehlercode → deutsche Meldung (`supabase-error-translation`) | Kernlogik, `@supabase/supabase-js` | Tabellen-/Spaltennamen, SQL-Fehlercodes |
+| `data-services` | Wahl lokal/Supabase anhand der Umgebungsvariablen; eine Instanz je Browser | beide Umsetzungen | Konfiguration |
 | Supabase (extern) | Konten, Sitzungen, Daten, RLS, atomare Fachoperationen | – | Passwörter, Sperren, Rechte |
 
 ### 4.2 Schnittstellen
@@ -174,18 +181,20 @@ technische Fehler (Netz, unerwartet): `Error`.
 | `leaveEvent(eventId: string): Promise<SportEvent>` | angemeldet, nicht Organisator | Person ist nicht mehr Teilnehmende; war nicht dabei → unverändert | `AUTH_REQUIRED`; `EVENT_NOT_FOUND`; `ORGANIZER_CANNOT_LEAVE` → "Als organisierende Person kannst du das gesamte Treffen absagen."; `EVENT_CANCELLED`; `EVENT_STARTED` |
 | `cancelEvent(eventId: string): Promise<SportEvent>` | angemeldet, Organisator | Status `cancelled` (endgültig); bereits abgesagt → unverändert | `AUTH_REQUIRED`; `EVENT_NOT_FOUND`; `NOT_ORGANIZER` → "Nur die organisierende Person darf das Treffen absagen."; `EVENT_STARTED` |
 
-Nur lokal: `LocalEventRepository.switchUser(userId: string | null)` wählt eine Demoperson (Fehler:
-keine Demoperson). Nur Supabase (geplant): `listParticipants(eventId)` über RPC `list_event_participants`
-(`NOT_PARTICIPANT` → "Nur Teilnehmende sehen die Liste.").
+`listParticipants(eventId): Promise<ParticipantEntry[]>` (umgesetzt in beiden Repositories): Namen nur für Mitglieder, sonst
+leere Liste (Supabase: RPC `list_event_participants`, `NOT_PARTICIPANT` → leere Liste). Die Wahl einer Demoperson liegt beim
+`AuthGateway` (`listDemoAccounts`, `signInAsDemo`; im Supabase-Modus ohne Demo-Konten). Die Meldung zu `EVENT_FULL` lautet
+„Leider gerade ausgebucht.“; `INVALID_INPUT` mit `events_max_duration` ergibt die Meldung zur Höchstdauer (BUG-04).
 
 #### Kernlogik (`src/lib/events`, Auswahl)
 | Modul | Funktion | Zweck | Fehlerfälle |
 | --- | --- | --- | --- |
-| event-validation | `findEventInputError(input, now): EventError \| null`, `validateEventInput(input, now): void` | erstes ungültiges Feld in Formularreihenfolge | wirft `EventError` (nur `validate…`) |
-| event-search | `searchEvents(events, filters, userId, now): SportEvent[]`, `toBerlinDay(moment): string` | Filtern/Sortieren, Kalendertag Berlin | `RangeError` bei ungültigem Datum |
-| participation | `checkJoinAvailability(event, userId, now)`, `addParticipant`, `removeParticipant`, `cancelEvent` | Vorabprüfung für Knopf; Regeln im Demo-Modus | `EventError` |
-| event-creation | `createEvent(input, userId, eventId, now): SportEvent` | neues Treffen, Organisator nimmt teil | `EventError` |
-| event-presentation | `summarizePlaces(event)`, `describeAgeGroup(value)`, Zustand | Anzeigetexte ("Noch 3 Plätze"), abgeleiteter Zustand | wirft nicht |
+| event-validation | `findEventInputError(input, now): EventError \| null`, `validateEventInput(input, now): void`, `describeFieldRule(field)` | erstes ungültiges Feld in Formularreihenfolge; Dauer höchstens 12 h | wirft `EventError` (nur `validate…`) |
+| event-search | `searchEvents(events, filters, now): SportEvent[]`, `toBerlinDay(moment)`, `buildCalendarWindow(now)` | Filtern/Sortieren, Kalendertag Berlin | `RangeError` bei ungültigem Datum |
+| participation | `checkJoinAvailability(event, now)`, `addParticipant`, `removeParticipant`, `cancelEvent` | Vorabprüfung für Knopf; Regeln im Demo-Modus | `EventError` |
+| event-creation | `createEvent(input, organizer, eventId, now): StoredEvent` | neues Treffen, Organisator nimmt teil | `EventError` |
+| event-presentation | `summarizePlaces`, `describeAgeGroup`, `describeEventStatus`, `describeCost`, `describeBringAlong`, `formatEventSchedule`, `describeDayLabel`, `countMissingParticipants` | Anzeigetexte („5 von 10 Plätzen frei“, „Alter: offen für alle“, „… 17:00–19:00 Uhr · 2 Std.“, „Heute“) | `RangeError` bei ungültigem Datum (Termin, Tagesangabe) |
+| viewer-events, list-order, failure-message | `splitViewerEvents`, `orderEventCards`, `describeActionFailure` | Meine Treffen/Profilzähler, „Ausgebuchte zuletzt“, Fehlertexte nie roh | wirft nicht |
 
 #### Supabase-RPC (Postgres-Funktionen, `supabase/migrations/0001_initial_schema.sql`)
 Alle `security definer`, `set search_path = ''`, nur `authenticated` darf ausführen, Identität aus `auth.uid()`.
@@ -206,28 +215,37 @@ erneut versuchen." Die Abbildung Code → Meldung steht genau einmal in `Supabas
 
 ```
 src/
-  app/                      Routen (App Router): page.tsx = Entdecken, meine-treffen/, erstellen/, profil/, anmelden/
+  app/                      Routen (App Router): (entdecken)/page.tsx = Entdecken, (entdecken)/treffen/[id]/ = Detail,
+                            meine-treffen/, erstellen/, profil/, anmelden/
   components/
-    map/                    Kartenbühne (MapLibre, Marker, Fallback), nur Client
-    sheet/                  Bottom Sheet mit Rastpunkten
-    event/                  Trefferkarte, Detailansicht, Teilnehmen-Knopf
-    create-event/           Erstellen-Assistent (3 Schritte)
+    app/                    App-Rahmen, Seitenrahmen, Toasts, app-services (DataServices für die Oberfläche)
+    auth/                   Anmelde-/Registrierformular, Rücksprungziel
+    create-event/           Erstellen-Assistent (3 Schritte), Entwurf → EventInput
+    discover/               Entdecken: Suchleiste, Sportarten-Chips, Filterdialog, Trefferliste, Erstbesuch-Hinweis
+    event/                  Trefferkarte, Detailansicht, Teilnehmen-Knopf, Bestätigungsdialog, Belegungsbalken
+    map/                    Kartenbühne (MapLibre, Offline-Karte, Marker- und Gruppen-Pillen, Ortswahl), nur Client
+    my-events/              Meine Treffen
     navigation/             Tab-Leiste (mobil), Seitenleiste (Desktop)
-    ui/                     Grundelemente (Button, Chip, Feld) nach design.md
+    profile/                Profil mit Zählern „dabei“ / „organisiert“
+    sheet/                  Bottom Sheet mit Rastpunkten
+  hooks/                    use-event-list, use-event-detail, use-participation, use-dialog-focus, use-media-query, use-stored-flag
   lib/
-    events/                 Kernlogik Treffen (rein): event-model, event-validation, event-search,
-                            participation, event-creation, event-presentation, list-order,
-                            event-error, acting-user, demo-events, demo-people
-    map/                    reine Kartenlogik (geplant): Marker-Daten, Stil-Anpassung
-    data/                   Datenzugriff: event-repository (Schnittstelle), local-event-repository,
-                            supabase-event-repository, repository-factory, auth-gateway (geplant)
-e2e/                        Playwright-Akzeptanztests (lokaler Modus, Karten-Fallback)
-tests/integration/          Vitest-Integrationstests (z. B. Vertragstests für beide Repositories)
+    events/                 Kernlogik Treffen (rein): event-model, stored-event, event-validation, event-search,
+                            participation, event-creation, event-presentation, list-order, viewer-events,
+                            failure-message, event-error, acting-user, demo-events, demo-people
+    auth/                   credential-validation, auth-error, auth-user
+    map/                    map-theme (Kartenfarben aus Tokens), marker-grouping (Gruppen, Auffächern, Offline-Projektion)
+    ui/                     sheet-snap (Rastpunkte), focus-trap (Fokusfalle der Dialoge)
+    data/                   Datenzugriff: event-repository und auth-gateway (Schnittstellen), local-event-repository,
+                            local-auth-gateway, local-session, key-value-storage, supabase-event-repository,
+                            supabase-auth-gateway, supabase-client, event-row-mapping, supabase-error-translation, data-services
+e2e/                        Playwright-Akzeptanztests (lokaler Modus, Offline-Karte), 59 Tests × 2 Projekte
+tests/integration/          Vitest-Integrationstests (lokal; Supabase nur mit SUPABASE_INTEGRATION=1)
 supabase/
-  migrations/0001_initial_schema.sql
+  migrations/0001_initial_schema.sql, 0002_cost_limit.sql
   seed.sql
   README.md
-docs/decisions/             ADRs
+docs/decisions/             ADRs 0001–0010
 ```
 Mutation Testing (SE-Eval/Stryker) zielt auf `src/lib/`. `demo-events.ts`/`demo-people.ts` sind Daten
 und können dort ausgenommen werden (Vorschlag).
@@ -253,13 +271,13 @@ sequenceDiagram
     DB-->>R: eigene Zeilen
     R->>R: Zeilen auf SportEvent abbilden
   else Lokaler Modus
-    R->>R: Zustand aus localStorage lesen
+    R->>R: Treffen aus dem Arbeitsspeicher lesen (ADR-0010)
   end
   R->>S: searchEvents(events, filters, userId, now)
   S-->>R: gefilterte, sortierte Treffer
   R-->>P: SportEvent[]
   par gleiche Treffer an beide Ansichten
-    P->>M: Marker setzen
+    P->>M: Marker setzen, überlappende zu Gruppen mit Anzahl (marker-grouping)
   and
     P->>L: Liste "12 Treffen in der Nähe"
   end
@@ -290,7 +308,7 @@ sequenceDiagram
     DB->>DB: Trigger: participant_count = 1
     DB-->>R: events-Zeile
   else Lokaler Modus
-    R->>R: createEvent aus Kernlogik, in localStorage speichern
+    R->>R: createEvent aus Kernlogik, im Arbeitsspeicher ablegen
   end
   R-->>F: SportEvent
   F-->>O: Detailansicht, Karte fliegt zum Treffpunkt
@@ -321,7 +339,7 @@ sequenceDiagram
   RA-->>A: "Du bist dabei", Zähler zählt hoch
   DB->>DB: B: liest neuen Stand 8 von 8
   DB-->>RB: Fehler EVENT_FULL
-  RB-->>B: EventError "Ausgebucht", Liste neu laden
+  RB-->>B: EventError "Leider gerade ausgebucht.", Liste neu laden
   Note over DB: Zweites Netz: Check events_not_overbooked verhindert Überbuchung auch bei Codefehler
 ```
 
@@ -384,25 +402,26 @@ keine Klasse.
 ```mermaid
 classDiagram
   class SportEvent {
+    <<type>>
     +id: string
-    +title: string
-    +sport: Sport
-    +meetingPoint: string
-    +latitude: number
-    +longitude: number
-    +startsAt: string
-    +endsAt: string
-    +capacity: number
-    +minParticipants: number
-    +level: Level
-    +ageGroup: AgeGroup
-    +description: string
     +organizerId: string
+    +organizerName: string
     +status: EventStatus
-    +participants: string[]
+    +participantCount: number
+    +isViewerParticipant: boolean
+    +isViewerOrganizer: boolean
+    +isDemo: boolean
   }
   class EventInput {
     <<type>>
+    +title, sport, locationName, meetingPoint
+    +latitude, longitude, startsAt, endsAt
+    +capacity, minParticipants, level, ageGroup
+    +costCents, bringAlong, description
+  }
+  class StoredEvent {
+    <<type>>
+    +members: EventMember[]
   }
   class EventFilters {
     +query: string
@@ -426,20 +445,50 @@ classDiagram
     +joinEvent(eventId) Promise~SportEvent~
     +leaveEvent(eventId) Promise~SportEvent~
     +cancelEvent(eventId) Promise~SportEvent~
+    +listParticipants(eventId) Promise~ParticipantEntry[]~
+  }
+  class AuthGateway {
+    <<interface>>
+    +getCurrentUser() Promise~AuthUser or null~
+    +signUp(input) Promise~AuthUser~
+    +signIn(input) Promise~AuthUser~
+    +signOut() Promise~void~
+    +onAuthChange(listener) Unsubscribe
+    +listDemoAccounts() AuthUser[]
+    +signInAsDemo(userId) Promise~AuthUser~
   }
   class LocalEventRepository {
-    -storage: KeyValueStorage
+    -storage: KeyValueStorage im Arbeitsspeicher
+    -session: LocalSession
     -now: Clock
-    +switchUser(userId) Promise~void~
+  }
+  class LocalAuthGateway {
+    -storage: KeyValueStorage in localStorage
+    -session: LocalSession
+  }
+  class LocalSession {
+    +getUser() AuthUser or null
+    +setUser(user)
+    +subscribe(listener)
   }
   class SupabaseEventRepository {
     -client: SupabaseClient
-    -mapRow(row) SportEvent
-    -mapError(error) EventError or Error
   }
-  class RepositoryFactory {
+  class SupabaseAuthGateway {
+    -client: SupabaseClient
+  }
+  class DataServices {
+    <<module data-services>>
+    +createDataServices() DataServices
+    +buildDataServices(environment, persistent) DataServices
+  }
+  class EventRowMapping {
     <<module>>
-    +createEventRepository(environment, storage) EventRepository
+    +mapEventRow(row, viewer) SportEvent
+  }
+  class ErrorTranslation {
+    <<module supabase-error-translation>>
+    +translateEventError(error) EventError
   }
   class EventValidation {
     <<module>>
@@ -448,51 +497,55 @@ classDiagram
   }
   class EventSearch {
     <<module>>
-    +searchEvents(events, filters, userId, now) SportEvent[]
-    +toBerlinDay(moment) string
+    +searchEvents(events, filters, now) SportEvent[]
+    +buildCalendarWindow(now) CalendarWindow
   }
   class Participation {
     <<module>>
-    +checkJoinAvailability(event, userId, now) JoinAvailability
-    +addParticipant(event, userId, now) SportEvent
-    +removeParticipant(event, userId, now) SportEvent
-    +cancelEvent(event, userId, now) SportEvent
+    +checkJoinAvailability(event, now) JoinAvailability
+    +addParticipant(event, member, now) StoredEvent
+    +removeParticipant(event, userId, now) StoredEvent
+    +cancelEvent(event, userId, now) StoredEvent
   }
   class EventPresentation {
     <<module>>
     +summarizePlaces(event) PlaceSummary
-    +describeAgeGroup(value) string
+    +formatEventSchedule(startsAt, endsAt) string
+    +describeDayLabel(iso, now) string
+  }
+  class MarkerGrouping {
+    <<module src/lib/map>>
+    +groupOverlappingMarkers(markers, box) MarkerGroup[]
+    +canSpreadGroup(members) boolean
+    +placeOnOfflinePlane(points, size) ScreenPosition[]
   }
   SportEvent --|> EventInput
+  StoredEvent --|> EventInput
   EventRepository <|.. LocalEventRepository
   EventRepository <|.. SupabaseEventRepository
-  RepositoryFactory ..> LocalEventRepository : erzeugt
-  RepositoryFactory ..> SupabaseEventRepository : erzeugt
+  AuthGateway <|.. LocalAuthGateway
+  AuthGateway <|.. SupabaseAuthGateway
+  LocalEventRepository --> LocalSession
+  LocalAuthGateway --> LocalSession
+  DataServices ..> LocalEventRepository : erzeugt
+  DataServices ..> SupabaseEventRepository : erzeugt
   LocalEventRepository ..> Participation
   LocalEventRepository ..> EventSearch
   SupabaseEventRepository ..> EventSearch
+  SupabaseEventRepository ..> EventRowMapping
+  SupabaseEventRepository ..> ErrorTranslation
+  ErrorTranslation ..> EventValidation
   EventRepository ..> SportEvent
   EventRepository ..> EventFilters
   Participation ..> EventError
   EventValidation ..> EventError
   EventPresentation ..> SportEvent
+  EventPresentation ..> EventSearch
 ```
 
-**Nötige Erweiterung des Modells (offen, vor der Supabase-Story):** Im Supabase-Modus darf niemand die
-Teilnehmerliste fremder Treffen lesen. `SportEvent` braucht daher `participantCount: number` (Belegung
-inkl. externer Plätze) und `isViewerParticipant: boolean`; `participants` enthält dort höchstens die eigene
-Kennung. `summarizePlaces` und `checkJoinAvailability` müssen auf `participantCount` umgestellt werden.
-Für design.md (Schritt 3 "Kosten, Mitbringen") und Seed-Treffen zusätzlich: `locationName`, `costCents`,
-`bringAlong`, `organizerName`, `isDemo`. Spaltennamen siehe Datenmodell.
-
-Hinweis zum Stand: Die im Absatz oben als „offen“ genannte Modellerweiterung ist inzwischen umgesetzt. Laut
-`specs/F-22/spec.md` (Abschnitt Entwurf) hat `SportEvent` keine öffentliche Teilnehmerliste mehr, sondern
-`participantCount`, `isViewerParticipant`, `isViewerOrganizer`, `organizerName`, `locationName`, `costCents`,
-`bringAlong`, `isDemo`; neu ist `EventRepository.listParticipants`. Für die Anmeldung kam laut `specs/F-01/spec.md` die
-Schnittstelle `AuthGateway` (`getCurrentUser`, `signUp`, `signIn`, `signOut`, `onAuthChange`, `listDemoAccounts`,
-`signInAsDemo`) mit lokaler und Supabase-Umsetzung hinzu; `repository-factory` wurde durch `data-services`
-(`createDataServices(): { events, auth, mode }`) ersetzt. Das Klassendiagramm in `docs/architecture.md` ist darauf noch
-nicht angepasst (siehe Lücken).
+Die früher als „nötige Erweiterung“ genannten Felder (`participantCount`, `isViewerParticipant`, `locationName`, `costCents`,
+`bringAlong`, `organizerName`, `isDemo`) sind umgesetzt. Teilnehmende stehen nur in `StoredEvent` (lokaler Modus), nie in
+`SportEvent`; Namen liefert `listParticipants`.
 
 ## 7. Datenmodell (ER-Diagramm) und Sicherheitskonzept
 
@@ -565,7 +618,7 @@ erDiagram
 | events | min_participants | smallint | 2…capacity, Standard 2 |
 | events | level | text | `Alle Niveaus`, `Anfänger`, `Fortgeschritten`, `Erfahren` |
 | events | age_group | text | leer (= alle), `unter 20`, `20–25`, `26–30`, `31–40`, `über 40` |
-| events | cost_cents | int | 0–10000, 0 = kostenlos |
+| events | cost_cents | int | 0–5000, 0 = kostenlos (Migration `0002_cost_limit.sql`, REV-08) |
 | events | bring_along | text | ≤ 200 Zeichen |
 | events | participant_count | smallint | ≥ 0, nur Trigger schreibt |
 | events | external_participants | smallint | ≥ 0, nur Seed (ADR-0008) |
@@ -630,9 +683,6 @@ flowchart LR
 Im lokalen Demo-Modus entfallen die Verbindungen zu Supabase; ohne Netz zusätzlich OpenFreeMap
 (Fallback "Karte offline"). Vercel führt keine eigene Fachlogik aus.
 
-Betrieb (Stand 23.11.2026): Die App ist unter <https://sportmate-gamma.vercel.app> auf Vercel bereitgestellt; Daten
-liegen in einem Supabase-Projekt des Teams. Schema per Migration, Demodaten per `supabase/seed.sql`.
-
 ## 9. Entwurfsprinzipien und wo sie im Code sichtbar sind
 
 - **Modularisierung / hohe Kohäsion:** Eine Datei, eine Aufgabe (Validierung, Suche, Teilnahme, Anzeige
@@ -656,9 +706,10 @@ Belege aus dem Review vom 23.11.2026 (`docs/testing/review-protokoll.md`, „Pos
 | Nichts doppelt | E6 | Teilnahme-Button-Logik einmal in `resolveJoinAction`, von Liste und Detail genutzt; Fehlertexte der Datenbankcodes an einer Stelle (`supabase-error-translation.ts`) |
 | Sicherheitsgrenze in der Datenbank | S1–S3 | RLS auf allen Tabellen; Schreiben nur per RPC mit `security definer`, `search_path = ''`, `auth.uid()`; Zeilensperre `select … for update` plus Check-Constraint `events_not_overbooked` |
 
-Bekannte Verstöße aus demselben Review: doppelte „Heute/Morgen“-Logik in der Oberfläche (`src/components/event/day-label.ts`,
-REV-04), harte Farbwerte statt Design-Tokens (REV-07), 12-Stunden-Regel nur in SQL, nicht in der Kernlogik (REV-01/BUG-04),
-Kostenobergrenze TS 5000 Cent vs. SQL 10000 Cent (REV-08).
+Im selben Review gefundene Verstöße, inzwischen behoben: doppelte „Heute/Morgen“-Logik in der Oberfläche (REV-04, jetzt
+`describeDayLabel` in `src/lib/events/event-presentation.ts`, `126600d`), harte Farbwerte statt Design-Tokens (REV-07, `c369461`),
+12-Stunden-Regel nur in SQL (REV-01/BUG-04, jetzt auch in `event-validation.ts`, `ded1894`), Kostenobergrenze TS 5000 Cent vs.
+SQL 10000 Cent (REV-08, Migration `0002_cost_limit.sql`). Offen: REV-10 (öffentliche `organizer_id`), REV-13 (Zeilentypen).
 
 ## 10. Entscheidungen (ADR 0001–0010)
 
@@ -685,46 +736,38 @@ Demo-Modus (ADR-0003). Zurückgestellt: Hinweise/Benachrichtigungen, Treffen bea
 
 ## 11. Nachvollziehbarkeit Anforderung → Realisierung
 
-Die Tabelle in `docs/architecture.md` trägt noch Platzhalter-IDs („F-xx“), weil sie vor dem Backlog entstand. Unten sind
-die Story-IDs aus `docs/backlog.md` zugeordnet (Zuordnung durch den reporter über die Story-Titel; vom Team zu prüfen).
+Story-IDs aus `docs/backlog.md`, Status nach dem Endlauf vom 23.11.2026.
 
 | Story | Bausteine | Schnittstellen | Daten |
 | --- | --- | --- | --- |
-| F-05, F-08 Treffen in Liste und auf der Karte | Seite Entdecken, Kartenbühne, Bottom Sheet | `listEvents`, `searchEvents`, `summarizePlaces` | events (SELECT anon) |
-| F-06, F-07, F-09 Filtern (Sportart, Zeit, Niveau, Alter, Text) | Bottom Sheet/Chips, Filterdialog, event-search | `listEvents(filters)` | events |
-| F-12, F-13, F-14 Details | Sheet-Detail, event-presentation | `getEvent` | events, profiles (Organisatorname) |
+| F-05 Liste, F-08 Karte (Marker-Gruppen) | Entdecken, Kartenbühne, Bottom Sheet, `src/lib/map` | `listEvents`, `searchEvents`, `summarizePlaces`, `groupOverlappingMarkers` | events (SELECT anon) |
+| F-06/F-07/F-09 Filtern und Suche | Suchleiste, Chips, Filterdialog, event-search | `listEvents(filters)` | events |
+| F-12/F-13/F-14 Details | Detail, event-presentation | `getEvent`, `formatEventSchedule`, `describeCost` | events, profiles (Organisatorname) |
 | F-17 Treffen erstellen | Erstellen-Assistent, event-validation | `createEvent` → `create_event` | events, participations |
-| F-22 Teilnehmen (inkl. letzter Platz) | Teilnehmen-Knopf, participation | `joinEvent` → `join_event` | participations, events.participant_count |
-| F-23 Teilnahme zurückziehen | Detail, participation | `leaveEvent` → `leave_event` | participations |
-| F-18 Treffen absagen | Detail, participation | `cancelEvent` → `cancel_event` | events.status |
-| F-01, F-02 Registrieren und anmelden | Seite Anmelden, AuthGateway | `signUp`, `signIn`, `signOut` | auth.users, profiles (Trigger) |
-| F-24 Meine Treffen | Seite Meine Treffen | `listEvents({ mine: true })` | participations (eigene) |
-| F-32 Demo-Modus | data-services, LocalEventRepository, LocalAuthGateway | `createDataServices` | Arbeitsspeicher, localStorage (Konten, Sitzung) |
+| F-22 Teilnehmen (inkl. letzter Platz) | Teilnehmen-Knopf, `use-participation`, participation | `joinEvent` → `join_event` | participations, events.participant_count |
+| F-23 Teilnahme zurückziehen | Detail, Bestätigungsdialog | `leaveEvent` → `leave_event` | participations |
+| F-18 Treffen absagen | Detail, Bestätigungsdialog | `cancelEvent` → `cancel_event` | events.status |
+| F-01/F-02 Registrieren, anmelden, Gast | Seite Anmelden, `AuthGateway` | `signUp`, `signIn`, `signOut`, `onAuthChange` | auth.users, profiles (Trigger) |
+| F-24 Meine Treffen, Profilzähler | Meine Treffen, Profil, viewer-events | `listEvents({ mine: true })`, `splitViewerEvents` | participations (eigene) |
+| F-32 Demo-Modus ohne Server | data-services, LocalEventRepository, LocalAuthGateway | `createDataServices`, `signInAsDemo` | Arbeitsspeicher (Treffen), localStorage (Konten, Sitzung) |
 | F-20 Teilnehmerliste | Detail | `listParticipants` → `list_event_participants` | participations, profiles |
 
 ## 12. Risiken und offene Punkte
 
 - **Freigaben des Menschen:** Abhängigkeitsrichtung (ADR-0003); Migration und Seed (Rechte/Schema) lesen.
-- **SQL nicht ausgeführt:** Migration und Seed sind ungetestet. Erst auf leerem Projekt anwenden, Prüfschritte
-  in `supabase/README.md`. Speziell prüfen: Trigger in Schema `private` feuert für `supabase_auth_admin`
-  (Registrierung und Konto-Löschung).
-- **Paralleltest fehlt:** Überbuchungsschutz ist nur durch Entwurf und manuellen `psql`-Test belegt.
-- **Modellerweiterung:** `participantCount`, `isViewerParticipant`, `locationName`, `costCents`, `bringAlong`,
-  `organizerName`, `isDemo` im TS-Modell fehlen noch (siehe Detailentwurf). Ohne sie kann
-  `SupabaseEventRepository` `SportEvent` nicht ehrlich befüllen.
-- **Doppelte Regeln TS/SQL:** Abweichungen möglich; Vertragstests für beide Repositories einplanen.
+- **SQL angewendet und getestet:** Migrationen `0001` und `0002` laufen auf der Supabase-DB; Integrationslauf mit echter DB
+  285/285 (23.11.2026). Menschliches Review der Migrationen steht weiter aus. Kopfkommentar in `0001` nennt noch „nicht
+  ausgeführt“ (REV-09).
+- **Paralleltest fehlt:** Überbuchungsschutz ist durch Entwurf, Review und sequenziellen Vollstand (Integrationstest) belegt, nicht durch einen automatischen Paralleltest.
+- **Ungeprüfte Zeilentypen:** `data as unknown as EventRow` ohne Laufzeitprüfung (REV-13); `organizer_id` für `anon` lesbar (REV-10, Entscheidung offen).
+- **Doppelte Regeln TS/SQL:** Abweichungen möglich; Kostenobergrenze angeglichen (Migration `0002`, REV-08), Höchstdauer 12 h jetzt auch in der Kernlogik (BUG-04).
 - **Koordinaten der Demotreffen** nicht nachgemessen; vor Demo prüfen (lokal und Seed gleich halten).
 - **OpenFreeMap** ohne Verfügbarkeitszusage; Fallback ist Pflicht. Datenschutzhinweis zu Kacheln offen.
 - **Supabase kostenloser Tarif:** Pausieren inaktiver Projekte möglich (Grenzen bei Einrichtung prüfen).
 - **Passwortlänge** (8 vs. 12) und E-Mail-Bestätigung für echten Betrieb offen.
 - **Vision und Qualitätsziele** noch Vorlage; Treiber oben sind Annahmen.
-- Zurückgestellt (keine Story): Treffen bearbeiten, Hinweise/Benachrichtigungen, Umkreissuche/GPS,
+- Zurückgestellt (Stories offen): Treffen bearbeiten, Hinweise/Benachrichtigungen, Umkreissuche/GPS,
   Profile mit Sportarten, Buchungspilot, Bewertungen.
-
-Stand 23.11.2026 dazu (`docs/testing/testbericht.md`, `docs/testing/fehlerprotokoll.md`): Migration und Seed wurden
-inzwischen gegen die Supabase-Datenbank ausgeführt (Integrationstests 2/2 grün nach Behebung von BUG-01, manuelle
-Smoke-Tests TC-M-04 bis TC-M-10 bestanden). Der automatische Paralleltest fehlt weiterhin. Die Modellerweiterung ist
-umgesetzt (siehe Abschnitt 6).
 
 ## 13. Lücken
 
@@ -732,10 +775,9 @@ Siehe auch `abgabe/LUECKEN.md`.
 
 | Bewertungskriterium | Was fehlt | Was das Team nachliefern muss |
 | --- | --- | --- |
-| Vollständiger Detailentwurf | Klassendiagramm zeigt den Stand vor F-01/F-22 (ohne `AuthGateway`, `data-services`, neue Modellfelder); `LocalEventRepository` dort noch mit `localStorage` statt Arbeitsspeicher (ADR-0010) | Klassendiagramm in `docs/architecture.md` aktualisieren (Rolle architect) |
 | Detailentwurf der Oberfläche | keine Diagramme für die React-Komponenten (Sheet, Karte, Assistent) | bei Bedarf Komponentendiagramm der Oberfläche |
 | Aktivitätsdiagramm | in `docs/abgabe.md` genannt, nicht vorhanden (Sequenz- und Zustandsdiagramme liegen vor) | Aktivitätsdiagramm z. B. für „Treffen erstellen“ ergänzen oder begründen |
 | Begründung aller Entscheidungen | alle ADRs „vorgeschlagen“, Freigabe offen; ADR-0003 verlangt ausdrücklich eine Freigabe der Abhängigkeitsrichtung; für ADR-0002/0007/0008/0009 keine Literaturquelle; neue npm-Abhängigkeiten ohne Notiz | Freigaben eintragen; Quellen ergänzen oder „Quelle offen“ begründen |
 | Architekturtreiber | Treiber im Dokument noch als „Annahmen des architect“ markiert, obwohl die Vision inzwischen vorliegt | mit `docs/vision.md` abgleichen |
-| Anforderung → Realisierung | Platzhalter-IDs in `docs/architecture.md` | Tabelle dort mit Story-IDs aktualisieren |
-| Menschliches Review | Migration und Anmelde-/Datenzugriffsdateien laut Review-Protokoll noch nicht von einem Menschen gelesen | Review durchführen und vermerken |
+| Menschliches Review | Migrationen `0001`/`0002` und Anmelde-/Datenzugriffsdateien laut Review-Protokoll noch nicht von einem Menschen gelesen | Review durchführen und vermerken |
+| Offene Entwurfsbefunde | REV-10 (`organizer_id` öffentlich lesbar, Entscheidung offen), REV-13 (Zeilentypen ohne Laufzeitprüfung) | ADR schreiben bzw. generierte Typen nutzen |
