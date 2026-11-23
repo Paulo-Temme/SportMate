@@ -1,8 +1,7 @@
 # Testfallkatalog SportMate
 
-Stand: 23.11.2026, ermittelt aus den Testdateien: Akzeptanztests von Commit `9f79927`; Vitest-Zahlen aus dem JSON-Lauf über den
-Arbeitsstand vom 23.11.2026, 13:15 (Commit `9f79927` plus nicht committete Änderungen des Coders an
-`event-presentation.test.ts` und `event-card.test.tsx`; der Coverage-Lauf um 13:13 zählte noch 245 statt 247 Fälle). Strategie und Regeln: `docs/teststrategie.md`. Ergebnisse der Läufe: `docs/testing/testbericht.md`.
+Stand: Endlauf 23.11.2026, ermittelt aus den Testdateien von Commit `004a9fa` (Branch `develop`, Arbeitsbaum sauber); Zahlen aus dem
+Vitest-JSON-Lauf und dem Playwright-Lauf desselben Commits. Strategie und Regeln: `docs/teststrategie.md`. Ergebnisse der Läufe: `docs/testing/testbericht.md`.
 
 Jede Zeile nennt Story/AK, Vorbedingung, Eingabe, das erwartete Ergebnis (Test-Orakel, steht so im Test) und die Fundstelle
 `Datei › Testname`. Gemeinsame Vorbedingung aller Akzeptanztests: Dev-Server im lokalen Modus mit Demodaten relativ zu „jetzt“,
@@ -12,36 +11,41 @@ Offline-Karte, `de-DE`, `Europe/Berlin`; jeder Test läuft in beiden Projekten (
 
 | Ebene | IDs | Anzahl Testfälle (automatisch) | davon im Katalog einzeln |
 | --- | --- | --- | --- |
-| Unit (`src/lib`) | TC-U-01 … TC-U-25 | 200 in 14 Dateien | 25 (repräsentativ) |
-| Komponente (`src/components`) | TC-K-01 … TC-K-15 | 39 in 7 Dateien | 15 (repräsentativ) |
+| Unit (`src/lib`) | TC-U-01 … TC-U-37 | 243 in 20 Dateien | 37 (repräsentativ) |
+| Unit/Komponente (`src/components`) | TC-K-01 … TC-K-21 | 34 in 6 Dateien (21 Komponententests in jsdom, 13 Unit-Tests reiner Hilfsfunktionen) | 21 (repräsentativ) |
 | Integration (`tests/integration`) | TC-I-01 … TC-I-08 | 8 in 3 Dateien (2 davon nur gegen echte DB) | 8 (vollständig) |
-| Akzeptanz / E2E (`e2e`) | TC-A-01 … TC-A-51 | 51 Tests × 2 Projekte = 102 Läufe | 51 (vollständig) |
+| Akzeptanz / E2E (`e2e`) | TC-A-01 … TC-A-59 | 59 Tests × 2 Projekte = 118 Läufe (1 davon gewollt übersprungen) | 59 (vollständig) |
 | Manuell / explorativ | TC-M-01 … TC-M-10 | – | 10 |
 
-Hinweis: Im Arbeitsstand nach `9f79927` kam ein weiterer Akzeptanztest hinzu (`e2e/f-12-details.spec.ts › F-12 AK2 (FB-45): Treffen
-ohne Altersgrenze zeigt "Alter: offen für alle"`, nicht committet, im Lauf vom 23.11.2026 noch nicht enthalten). Er wird nach dem Commit als TC-A-52 geführt.
+Vitest gesamt: 243 + 34 + 8 = 285 Fälle in 29 Dateien; im Standardlauf 283 bestanden, 2 übersprungen (Supabase ohne
+`SUPABASE_INTEGRATION=1`); mit echter DB 285/285 (Orchestrator, 23.11.2026). Hinweis: `sheet-snap.test.ts` und `map-theme.test.ts`
+liegen seit `ebe3eb4` unter `src/lib/ui` bzw. `src/lib/map` und zählen jetzt zu `src/lib` (im ersten Katalog unter Komponente).
 
 ## Unit-Tests: Anzahl je Datei
 
 | Datei | Tests | Gegenstand |
 | --- | ---: | --- |
-| `src/lib/events/event-creation.test.ts` | 44 | Erstellen, Feldvalidierung, Randwerte |
-| `src/lib/data/supabase-error-translation.test.ts` | 32 | Datenbank- und Auth-Codes → deutsche Meldungen |
-| `src/lib/events/event-presentation.test.ts` | 22 | Plätze, Status, Alter, Kosten, Datum |
+| `src/lib/events/event-creation.test.ts` | 48 | Erstellen, Feldvalidierung, Randwerte, Höchstdauer 12 h (BUG-04) |
+| `src/lib/data/supabase-error-translation.test.ts` | 33 | Datenbank- und Auth-Codes → deutsche Meldungen |
+| `src/lib/events/event-presentation.test.ts` | 30 | Plätze, Status, Alter, Kosten, Termin mit Dauer, Heute/Morgen |
 | `src/lib/events/demo-events.test.ts` | 14 | Demodaten relativ zu „jetzt“, Zeitumstellung |
 | `src/lib/auth/credential-validation.test.ts` | 13 | Registrierungseingaben |
+| `src/lib/map/marker-grouping.test.ts` | 12 | Marker-Gruppen ohne Überlappung, Auffächern, Offline-Projektion |
+| `src/lib/data/supabase-gateways.test.ts` | 12 | Supabase-Gateways mit gemocktem Client, Abbestellen (REV-12) |
 | `src/lib/events/event-search.test.ts` | 11 | Suche, Filter, Zeitraum, Berliner Kalendertag |
 | `src/lib/events/participation.test.ts` | 11 | Teilnehmen, Verlassen, Absagen, Vorabprüfung |
 | `src/lib/data/local-auth-gateway.test.ts` | 11 | lokale Anmeldung |
 | `src/lib/data/local-event-repository.test.ts` | 10 | lokaler Datenzugriff |
-| `src/lib/data/supabase-gateways.test.ts` | 10 | Supabase-Gateways mit gemocktem Client |
 | `src/lib/data/data-services.test.ts` | 9 | Wahl lokal/Supabase |
+| `src/lib/ui/sheet-snap.test.ts` | 7 | Rastpunkte des Bottom Sheets |
 | `src/lib/data/local-session.test.ts` | 6 | geteilte Sitzung |
 | `src/lib/data/event-row-mapping.test.ts` | 5 | Zeile ↔ Modell |
+| `src/lib/ui/focus-trap.test.ts` | 3 | Fokusfalle für Dialoge (REV-05/06) |
+| `src/lib/map/map-theme.test.ts` | 2 | Kartenfarben aus Tokens |
+| `src/lib/events/failure-message.test.ts` | 2 | Fehlertexte nie roh |
 | `src/lib/events/list-order.test.ts` | 2 | Ausgebuchte zuletzt |
-| **Summe** | **200** | |
-
-Vitest gesamt: 200 Unit + 39 Komponente + 8 Integration = 247 Fälle (davon 2 Supabase-Fälle ohne `SUPABASE_INTEGRATION=1` übersprungen).
+| `src/lib/events/viewer-events.test.ts` | 2 | Aufteilung organisiert/dabei (F-24) |
+| **Summe** | **243** | |
 
 ## Unit-Tests (repräsentative Auswahl)
 
@@ -72,11 +76,23 @@ Vitest gesamt: 200 Unit + 39 Komponente + 8 Integration = 247 Fälle (davon 2 Su
 | TC-U-23 | F-22 AK4 | DB-Fehler `EVENT_FULL` | `translateEventError` | `EventError` „Leider gerade ausgebucht.“ | `supabase-error-translation.test.ts › F-22 AK4: übersetzt EVENT_FULL` |
 | TC-U-24 | F-17 AK4 | DB-Fehler `INVALID_INPUT`, detail `events_capacity_range` | `translateEventError` | Feldmeldung für `capacity` aus `event-validation` | `supabase-error-translation.test.ts › F-17 AK4: INVALID_INPUT mit events_capacity_range ergibt eine Feldmeldung` |
 | TC-U-25 | F-22 | Supabase-Repository mit Mock-Client | `getEvent('demo-fussball')`, `joinEvent('kein-uuid')` | `null` bzw. „Dieses Treffen gibt es nicht.“, kein RPC-Aufruf | `supabase-gateways.test.ts › F-22: unbekannte Kennungen ohne UUID-Form gibt es nicht` |
+| TC-U-26 | F-17 AK4 (BUG-04) | gültiger Entwurf | Dauer 12 h bzw. 12 h 1 min | 12 h akzeptiert; 12 h 1 min abgelehnt mit eigener Meldung zur Höchstdauer | `event-creation.test.ts › F-17 AK4: 12 Stunden sind erlaubt, 12 Stunden und 1 Minute nicht – mit eigener Meldung` |
+| TC-U-27 | F-17 AK3/AK4 (BUG-04) | gültiger Entwurf | Ende vor Beginn | Meldung zur Reihenfolge, nicht zur Dauer | `event-creation.test.ts › F-17 AK4: Ende vor Beginn meldet weiterhin die Reihenfolge, nicht die Dauer` |
+| TC-U-28 | F-17 AK4 (BUG-04) | DB-Fehler `INVALID_INPUT`, detail `events_max_duration` | `translateEventError` | Meldung zur Höchstdauer statt „Das Ende muss nach dem Beginn liegen.“ | `supabase-error-translation.test.ts › F-17 AK4 (BUG-04): events_max_duration ergibt die Meldung zur Höchstdauer, nicht die zur Reihenfolge` |
+| TC-U-29 | F-12 AK1 | Beginn/Ende in Berliner Zeit | `formatEventSchedule` | Wochentag, Datum, Uhrzeit und Dauer, z. B. „… 17:00–19:00 Uhr · 2 Std.“; Minuten, „1 Std.“, Sommerzeit, über Mitternacht; ohne Dauer, wenn Ende ≤ Beginn; Fehler bei ungültigem Datum | `event-presentation.test.ts › F-12 AK1: zeigt Wochentag, Datum, Uhrzeit und Dauer in Stunden` (+ 4 weitere) |
+| TC-U-30 | F-05 AK1 (REV-04) | festes „jetzt“ | `describeDayLabel` heute/morgen/später, Herbst- und Frühjahrsumstellung | „Heute“, „Morgen“, sonst kurzes Datum; über die Zeitumstellung richtig; Fehler bei ungültigem Datum | `event-presentation.test.ts › F-05 AK1: rechnet über die Zeitumstellung im Herbst und Frühjahr richtig` (+ 2 weitere) |
+| TC-U-31 | F-08 AK5 | Marker mit Bildschirmfeldern | `groupOverlappingMarkers` | weit entfernte bleiben einzeln, überlappende werden Gruppe, Feldgrenze ist keine Überlappung, Gruppe im Mittel, wachsende Gruppe nimmt Nachzügler auf, Ergebnis ohne Überlappung, leere Eingabe → keine Gruppen | `marker-grouping.test.ts › F-08 AK5: im Ergebnis überlappt keine Gruppe eine andere` (+ 6 weitere) |
+| TC-U-32 | F-08 AK6 | Gruppe mit verschiedenen bzw. gleichen Orten | `canSpreadGroup`, `findMarkerBounds` | verschiedene Orte auffächerbar, gleicher Ort nicht; Ausdehnung korrekt | `marker-grouping.test.ts › F-08 AK6: Gruppe mit verschiedenen Orten lässt sich auffächern, gleicher Ort nicht` (+ 1) |
+| TC-U-33 | F-08 AK3 | Offline-Karte, Fläche fester Größe | `placeOnOfflinePlane` | Ecken/Mitte auf feste Anteile, Norden oben, skaliert mit Fläche, Einzelort mittig | `marker-grouping.test.ts › F-08 AK3: legt Ecken und Mitte auf feste Anteile der Fläche (Norden oben)` (+ 2) |
+| TC-U-34 | F-24 AK1/AK3 | Treffen eigener, besuchter, fremder Art | `splitViewerEvents` | organisiert / dabei getrennt, fremde ignoriert; ohne eigene beide leer | `viewer-events.test.ts › F-24 AK1: trennt organisierte von besuchten Treffen und ignoriert fremde` |
+| TC-U-35 | F-18 AK1 (REV-05) | Dialog mit fokussierbaren Elementen | `findTrapTarget`: Tab am letzten / Shift+Tab am ersten, Fokus außerhalb | springt zyklisch; Fokus wird hineingeholt; ohne Ziele bleibt er im Dialog | `focus-trap.test.ts › F-18 AK1: springt vom letzten zum ersten Element und rückwärts vom ersten zum letzten` (+ 2) |
+| TC-U-36 | F-01 AK5 (REV-12) | Supabase-Auth-Gateway mit Mock | Listener abbestellen, bevor der geplante Rückruf läuft | Listener wird nicht mehr aufgerufen | `supabase-gateways.test.ts › F-01 AK5: nach dem Abbestellen erreicht ein schon geplanter Rückruf den Listener nicht mehr` |
+| TC-U-37 | F-22 AK4 | Fach- bzw. technischer Fehler | `describeActionFailure` | Fachfehler behalten deutsche Meldung; Netz-/unbekannte Fehler zeigen nie die Rohmeldung | `failure-message.test.ts › F-22 AK4: technische Fehler (Netz, unbekannt) zeigen nie die Rohmeldung` |
 
 ## Komponententests
 
-Anzahl je Datei: `event-draft.test.ts` 11 · `event-card.test.tsx` 8 · `sheet-snap.test.ts` 7 · `filter-controls.test.tsx` 6 ·
-`step-fields.test.tsx` 3 · `return-path.test.ts` 2 · `map-theme.test.ts` 2 = **39**.
+Anzahl je Datei: `event-draft.test.ts` 11 · `event-card.test.tsx` 8 · `filter-controls.test.tsx` 7 · `confirm-dialog.test.tsx` 3 ·
+`step-fields.test.tsx` 3 · `return-path.test.ts` 2 = **34** (davon 21 Komponententests in jsdom).
 
 | ID | Story/AK | Vorbedingung | Eingabe | Erwartetes Ergebnis (Orakel) | Datei › Test |
 | --- | --- | --- | --- | --- | --- |
@@ -93,8 +109,14 @@ Anzahl je Datei: `event-draft.test.ts` 11 · `event-card.test.tsx` 8 · `sheet-s
 | TC-K-11 | F-06 AK1 | Filterleiste | Volleyball an, Laufen an, Volleyball aus | Filter `sports` entsprechend | `filter-controls.test.tsx › F-06 AK1: Sportarten lassen sich mehrfach wählen und wieder abwählen` |
 | TC-K-12 | F-06 AK5 | gesetzte Filter | „Filter zurücksetzen“ | alle Filter leer | `filter-controls.test.tsx › F-06 AK5: "Filter zurücksetzen" leert alle Filter` |
 | TC-K-13 | F-02 AK3 | Rücksprungziel | `weiter=/treffen/<id>` bzw. fremdes Ziel (z. B. andere Domain) | Rücksprung zu den Details bzw. Ersatzziel (kein offener Redirect) | `return-path.test.ts › F-02 AK3: lehnt fremde Ziele ab und nutzt das Ersatzziel` |
-| TC-K-14 | F-05 AK1 | Sheet | Tastatur Pfeil hoch/runter | ein Rastpunkt weiter | `sheet-snap.test.ts › stepSnapPoint F-05 AK1: Tastatur bewegt das Sheet um einen Rastpunkt` |
-| TC-K-15 | F-08 AK1 | Positron-Stil | `buildMapTheme` | Wasser bläulich-grau, Grün blass, Straßen weiß (Token-Farben) | `map-theme.test.ts › F-08 AK1: Wasser bläulich-grau, Grünflächen blass, Straßen weiß` |
+| TC-K-14 | F-05 AK1 | Sheet (jetzt `src/lib/ui`) | Tastatur Pfeil hoch/runter | ein Rastpunkt weiter | `sheet-snap.test.ts › stepSnapPoint F-05 AK1: Tastatur bewegt das Sheet um einen Rastpunkt` |
+| TC-K-15 | F-08 AK1 | Positron-Stil (jetzt `src/lib/map`) | `buildMapTheme` | Wasser bläulich-grau, Grün blass, Straßen weiß (Token-Farben) | `map-theme.test.ts › F-08 AK1: Wasser bläulich-grau, Grünflächen blass, Straßen weiß` |
+| TC-K-16 | F-18 AK1 (REV-05) | Bestätigungsdialog offen | Tab / Shift+Tab | Fokus bleibt im Dialog | `confirm-dialog.test.tsx › F-18 AK1 (REV-05): Tab und Shift+Tab bleiben im Dialog` |
+| TC-K-17 | F-18 AK1 (REV-05) | Dialog über Auslöser geöffnet | Schließen | Fokus wieder auf dem Auslöser | `confirm-dialog.test.tsx › F-18 AK1 (REV-05): nach dem Schließen liegt der Fokus wieder auf dem Auslöser` |
+| TC-K-18 | F-18 AK1 (REV-05) | Dialog, Aktion läuft bzw. nicht | Escape | bricht ab, außer während die Aktion läuft | `confirm-dialog.test.tsx › F-18 AK1 (REV-05): Escape bricht ab, außer während die Aktion läuft` |
+| TC-K-19 | F-06 AK1 (REV-06) | Filterdialog offen | Tab am letzten Element | Fokus bleibt im Filterdialog | `filter-controls.test.tsx › F-06 AK1 (REV-06): Tab bleibt im Filterdialog` |
+| TC-K-20 | F-12 AK2 (FB-45) | Treffen ohne Altersgruppe | `EventCard` rendern | „Alter: offen für alle“ | `event-card.test.tsx › F-12 AK2 (FB-45): ohne Altersgrenze steht "Alter: offen für alle"` |
+| TC-K-21 | F-06 AK2/AK3 | Filterleiste | „Heute“, „Morgen“, „Diese Woche“; Datum wählen | Zeitraum-Filter entsprechend bzw. `date` mit diesem Tag | `filter-controls.test.tsx › F-06 AK2: Zeitraum "Heute", "Morgen" und "Diese Woche" setzen den Filter` (+ AK3) |
 
 ## Integrationstests (vollständig)
 
@@ -122,7 +144,7 @@ Spalte „Vorbedingung“: „Entdecken“ = Startseite geöffnet, Erstbesuch-Hi
 | TC-A-05 | F-01 AK4 | Konto vorhanden, abgemeldet | Anmeldung mit `falsch123` | „E-Mail oder Passwort falsch.“ | `f-01-anmeldung.spec.ts › F-01 AK4: falsches Passwort lässt die Person abgemeldet` |
 | TC-A-06 | F-01 AK5 | registriert | „Abmelden“, dann „Treffen erstellen“ | Link „Anmelden“ sichtbar; URL `/anmelden?weiter=%2Ferstellen` | `f-01-anmeldung.spec.ts › F-01 AK5: nach dem Abmelden führt "Treffen erstellen" wieder zur Anmeldung` |
 | TC-A-07 | F-02 AK1 | Gast, Entdecken | Details „Basketball auf dem Exe“ | ≥ 3 Treffer; Details offen; URL ohne `anmelden` | `f-02-gast.spec.ts › F-02 AK1: Gäste sehen Treffen und Details ohne Anmeldeaufforderung` |
-| TC-A-08 | F-02 AK2/AK3 | Gast, Details „Badminton zu zweit“ | „Jetzt teilnehmen“; Anmeldung als Lea; erneut „Jetzt teilnehmen“ | URL `/anmelden?weiter=%2Ftreffen%2Fdemo-badminton-halle`; danach `/treffen/demo-badminton-halle` mit „1 von 2 Plätzen frei“ (kein Auto-Beitritt); nach Klick Status „Du bist angemeldet“, „Du bist dabei“ | `f-02-gast.spec.ts › F-02 AK2/AK3: "Jetzt teilnehmen" führt zur Anmeldung und danach zurück, ohne automatisch beizutreten` |
+| TC-A-08 | F-02 AK2/AK3 | Gast, Details „Badminton zu zweit“ | „Jetzt teilnehmen“; Anmeldung als Lea; erneut „Jetzt teilnehmen“ | URL `/anmelden?weiter=%2Ftreffen%2Fdemo-badminton-halle`; danach `/treffen/demo-badminton-halle` mit „1 von 2 Plätzen frei“ (kein Auto-Beitritt); nach Klick Status „Du bist dabei“ (BUG-02 behoben), Hinweis „Du bist dabei“ in den Details | `f-02-gast.spec.ts › F-02 AK2/AK3: "Jetzt teilnehmen" führt zur Anmeldung und danach zurück, ohne automatisch beizutreten` |
 | TC-A-09 | F-02 AK4 | Gast, Entdecken | „Treffen erstellen“ | URL `/anmelden`, Überschrift „Anmelden“ | `f-02-gast.spec.ts › F-02 AK4: Gäste landen bei "Treffen erstellen" in der Anmeldung` |
 | TC-A-10 | F-31 AK1/AK2 | Erstbesuch | Hinweis lesen, „Treffen entdecken“, neu laden | drei Schritte „Sportart auswählen“, „Treffen finden“, „Gemeinsam Sport machen“; nach Schließen und Neuladen kein Hinweis | `f-02-gast.spec.ts › F-31 AK1/AK2: Erstbesuch-Hinweis erklärt SportMate in drei Schritten und bleibt nach dem Schließen weg` |
 | TC-A-11 | F-32 AK1 | lokaler Modus | `/` und `/profil` | „Demo-Modus – Beispieldaten, nichts wird gespeichert“ auf beiden | `f-02-gast.spec.ts › F-32 AK1: im lokalen Modus steht dauerhaft der Demo-Hinweis` |
@@ -138,11 +160,11 @@ Spalte „Vorbedingung“: „Entdecken“ = Startseite geöffnet, Erstbesuch-Hi
 | TC-A-21 | F-07 AK3 | Entdecken | Tischtennis + „Fortgeschritten“ | „Keine Treffen gefunden“ | `f-06-filter.spec.ts › F-07 AK3: kein passendes Treffen ergibt den Leerzustand` |
 | TC-A-22 | F-09 AK1 | Entdecken | Suche `duburg` | Trefferzahl 1, „Tischtennis in der Duburg“ | `f-06-filter.spec.ts › F-09 AK1: "duburg" findet nur das Treffen in der Duburg` |
 | TC-A-23 | F-09 AK2 | Entdecken | Suche `"   "` | Trefferzahl = Ausgangszahl | `f-06-filter.spec.ts › F-09 AK2: nur Leerzeichen zeigt alle Treffen` |
-| TC-A-24 | F-08 AK1 | Entdecken | Chip Fußball | Marker = Karten = Trefferzahl; nach Filter weniger und Marker = neue Zahl | `f-08-karte.spec.ts › F-08 AK1: Anzahl der Marker entspricht der Trefferzahl, auch nach dem Filtern` |
+| TC-A-24 | F-08 AK1 | Entdecken | Chip Fußball | Kennungen auf der Karte (Marker und Gruppen) = Kennungen der Liste = Trefferzahl; nach Filter weniger, wieder gleich | `f-08-karte.spec.ts › F-08 AK1: Karte zeigt genau die Treffen der Liste (einzeln oder gruppiert), auch nach dem Filtern` |
 | TC-A-25 | F-08 AK2 | Entdecken, mobil Sheet auf „peek“ | Klick Marker `demo-tischtennis-duburg` | URL `/treffen/demo-tischtennis-duburg`, Überschrift, Marker `aria-pressed="true"` | `f-08-karte.spec.ts › F-08 AK2: Klick auf einen Marker öffnet die Details und markiert ihn` |
 | TC-A-26 | F-08 AK3 | Offline-Karte | Details über die Liste öffnen | „Karte offline“, „Karte nicht verfügbar“; Liste bedienbar | `f-08-karte.spec.ts › F-08 AK3: ohne Kartenkacheln bleibt die Liste bedienbar und die Karte ist als offline gekennzeichnet` |
 | TC-A-27 | F-08 AK4 | Viewport 360×740 | Entdecken, Details, `/anmelden` | `scrollWidth − clientWidth ≤ 0` auf allen drei | `f-08-karte.spec.ts › F-08 AK4: bei 360 px Breite gibt es kein seitliches Scrollen` |
-| TC-A-28 | F-12 AK1 | Entdecken | Details „Fußball am Campus – Anfänger willkommen“ | „Fußball“, „17:00–19:00 Uhr“, „Campus Flensburg, Sportplatz (Beispiel)“, „Niveau: Anfänger“, „Anfänger willkommen“, „5 von 10 Plätzen frei“ | `f-12-details.spec.ts › F-12 AK1: zeigt Sportart, Zeit, Treffpunkt, Niveau und freie Plätze` |
+| TC-A-28 | F-12 AK1 | Entdecken | Details „Fußball am Campus – Anfänger willkommen“ | „Fußball“, Termin im Format `Wt, TT.MM., 17:00–19:00 Uhr · 2 Std.` (regulärer Ausdruck), „Campus Flensburg, Sportplatz (Beispiel)“, „Niveau: Anfänger“, „Anfänger willkommen“, „5 von 10 Plätzen frei“ | `f-12-details.spec.ts › F-12 AK1: zeigt Sportart, Zeit, Treffpunkt, Niveau und freie Plätze` |
 | TC-A-29 | F-12 AK2 | Entdecken | Details „Basketball auf dem Exe“ | „Alter: 20–25 Jahre“ | `f-12-details.spec.ts › F-12 AK2: Altersangabe ist eindeutig mit Jahren beschriftet` |
 | TC-A-30 | F-12 AK4 | Entdecken | Details „Volleyball an der Hafenspitze“ | Button „Ausgebucht“ deaktiviert; kein „0 von 4 Plätzen frei“ | `f-12-details.spec.ts › F-12 AK4: ausgebuchtes Treffen zeigt "Ausgebucht" statt "0 von 4 Plätzen frei"` |
 | TC-A-31 | F-12 AK5 | – | Direktlink `/treffen/demo-volleyball-ostseebad` | „Abgesagt“, kein „Jetzt teilnehmen“ | `f-12-details.spec.ts › F-12 AK5: abgesagtes Treffen per Direktlink zeigt "Abgesagt" ohne Teilnahme-Button` |
@@ -159,13 +181,21 @@ Spalte „Vorbedingung“: „Entdecken“ = Startseite geöffnet, Erstbesuch-Hi
 | TC-A-42 | F-17 AK4 | Lea, Schritt 3 | Plätze 51 | „zwischen 2 und 50“, URL bleibt `/erstellen` | `f-17-erstellen.spec.ts › F-17 AK4: 51 Plätze werden abgelehnt` |
 | TC-A-43 | F-17 AK5 | 360×740 | `/` | Link „Treffen erstellen“ im sichtbaren Bereich | `f-17-erstellen.spec.ts › F-17 AK5: "Treffen erstellen" ist auf 360 px ohne Scrollen sichtbar` |
 | TC-A-44 | F-22 AK5 | Gast | Karte Basketball | Button „Jetzt teilnehmen“ sichtbar | `f-22-teilnahme.spec.ts › F-22 AK5: Karten mit freien Plätzen tragen "Jetzt teilnehmen"` |
-| TC-A-45 | F-22 AK1, F-24 | Lea, Details Badminton zu zweit | „Jetzt teilnehmen“, dann Meine Treffen | Status „Du bist angemeldet“ (Text betroffen von BUG-02); „Ausgebucht“; Eintrag mit „Angemeldet“ | `f-22-teilnahme.spec.ts › F-22 AK1: Beitritt zeigt "Du bist angemeldet", danach ausgebucht und unter Meine Treffen` |
-| TC-A-46 | F-22 AK1 | Lea, Entdecken | „Jetzt teilnehmen“ auf Karte Basketball | Status „Du bist angemeldet“, „Dabei“, „5 von 10 Plätzen frei“ | `f-22-teilnahme.spec.ts › F-22 AK1: Beitritt direkt aus der Liste` |
+| TC-A-45 | F-22 AK1, F-24 | Lea, Details Badminton zu zweit | „Jetzt teilnehmen“, dann Meine Treffen | Status „Du bist dabei“; „Ausgebucht“; Eintrag mit „Angemeldet“ | `f-22-teilnahme.spec.ts › F-22 AK1: Beitritt zeigt "Du bist dabei", danach ausgebucht und unter Meine Treffen` |
+| TC-A-46 | F-22 AK1 | Lea, Entdecken | „Jetzt teilnehmen“ auf Karte Basketball | Status „Du bist dabei“, „Dabei“, „5 von 10 Plätzen frei“ | `f-22-teilnahme.spec.ts › F-22 AK1: Beitritt direkt aus der Liste` |
 | TC-A-47 | F-22 AK2 | Lea | Karte und Details Volleyball an der Hafenspitze | Button „Ausgebucht“ deaktiviert, kein „Jetzt teilnehmen“ | `f-22-teilnahme.spec.ts › F-22 AK2: ausgebuchtes Treffen bietet keinen Beitritt` |
-| TC-A-48 | F-23 AK1 | Tom, Details „Strandlauf Solitüde“ (10 von 12 frei) | „Teilnahme zurückziehen“, Dialog „Zurückziehen“ | Status „Teilnahme zurückgezogen“, „11 von 12 Plätzen frei“, nicht mehr unter Meine Treffen | `f-22-teilnahme.spec.ts › F-23 AK1: Teilnahme zurückziehen gibt den Platz frei und entfernt das Treffen aus Meine Treffen` |
+| TC-A-48 | F-23 AK1 | Tom, Details „Strandlauf Solitüde“ (10 von 12 frei) | „Teilnahme zurückziehen“, Dialog „Zurückziehen“ | Status „Du bist nicht mehr dabei“, „11 von 12 Plätzen frei“, nicht mehr unter Meine Treffen | `f-22-teilnahme.spec.ts › F-23 AK1: Teilnahme zurückziehen gibt den Platz frei und entfernt das Treffen aus Meine Treffen` |
 | TC-A-49 | F-24 AK1/AK2 | Lea | Meine Treffen › „Ich organisiere“ | Strandlauf mit „Organisiert von dir“, Beachvolleyball mit „Abgesagt“ | `f-22-teilnahme.spec.ts › F-24 AK1/AK2: zeigt organisierte Treffen mit "Organisiert von dir" und abgesagte mit "Abgesagt"` |
 | TC-A-50 | F-24 AK3 | Lea ohne Teilnahmen | Meine Treffen | „Noch keine Treffen“, Link „Zur Übersicht“ | `f-22-teilnahme.spec.ts › F-24 AK3: ohne Teilnahmen erscheint "Noch keine Treffen" mit Link zur Übersicht` |
 | TC-A-51 | F-18 AK1 | Lea, Details Strandlauf Solitüde | „Treffen absagen“, Dialog bestätigen, „Alle Treffen“ | Status „Treffen abgesagt“, „Abgesagt“; nicht mehr in Liste, kein Marker `demo-laufen-solitude` | `f-22-teilnahme.spec.ts › F-18 AK1: Organisatorin sagt ab; Treffen ist abgesagt und verschwindet aus Liste und Karte` |
+| TC-A-52 | F-12 AK3 (FB-45) | Entdecken | Details „Lockere Laufrunde im Volkspark“ | „Alter: offen für alle“ (exakt) | `f-12-details.spec.ts › F-12 AK2 (FB-45): Treffen ohne Altersgrenze zeigt "Alter: offen für alle"` |
+| TC-A-53 | F-01 AK6 | Lea angemeldet | `/anmelden` erneut öffnen, „Zum Profil“ | „Du bist bereits angemeldet als Lea.“, kein E-Mail-Feld; Link führt zu `/profil` | `f-01-anmeldung.spec.ts › F-01 AK6: wer angemeldet ist und /anmelden öffnet, sieht einen Hinweis mit Link zum Profil statt des Formulars` |
+| TC-A-54 | F-05 AK2 | Viewport 320×640 | Entdecken | mindestens eine Meta-Zeile bricht um; Trennpunkt am Zeilenanfang liegt im abgeschnittenen Rand (unsichtbar); kein Element bricht in sich um (< 24 px hoch) | `f-05-liste.spec.ts › F-05 AK2: Meta-Angaben brechen ohne Trennpunkt am Zeilenanfang um (320 px)` |
+| TC-A-55 | F-05 AK2 | nur Mobile Chrome (Desktop: gewollt übersprungen) | Karte „Basketball auf dem Exe“ | Niveau, „Alter: 20–25 Jahre“ und Kosten: 3 Elemente auf gleicher Höhe | `f-05-liste.spec.ts › F-05 AK2: Niveau, Alter und Kosten passen auf Mobilgeräten in eine Zeile` |
+| TC-A-56 | F-05 AK5 | `/` | Tab-Leiste: Meine Treffen → Treffen erstellen → Profil → Entdecken (echte Klicks) | jeweils passende URL; „Entdecken“ mit `aria-current="page"`; kein Next.js-Dev-Tools-Knopf | `smoke.spec.ts › F-05 AK5: Tab-Leiste führt per Klick zu allen vier Zielen und zurück zu Entdecken` |
+| TC-A-57 | F-08 AK5 | Entdecken, Karte sichtbar | – | Karte = Liste; keine zwei Marker-/Gruppen-Pillen überlappen (Bounding Boxes paarweise) | `f-08-karte.spec.ts › F-08 AK5: Marker und Gruppen überlappen sich nicht` |
+| TC-A-58 | F-08 AK6 | Entdecken, Karte sichtbar | Klick auf erste Gruppe, dann „Alle Treffen auf der Karte zeigen“ | Gruppe trägt ihre Anzahl; danach jedes Mitglied als einzelner Marker sichtbar; zurück: Karte = Liste | `f-08-karte.spec.ts › F-08 AK6: Klick auf eine Gruppe mit Anzahl fächert ihre Treffen einzeln auf` |
+| TC-A-59 | F-24 AK4 | Lea angemeldet | Profil; dann Beitritt Basketball; Profil; „Deine Treffen ansehen“ | Zähler „dabei“ 0 → 1, „organisiert“ 2; Link führt zu `/meine-treffen` mit 1 Eintrag | `f-22-teilnahme.spec.ts › F-24 AK4: Profil zählt Treffen "dabei" und "organisiert" wie Meine Treffen und verlinkt dorthin` |
 
 ## Manuelle und explorative Testfälle
 
